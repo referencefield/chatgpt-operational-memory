@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Advisory structural validator for ChatGPT Operational Memory.
+"""Advisory structural validator for Operational Memory.
 
 This intentionally checks only machine-verifiable repository invariants.
 Semantic questions remain part of the ChatGPT health check described in OPERATIONS.md.
@@ -22,6 +22,8 @@ except ImportError:  # pragma: no cover
 ROOT = Path(__file__).resolve().parents[1]
 ERRORS: list[str] = []
 WARNINGS: list[str] = []
+LEGACY_REPOSITORY_SLUG = "chatgpt" + "-operational-memory"
+LEGACY_PROJECT_NAME = "ChatGPT" + " Operational Memory"
 
 
 def error(message: str) -> None:
@@ -170,6 +172,27 @@ def budget_bytes(path: str, limit: int, label: str) -> None:
         warn(f"soft budget crossed: {label} is {target.stat().st_size} bytes > {limit}")
 
 
+def check_legacy_project_naming() -> None:
+    forbidden = (
+        "referencefield/" + LEGACY_REPOSITORY_SLUG,
+        "template_name=" + LEGACY_REPOSITORY_SLUG,
+        LEGACY_PROJECT_NAME,
+    )
+    text_suffixes = {".md", ".yaml", ".yml", ".py"}
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or ".git" in path.parts:
+            continue
+        if path.suffix.lower() not in text_suffixes:
+            continue
+        text = read_text(path)
+        for term in forbidden:
+            if term in text:
+                error(
+                    f"legacy project/repository naming remains in {path.relative_to(ROOT)}"
+                )
+                break
+
+
 def load_manifest() -> dict:
     manifest_path = require_file("PROTOCOL.yaml", "protocol manifest")
     if not manifest_path.is_file():
@@ -211,6 +234,8 @@ def main() -> int:
     if not manifest:
         print_results()
         return 1
+
+    check_legacy_project_naming()
 
     version = str(manifest.get("protocol_version", "")).strip()
     if not version:
