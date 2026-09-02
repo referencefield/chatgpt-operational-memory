@@ -1,437 +1,344 @@
 # ChatGPT Operational Memory
 
-A low-infrastructure GitHub template for ChatGPT users who want explicit, user-owned working state with conversational GitHub writeback and post-write verification.
+A low-infrastructure GitHub template for ordinary ChatGPT users who want important working state to survive across conversations in a form they can inspect, correct, version, and own.
 
-The goal is simple: keep the small amount of state that actually needs to survive a conversation somewhere you can inspect, correct, version, and own.
+The template starts simple, but it is designed to **grow without turning into an uncontrolled knowledge base**.
 
-This is designed for ordinary ChatGPT users. You do not need a terminal, local agent framework, vector database, MCP server, or Git expertise for normal use.
+It gives ChatGPT:
 
-## What this is architecturally
+- one runtime front door;
+- explicit global working state and durable decisions;
+- a durable place for collaboration preferences and accumulated working-style calibration;
+- a project registry and project-local front doors for multiple ongoing workstreams;
+- routing rules that prefer existing sources of record before creating new files;
+- visible retrieval, persistence, conflict, and scaling signals.
 
-This is a **lightweight operating protocol**, not a server-side enforcement engine.
+You do not need a terminal, local agent framework, vector database, MCP server, or Git expertise for normal use.
 
-GitHub provides the durable files, version history, and some mechanical protections such as current-version/blob preconditions when the available integration exposes them. ChatGPT performs retrieval, interpretation, selective persistence, reconciliation, and most failure reporting by following the operating instructions in this repository and your ChatGPT instructions.
+## The core idea
 
-That distinction matters. The repository makes important state more explicit, inspectable, correctable, and verifiable, but many safeguards remain behavioral rather than independently enforced. If you require typed APIs, deterministic schema validation, atomic multi-file transactions, CI-enforced invariants, automated secret scanning, or a memory service that can reject invalid state outside the model's discretion, this lightweight template is not the right endpoint. See **Prior art and advanced alternatives** below.
+ChatGPT already has native memory, chat history, Projects, and conversation context. Those features are useful and this template does not replace them.
 
-## Who this is for
+This repository is for the smaller class of state that is important enough to **govern future work** and valuable enough that you want to know where it lives.
 
-This template is intentionally narrow.
-
-It is for people who:
-
-- primarily work in ordinary ChatGPT chats or Projects;
-- want important working state to survive across conversations;
-- are comfortable creating a private GitHub repository and connecting ChatGPT to it;
-- want a small, inspectable state surface rather than an autonomous memory stack;
-- do not want to install local agent frameworks, databases, MCP servers, or command-line tooling just to preserve continuity.
-
-It is probably **not** the right endpoint if you want autonomous agents, vector retrieval, multi-agent orchestration, local execution, formal evidence/authority contracts, automatic memory consolidation, or a developer-facing memory API. See **Prior art and advanced alternatives** below for projects that go further in those directions.
-
-## What this is good for
-
-This template is most useful when a normal ChatGPT conversation produces a small amount of working state that will matter later.
-
-Typical examples:
-
-- **Long-running project continuity:** carry forward the current objective, active work, constraints, and open material questions without reconstructing them from old chats.
-- **Durable decisions:** preserve a decision such as “we chose option B” together with the brief reason it should continue governing future work.
-- **Corrections that should stick:** record that an earlier assumption was wrong or superseded so it does not keep resurfacing as active state.
-- **Resuming after time away:** return days or weeks later and reload the explicitly recorded current state before continuing research, planning, writing, or other ongoing work.
-
-This is not intended to archive every conversation or replace ChatGPT's native personalization features. It is for the smaller class of state that is important enough to survive the chat and explicit enough that you want to inspect and own it.
-
-## What changes in practice
-
-This template is not trying to make ChatGPT “remember everything.” ChatGPT can already use whatever memory, chat history, Project context, and current-conversation context are available on your account and surface. This repository adds a separate, explicit operational record for the smaller set of facts and decisions important enough to govern ongoing work.
-
-| Situation | ChatGPT out of the box | With this repo connected |
-| --- | --- | --- |
-| **Starting a fresh chat later** | ChatGPT may have useful prior context available, but you may not know exactly what it is relying on. | ChatGPT can retrieve `CURRENT.md` and `DECISIONS.md` and show what was actually loaded before continuing. |
-| **You ask “Where were we?”** | ChatGPT reconstructs from the context available to that conversation. The answer may be useful, but the reconstruction itself is less explicit. | The repository contains an inspectable current objective, active work, constraints, open material questions, and active durable decisions. |
-| **You make an important decision** | The decision exists in that conversation and may influence later work, but there is no separate operational decision record unless you create one. | You can say **“Make this a durable decision.”** It is recorded in `DECISIONS.md` with explicit status and supersession fields. |
-| **You change your mind later** | Old and new positions can both exist across prior conversations or memory. ChatGPT must infer which one now governs. | The newer decision can explicitly supersede the old one. The old decision remains historical but is no longer active authority. |
-| **You correct an old assumption** | You can correct ChatGPT in conversation, but later use of that correction depends on the context available to the future chat. | You can correct the recorded operational state so future repo-backed work loads the explicit correction. |
-| **Something important changes casually during a long chat** | It remains in the conversation, but there is no separate visible signal that it became durable operational state. | Assisted persistence can record clear, non-sensitive current-state changes in `CURRENT.md` and tell you what was persisted. |
-| **You wonder whether something was actually saved** | There is normally no Git-style transaction receipt for an ordinary conversational fact. | A successful write should produce readback verification and, when GitHub exposes it, a real commit receipt such as `Persisted: changed launch date · CURRENT.md · commit a1b2c3d`. |
-| **ChatGPT gives the right prior answer** | A correct answer does not necessarily tell you whether it came from memory, project/chat context, the current conversation, or inference. | The workflow treats content agreement alone as insufficient proof. The relevant repository retrieval should be observable and correctly targeted. |
-| **Only part of the relevant prior state is available** | ChatGPT may still try to answer using whatever context is available. Missing context may not always be obvious. | If only one required state file was retrieved, the workflow should report **partial retrieval** rather than claim operational memory is fully loaded. |
-| **Something goes wrong while recording state** | There usually is no separate operational-state transaction to inspect. | The workflow is designed to fail visibly: **not persisted**, **not verified**, **partial retrieval**, or **operational memory is temporarily inconsistent**, depending on the failure. |
-| **Two sessions or a manual GitHub edit collide** | Native conversational memory does not expose this as a versioned file-write problem. | Existing-file updates can use the current GitHub blob/version as a write precondition so stale writes are rejected and reconciled rather than blindly overwriting newer state. |
-| **You want to inspect what should govern future work** | Relevant context may be distributed across memories, chats, Projects, and the current conversation. | Open `CURRENT.md` and `DECISIONS.md`. The active operational state is intentionally small and human-readable. |
-| **You finish an important work session** | You normally end the chat and rely on whatever context is available next time or on notes you maintain separately. | Say **“Close out operational memory.”** ChatGPT can check for unpersisted durable changes, compact current state, reconcile decisions, verify writes, and report what changed. |
-| **You want revision history or recovery** | Chat history preserves conversations, but not a compact revision history of this explicit operational record. | Git preserves the change history of `CURRENT.md` and `DECISIONS.md`, giving you version history and recovery for the recorded state. |
-| **You want portability** | Native ChatGPT context is a ChatGPT product capability. | The durable operational state is ordinary Markdown in a GitHub repository you control. |
-| **You just want casual personalization** | Native ChatGPT memory is usually the simpler fit. | This repository is probably unnecessary overhead. It is aimed at operational continuity, not replacing ordinary personalization. |
-| **You have a one-off casual conversation** | Just chat. | Also just chat. The repository should stay out of the way because nothing needs durable operational persistence. |
-
-The practical difference is not **“ChatGPT remembers more.”** It is closer to this:
+The practical difference is not “ChatGPT remembers more.” It is:
 
 **Out of the box:** “ChatGPT may have useful context available.”
 
-**With this repository:** “For the parts important enough to govern ongoing work, I can inspect what was loaded, what is recorded as current, what decisions remain active, what changed, and whether that change actually persisted.”
+**With this repository:** “For the parts important enough to govern ongoing work, I can see how ChatGPT routed the task, what durable state it loaded, what is current, what decisions remain active, what working preferences apply, and whether changes were actually persisted.”
 
-There is a tradeoff: this workflow adds some ceremony. You set up GitHub once, may need to invoke `@GitHub` when automatic selection does not occur, and will occasionally see retrieval or persistence receipts. If you do not value that extra inspectability and control, native ChatGPT behavior may be the better fit.
+## Architecture at a glance
 
-## 60-second operating model
+A fresh session should not load the whole repository.
 
-After completing [`SETUP.md`](SETUP.md), normal use is intentionally simple.
+`START_HERE.md` is the runtime front door:
 
-### When prior state matters
+```text
+user request
+    |
+    v
+START_HERE.md
+    |
+    +-- no durable state needed -> ordinary ChatGPT conversation
+    |
+    +-- global / cross-project work
+    |      +-- CURRENT.md
+    |      +-- DECISIONS.md
+    |
+    +-- collaboration / working preference
+    |      +-- WORKING_STYLE.md
+    |
+    +-- project-specific work
+           +-- PROJECTS.md
+                  |
+                  v
+             projects/<slug>/PROJECT.md
+                  +-- CURRENT.md
+                  +-- DECISIONS.md
+                  +-- only other registered sources actually needed
+```
 
-Invoke GitHub explicitly if needed and say:
+The goal is **route first, retrieve second**. A project-specific question should not cause ChatGPT to load every other project.
 
-> `@GitHub Load my operational-memory repository. Retrieve both CURRENT.md and DECISIONS.md before we continue.`
+## What changes in practice
 
-A complete operational-memory load means **both files were actually retrieved from the intended repository**. ChatGPT should give you a compact retrieval receipt when GitHub exposes the identifiers, for example:
+| Situation | ChatGPT out of the box | With this repo connected |
+| --- | --- | --- |
+| **Starting a fresh chat later** | ChatGPT may have useful prior context, but you may not know exactly what it is relying on. | ChatGPT can enter through `START_HERE.md`, route to the relevant durable state, and show what was actually retrieved. |
+| **You ask “Where were we?”** | ChatGPT reconstructs from the context available to that conversation. | The appropriate global or project current-state file provides an explicit recorded answer. |
+| **You have several ongoing projects** | Context can be distributed across chats, Projects, files, and memory. | `PROJECTS.md` routes each workstream to its own project front door so unrelated projects do not share one giant state file. |
+| **You make an important decision** | The decision exists in the conversation and may influence later work. | A durable decision is recorded in the correct global or project `DECISIONS.md` with explicit supersession. |
+| **You change your mind later** | Old and new positions can coexist across prior context. | The new decision can explicitly supersede the old one so stale history does not remain active authority. |
+| **You repeatedly teach ChatGPT how you like to work** | Native personalization may help, but the durable collaboration rule may not be visible as a project artifact. | Stable, collaboration-relevant preferences can be recorded in `WORKING_STYLE.md`, corrected, superseded, and inspected. |
+| **You say “record this”** | There is no Git-backed routing transaction. | ChatGPT must classify the material, prefer an existing source of record, and route it to global current state, a global decision, working style, a project, or `NOT-V1`. The instruction does not authorize arbitrary file creation. |
+| **Something does not fit anywhere** | The conversation can continue without a formal structural signal. | ChatGPT should say the material has no legitimate current home rather than inventing a file. Repeated `NOT-V1` candidates become a growth signal. |
+| **You wonder whether something was actually saved** | There is normally no Git-style receipt for an ordinary conversational fact. | Consequential writes should be read back and, when GitHub exposes it, accompanied by a real commit receipt. |
+| **Only part of required state was retrieved** | ChatGPT may still try to answer from partial context. | The workflow reports incomplete/partial retrieval and should not claim the relevant operational state is fully loaded. |
+| **Two sessions edit the same file** | Native conversational memory does not expose a versioned write conflict. | Existing-file updates can use the current GitHub blob/version as a precondition so stale writes are rejected and reconciled. |
+| **The repository starts getting messy** | There is no repository-specific growth signal. | Health/maintenance checks report `Healthy`, `Watch`, or `Outgrowing the template` and recommend the smallest structural correction. |
+| **You want portability** | Native ChatGPT context is a ChatGPT product capability. | The durable operational layer is ordinary Markdown in a GitHub repository you control. |
+| **You just want casual personalization or a one-off chat** | Native ChatGPT is usually the simpler fit. | The repository should stay out of the way. No durable state is a valid route. |
 
-`Loaded: CURRENT.md@1d8998f + DECISIONS.md@743fa79 · main · owner/repo`
+## What each durable layer is for
 
-The identifiers must come from the actual GitHub retrieval. If only one required file was retrieved, ChatGPT should say **partial retrieval** and should not claim operational memory is fully loaded.
+### `START_HERE.md` - runtime front door
 
-If your account/surface reliably selects GitHub automatically, the `@GitHub` mention may be unnecessary. Observable retrieval still matters.
+This is the first repository file a fresh session should use when durable state may matter.
 
-### During the conversation
+It decides whether repository context is needed at all, then routes to global state, working-style calibration, or the correct project. It also contains the persistence-routing gate and the growth/scale signals.
 
-The recommended Custom Instruction in `SETUP.md` tells ChatGPT to watch for clear, non-sensitive changes that are likely to matter in future chats and to persist them selectively.
+### `WORKING_STYLE.md` - accumulated collaboration calibration
 
-You can also control persistence directly with ordinary language:
+This holds stable preferences about **how the user and ChatGPT work together**, for example:
 
-- **"Record this in operational memory."**
-- **"Update current state with this."**
-- **"Make this a durable decision."**
-- **"Do not persist this."**
-- **"What do you currently have recorded about this?"**
-- **"Run a repository consistency check."**
+- preferred communication depth or formatting;
+- how much initiative ChatGPT should take;
+- evidence and uncertainty standards;
+- tool-use and verification preferences;
+- approval boundaries;
+- recurring workflow conventions;
+- corrections that should change future behavior.
 
-For routine, non-sensitive **current-state** changes, the recommended setup authorizes ChatGPT to update `CURRENT.md` and tell you what it persisted. A new durable decision should not be inferred into governing state unless you clearly authorized the decision or explicitly directed that it be recorded as durable. If the durable meaning is ambiguous, ChatGPT should ask first.
+It is deliberately **not** a biography or personality dossier. Project state does not belong there, and ambiguous model-inferred preferences require confirmation before becoming durable.
 
-When GitHub provides a real commit SHA for a write, ChatGPT should also show you a shortened commit ID derived from that SHA, for example `a1b2c3d`. Ambiguous, sensitive, destructive, public, or authority-changing writes should require confirmation.
+### `PROJECTS.md` - project registry and router
 
-### Before ending an important session
+Most people who use operational memory for long enough will have more than one ongoing workstream. That should not force all project state into root `CURRENT.md`.
 
-Optionally say:
+`PROJECTS.md` is the compact index. Each durable project gets a stable path such as:
 
-> **"Close out operational memory."**
+`projects/home-renovation/PROJECT.md`
 
-That means: retrieve both current state files, identify any material durable changes from the session that have not yet been persisted, update only what earns persistence, reconcile `CURRENT.md` with active durable decisions, verify consequential writes, and report what changed.
+That project front door tells a future session what the project is, when to route there, what the current authority is, and what to load first.
 
-This is a conversational closeout, not a new file or transcript archive.
+### Root `CURRENT.md` and `DECISIONS.md` - global state only
 
-## What this repository contains
+Root `CURRENT.md` is for cross-project current focus, coordination, constraints, and global open questions.
 
-### `CURRENT.md`
+Root `DECISIONS.md` is for durable decisions that govern multiple projects or the repository as a whole.
 
-The repository's **currently recorded working state**: current focus, active work, constraints, and open material questions.
+Once a workstream has its own project boundary, its detailed current state and project decisions belong inside that project instead of being duplicated globally.
 
-This file governs transient/current working state. Keep it compact. Replace stale state rather than accumulating a running transcript.
+### `projects/_TEMPLATE/` - latent growth skeleton
 
-### `DECISIONS.md`
+The template includes a project front door plus project-local current-state and decision files.
 
-Only durable decisions likely to matter in later conversations. Active decisions govern durable choices. Superseded decisions remain history and should not continue governing.
+Do **not** instantiate it for every topic. A project earns a durable boundary when it is explicitly ongoing, expected to span sessions, has its own state/constraints/decisions, or repeatedly produces durable material that should be retrieved together later.
 
-The decision template includes an ID, status, date, one-sentence decision, brief basis, and explicit supersession links. A new active decision should reflect clear user intent rather than an ambiguous model inference.
+## The persistence-routing gate
 
-### Git history
+“Record this in operational memory” means **route this correctly**, not “create a file.”
 
-Git provides version history, provenance, and recovery. It is also why privacy matters: material committed to Git may remain in earlier history even after a line or file is later deleted.
+Before a write, ChatGPT should classify the material:
 
-## Required environment
+1. **Existing source of record** - update it rather than duplicating state.
+2. **Global CURRENT** - cross-project transient/current state.
+3. **Global DECISION** - cross-project durable governing decision.
+4. **WORKING STYLE** - stable collaboration preference about how work should be performed.
+5. **PROJECT** - project-specific state or decision routed through `PROJECTS.md`.
+6. **NOT-V1 / no legitimate home** - do not invent structure; surface the mismatch and treat recurrence as a growth signal.
 
-This template requires a **write-capable OpenAI GitHub plugin connection**. Read-only GitHub access is not a supported operating mode.
+A new durable file outside the provided structure should be exceptional. Before one is created, it needs a distinct role, expected recurrence, a future retrieval trigger, clear authority, navigation from the relevant front door, and human visibility that the structure is expanding.
 
-Do not infer support from a ChatGPT plan name alone. This workflow is supported only on an account and surface where the required GitHub actions are actually available and the tests in [`SETUP.md`](SETUP.md) pass.
+## Growing without becoming a knowledge junk drawer
 
-## Setup
+This repository is designed to grow by **adding routing boundaries**, not by accumulating miscellaneous files.
 
-Follow [`SETUP.md`](SETUP.md). Setup covers the first-time GitHub connection, repository authorization, Custom Instructions, write/readback testing, fresh-chat recovery testing, troubleshooting, and lightweight repository maintenance.
+A typical progression is:
 
-For normal use, **`main` is the canonical branch and a one-branch repository is the desired steady state**. Ordinary ChatGPT memory writes go directly to `main`; users do not need a branching workflow. If a temporary branch is ever created, compare it with `main`, preserve any unique work, and delete it only after it is merged or deliberately abandoned. See **Repository maintenance** in `SETUP.md`.
+```text
+simple use
+  global CURRENT + DECISIONS
+        |
+        v
+stable collaboration preferences emerge
+  WORKING_STYLE
+        |
+        v
+multiple ongoing workstreams emerge
+  PROJECTS + project front doors
+        |
+        v
+individual projects need additional canonical artifacts
+  register only justified sources in that project's PROJECT.md
+        |
+        v
+routing/indexing itself becomes insufficient
+  graduate to structured/indexed/tool-backed memory
+```
 
-It verifies:
+The project skeleton should make the scaling boundary arrive much later than a flat two-file design. A normal user should be able to maintain multiple durable projects without turning the root into an uncontrolled knowledge base.
 
-1. your working repository is visibly **Private**;
-2. the correct write-capable GitHub plugin and repository are connected;
-3. create/update/readback/delete capability works;
-4. persistent ChatGPT instructions identify the repository and persistence policy;
-5. a fresh chat can retrieve a repository-only test value it has never previously seen;
-6. whether automatic GitHub selection works on your surface or explicit `@GitHub` invocation is required.
+## Built-in scale signal
 
-Automatic GitHub invocation is an optional convenience, not a prerequisite. If explicit `@GitHub` reliably retrieves and writes the correct repository, the core workflow can operate.
+A repository health or maintenance check should report:
 
-## Operating rules
+### `V1 scale status: Healthy`
 
-Normal conversation should remain normal conversation. Use the repository only when something deserves to survive the chat or when prior durable state materially affects the answer.
+Routing is clear, global files remain global, project-specific material is behind project front doors, working-style entries are compact, and required retrieval is straightforward.
 
-### Authority and conflicts
-
-Use semantic authority, not a single blind precedence stack:
-
-- the user's current explicit instruction wins;
-- `CURRENT.md` governs transient/current working state;
-- active entries in `DECISIONS.md` govern durable decisions;
-- Git history is historical evidence, not active authority by itself.
-
-If `CURRENT.md` conflicts with an active durable decision, **do not silently choose one**. Treat the repository as inconsistent, surface the conflict, and reconcile it before relying on the disputed state.
-
-### Retrieve before relying
-
-When an answer materially depends on prior work, an ongoing project, or a durable decision, retrieve **both `CURRENT.md` and `DECISIONS.md`** before relying on remembered prior context. The two-file bundle is intentionally small enough that complete retrieval is preferred over partial retrieval.
-
-Retrieval should be observable. If automatic GitHub selection does not occur, use explicit `@GitHub`. If GitHub was not retrieved, say so rather than silently substituting native memory or chat recollection.
-
-When the integration exposes file/repository identifiers, report a compact retrieval receipt containing the repository, ref/branch when available, both file paths, and real shortened blob/version identifiers derived from the retrieval metadata. Never invent retrieval identifiers.
-
-If either required file was not retrieved, explicitly report **partial retrieval** and do not treat the repository as fully loaded.
-
-**Content agreement alone is not proof of retrieval. Observable, correctly targeted retrieval is.**
-
-### Persist selectively
-
-Persist only information likely to matter again and whose future value justifies durable storage. Do not turn ordinary conversation into an archive.
-
-Good candidates include:
-
-- a changed current objective;
-- an active constraint;
-- a material change to active work;
-- a durable decision;
-- an explicit correction to durable state.
-
-Do not persist ordinary brainstorming, temporary wording choices, incidental facts, or a transcript merely because they appeared in the conversation.
-
-Routine assisted persistence may update clear, non-sensitive current state. Do not silently turn an inferred or ambiguous conversational conclusion into an active durable decision. If the user did not clearly authorize the decision or its durable status, ask before activating it.
-
-### Human override
-
-The human remains in control of persistence.
-
-A current instruction such as **"do not persist this"**, **"remove this from active state"**, or **"ask me before writing anything else this session"** overrides the routine persistence policy.
-
-Removing something from active state does not erase it from prior Git history.
-
-### Default failure behavior: closed, loud, recoverable
-
-When something important cannot be established, **do not silently continue as though it succeeded**.
-
-The preferred failure behavior is:
-
-1. **fail closed:** do not promote uncertain, stale, partially retrieved, conflicting, or unverified state into governing operational memory;
-2. **fail loud:** tell the user what failed, what is known, and what remains unverified;
-3. **preserve the last known good state:** avoid force-overwriting or destructive recovery when the failure can be reconciled safely;
-4. **provide a recovery path:** re-retrieve, reconcile, retry with the current version, or fall back to a manual GitHub edit when the connector is unavailable.
+### `V1 scale status: Watch`
 
 Examples:
 
-- incomplete retrieval -> report **partial retrieval** and do not claim memory is loaded;
-- unverified write -> report **not verified** and do not claim persistence;
-- concurrent/stale write conflict -> do not overwrite; reload the current version and reconcile;
-- one half of a coupled `CURRENT.md`/`DECISIONS.md` update fails -> report **operational memory is temporarily inconsistent** and finish reconciliation before claiming completion;
-- ambiguous durable decision -> ask before making it active;
-- connector unavailable -> say the change was **not persisted** and offer the GitHub web-edit fallback described in `SETUP.md`.
+- project-specific state is leaking into global files;
+- multiple ongoing durable workstreams are not registered as projects;
+- similar material repeatedly has no legitimate home;
+- working-style entries are duplicative or contradictory;
+- compaction is needed unusually often just to understand current state;
+- a project front door no longer points cleanly to its current authority.
+
+The first response should be a small structural correction such as registering a project, moving state into the project, superseding stale material, or creating one specifically justified source of record.
+
+### `V1 scale status: Outgrowing the template`
+
+Use this only when the routing skeleton itself is no longer sufficient, for example when correct work routinely requires broad repository search, many independent knowledge domains require indexed retrieval, active state remains too large after project scoping and compaction, or the user needs deterministic schemas/validation/transactions or a dedicated memory service.
+
+At that point, preserve this repository as a human-readable control layer and add or migrate to structured/indexed/tool-backed memory rather than continuing to bolt on Markdown.
+
+## 60-second operating model
+
+After completing [`SETUP.md`](SETUP.md), normal use should still feel like normal ChatGPT.
+
+When prior durable state matters, say:
+
+> `@GitHub Enter through START_HERE.md in my operational-memory repository and load only the durable state relevant to this task.`
+
+Useful controls include:
+
+- **“Record this in operational memory.”** Route it to the correct existing home.
+- **“Update current state with this.”** Use the appropriate global or project current-state file.
+- **“Make this a durable decision.”** Record it in the appropriate global or project decision log.
+- **“Remember this as a working preference.”** Record it in `WORKING_STYLE.md` when appropriate.
+- **“This is an ongoing project.”** Create/register a project boundary when clearly authorized.
+- **“Do not persist this.”** Override routine persistence.
+- **“What do you currently have recorded about this?”** Retrieve the relevant durable state rather than answer from recollection.
+- **“Run a repository health check.”** Check routing, consistency, project registry integrity, working-style hygiene, branches/root hygiene, and scale status.
+- **“Close out operational memory.”** Catch material durable changes that were discussed but not yet persisted.
+
+## Architectural honesty
+
+This is a **lightweight operating protocol**, not a server-side enforcement engine.
+
+GitHub provides durable files, version history, and some mechanical protections such as current-version/blob preconditions when the available integration exposes them. ChatGPT performs retrieval, interpretation, routing, selective persistence, reconciliation, and much failure reporting by following these instructions.
+
+Many safeguards therefore remain behavioral rather than independently enforced.
+
+If you require typed APIs, deterministic schema validation, atomic multi-file transactions, CI-enforced invariants, automated secret scanning, semantic/vector retrieval, or a memory service that can reject invalid state outside the model's discretion, this template is not the final endpoint.
+
+## Failure behavior
+
+The preferred failure model is **closed, loud, and recoverable**.
+
+- incomplete required retrieval -> say so and do not claim the relevant memory is loaded;
+- no legitimate persistence destination -> do not invent one;
+- stale/concurrent write -> reread and reconcile rather than overwrite;
+- unverified write -> do not claim persistence;
+- partially completed coupled update -> report the temporary inconsistency and reconcile it before success;
+- ambiguous durable decision or inferred working preference -> ask before activating it;
+- connector unavailable -> say the change was not persisted and use the documented manual fallback.
 
 A visible stop is preferable to a plausible but silently wrong success.
 
-### Verify writes and protect against stale overwrites
+## Setup
 
-For consequential durable changes, use the smallest closed loop:
+Follow [`SETUP.md`](SETUP.md).
 
-`read current state -> authorized write -> readback -> verify intended durable state`
+Setup verifies that:
 
-Immediately before updating an existing file, retrieve the current target and use the observed current file version/blob SHA as the update precondition when the integration exposes one. Do not base a late-session write on a version fetched many turns earlier.
+1. the user's working copy is private;
+2. a write-capable GitHub integration can access the intended repository;
+3. create/update/readback/delete operations actually work;
+4. existing-file updates can use current version/blob preconditions when supported;
+5. persistent ChatGPT instructions point future sessions to `START_HERE.md`;
+6. a fresh chat can retrieve a repository-only value it has never previously seen;
+7. the user understands the routing/persistence model and optional branch hardening.
 
-If GitHub or the integration rejects the update because the target changed, treat that as a **concurrency conflict**, not as a nuisance to bypass. Do not force the write or retry blindly. Re-read the current repository state, surface the competing change when material, reconcile intent, then write against the new current version.
+## Repository maintenance
 
-When the integration exposes the information, verify:
+The normal steady state uses one canonical branch, `main`. Routine ChatGPT memory writes go directly to `main`; users do not need a feature-branch workflow.
 
-- repository owner/name;
-- branch or ref;
-- exact path;
-- resulting intended content/state.
+Temporary branches should be compared with `main`, unique work preserved, and removed only when safely incorporated or deliberately abandoned.
 
-Readback verifies the recorded bytes and target. It does **not** by itself prove that ChatGPT summarized the user's intent correctly. For a new durable decision, report the exact stored one-sentence `Decision` field so the human can inspect the semantic result.
+Optional light `main` protection can block branch deletion and force pushes without blocking ordinary direct commits. See `SETUP.md`.
 
-A tool reporting that it accepted a write is not by itself proof that the intended repository state exists.
+A repository health/maintenance check should also verify:
 
-### Coupled current-state and decision changes
-
-If a durable decision changes something represented in `CURRENT.md`, reconcile both files before reporting completion.
-
-The two writes are not assumed to be atomic. If one succeeds and the other fails:
-
-- explicitly report **operational memory is temporarily inconsistent**;
-- do not present the overall change as complete;
-- re-read both files;
-- preserve any valid intervening edits;
-- complete or deliberately roll back/reconcile the coupled state before reporting success.
-
-### Give the human a commit receipt
-
-When a persistence write succeeds, report a compact receipt so the human has a visible pointer into Git history.
-
-A good receipt is:
-
-`Persisted: <short description> · <file> · commit <short SHA>`
-
-For example:
-
-`Persisted: changed launch date · CURRENT.md · commit a1b2c3d`
-
-The short commit ID must be **derived from a real commit SHA returned by GitHub or confirmed by a GitHub fetch**. Never invent or guess a commit hash. If the integration does not expose or confirm the commit SHA, say **commit ID unavailable** rather than fabricating one.
-
-Seven characters is usually sufficient for a human-facing receipt in a small repository, but a longer unambiguous prefix may be used. The receipt supplements readback verification; it does not replace it.
-
-### Keep memory healthy
-
-Operational memory should be **compacted, not merely appended**.
-
-- replace stale current-state entries instead of preserving obsolete versions in `CURRENT.md`;
-- mark durable decisions superseded when they no longer govern;
-- leave historical recovery to Git history;
-- periodically reconcile current state against active decisions;
-- do not grow the repository merely because storage is cheap.
-
-This keeps recovery fast and reduces stale-state drift.
-
-### Know when you have outgrown V1
-
-This design assumes `CURRENT.md` and `DECISIONS.md` remain small enough that ChatGPT can retrieve both completely and a human can inspect them without specialized tooling.
-
-If whole-file retrieval becomes slow, token-heavy, or difficult to reason about, treat that as a **scaling boundary**, not a reason to keep expanding the template indefinitely. First compact stale current state, supersede obsolete decisions, and rely on Git history for old versions. If the active durable state is still too large for the two-file model, move to a system with structured storage, indexing, scoped retrieval, or typed memory tools rather than proliferating more loosely governed Markdown files.
-
-The simplicity of this template is a design constraint, not a promise that two files scale without limit.
-
-### High-impact changes
-
-Before destructive, public, authority-changing, or otherwise high-impact durable changes:
-
-- confirm the current state or decision being changed;
-- do not invent user intent;
-- obtain approval when needed;
-- verify the resulting state afterward.
-
-These are behavioral safeguards, not a deterministic security boundary.
-
-### Repository consistency check
-
-The user may say **"run a repository consistency check"** or **"run a health check."**
-
-Check only what the repository can actually establish:
-
-- both required V1 state files were retrieved from the intended repository;
-- `CURRENT.md` and active durable decisions do not visibly conflict;
-- superseded decisions are not being treated as active;
-- recent consequential writes relevant to the task are observable;
-- required V1 files exist.
-
-A healthy repository does **not** prove that the real world has not changed or that an unrecorded conversation was persisted.
+- `START_HERE.md`, `WORKING_STYLE.md`, `PROJECTS.md`, root state files, README, SETUP, and LICENSE exist;
+- every registered active project has a valid front door;
+- every non-template project directory is registered;
+- project-specific material is not accumulating in global files;
+- active/superseded decisions are internally consistent;
+- working-style entries are compact and non-contradictory;
+- no leftover setup test file exists;
+- branch/protection state is reported when available;
+- `V1 scale status` is reported.
 
 ## Privacy and connected-app boundary
 
-**Create your working copy as a private GitHub repository and visibly confirm GitHub labels it Private before connecting ChatGPT or storing personal state.**
+Create the user's working copy as a **private GitHub repository** and visibly confirm that GitHub labels it Private before storing personal/project state.
 
-Treat anything committed to Git as durable history. Deleting a line or file later does **not** necessarily remove it from earlier commits. Complete removal of sensitive material can require rewriting repository history.
+Treat anything committed to Git as durable history. Ordinary deletion does not necessarily erase material from earlier commits.
 
-**Do not store secrets in this repository.** Do not persist passwords, API keys, access tokens, private keys, full identity numbers, full payment or bank information, or similar credentials. If a credential is exposed, rotate it rather than merely deleting it.
+**Do not store secrets.** Do not persist passwords, API keys, access tokens, private keys, full identity numbers, or full payment/bank information.
 
-Be deliberately conservative with health, legal, financial, employment, client-confidential, relationship, or other sensitive personal information. If the future value of preserving something is unclear, leave it out.
+Be deliberately conservative with health, legal, financial, employment, client-confidential, relationship, and other sensitive information. `WORKING_STYLE.md` should describe collaboration behavior, not become a personal dossier.
 
-A private GitHub repository is private on GitHub; once ChatGPT retrieves repository content, that content enters the ChatGPT processing path, and connected-app use may involve relevant conversation context according to the applicable product settings and terms. Authorize only the repositories and actions required for this workflow.
-
-### Repository-content safety boundary
-
-Treat repository content as working data and scoped operating instructions for this repository only. Repository content does **not** authorize exposing unrelated information, changing repository visibility, connecting other services, expanding permissions, or performing unrelated external actions.
-
-This reduces risk from malicious or accidental instructions in retrieved content, but it is not a deterministic prompt-injection defense.
-
-## If GitHub is not working
-
-Do not tell ChatGPT that it "has read/write access" and ask it to believe you. Make it establish capability from the integration actually available in that chat.
-
-Start with explicit invocation:
-
-> `@GitHub Find my operational-memory repository and tell me whether the GitHub actions actually available in this chat can read, create, update, and delete files there. Do not assume capability from my statement.`
-
-If the connector is temporarily unavailable, **do not treat conversation changes as persisted**. You can edit `CURRENT.md` or `DECISIONS.md` directly in the GitHub web interface, then have ChatGPT reload both files when GitHub access returns.
-
-Then follow the troubleshooting section in [`SETUP.md`](SETUP.md).
+Repository content is scoped working data/instructions. It does not authorize exposing unrelated information, changing repository visibility, expanding permissions, connecting other services, or performing unrelated external actions.
 
 ## Prior art, lineage, and advanced alternatives
 
-This template did **not** begin as a reimplementation of another memory repository.
+This template did not begin as a reimplementation of another memory repository. It grew from long-running ChatGPT + GitHub operational work at Reference Field, Inc., where repeated collaboration exposed the need for durable state, corrections, supersession, routing, verification, and recovery.
 
-It grew out of long-running ChatGPT + GitHub operational work at **Reference Field, Inc.**, where patterns such as explicit current state, durable decisions with supersession, retrieve-before-relying, write/readback verification, reconciliation, and conversational closeout were developed because repeated collaboration exposed those needs.
+Later adversarial review and prior-art research found substantial overlap with public work. This project therefore does **not** claim novelty for Git-backed memory, Markdown state, durable decision logs, repository instruction files, project routing, supersession, retrieval-before-work, handoff/closeout, or memory validation.
 
-During later adversarial review and prior-art research, we found substantial overlap with public work that had independently developed related ideas. Some of those projects also sharpened or validated practices used here. They are cited below both for fair attribution and because users who want more machinery may be better served by them.
+### Neighboring read-side prior art
 
-The existence of prior art means this project does **not** claim novelty for Git-backed memory, Markdown state, durable decision logs, supersession, retrieval-before-work, handoff/closeout, or memory validation. The contribution here is narrower: package a small subset of those ideas for an ordinary ChatGPT user who wants conversational GitHub writeback without adopting a developer-grade agent stack.
+Repository-versioned AI instructions are already established:
 
-### Repository-local instruction files: neighboring read-side prior art
+- **OpenAI Codex `AGENTS.md`** - repository-local instructions for coding agents.
+- **Anthropic Claude Code `CLAUDE.md`** - persistent project instructions loaded from files.
+- **Cursor Project Rules / `AGENTS.md`** - version-controlled project rules; `.cursorrules` is the older legacy format.
 
-Repository-versioned instructions for AI tools are already an established pattern. Examples include:
+Those systems demonstrate the read-side pattern. This template's narrower emphasis is ordinary ChatGPT use plus mutable operational state, conversational writeback, project routing, working-style calibration, explicit decision supersession, observable retrieval, and post-write verification.
 
-- **OpenAI Codex `AGENTS.md`** — https://github.com/openai/codex/blob/main/docs/agents_md.md  
-  Repository-local instructions tell a coding agent how to work in a codebase and can be scoped by directory.
-- **Anthropic Claude Code `CLAUDE.md`** — https://code.claude.com/docs/en/memory  
-  Claude Code loads persistent project instructions from version-controlled Markdown files and also distinguishes those instructions from auto memory.
-- **Cursor Project Rules / `AGENTS.md`** — https://docs.cursor.com/context/rules  
-  Cursor supports version-controlled project rules and `AGENTS.md`; its older `.cursorrules` format is legacy/deprecated.
+### If you need stronger memory infrastructure
 
-These systems are important prior art for the **read side** of the pattern: putting durable instructions or context in a repository so an AI tool can load them in later sessions. This template overlaps with that idea but has a different center of gravity. It targets ordinary ChatGPT users and emphasizes a small mutable operational-state surface, conversational writeback, explicit decision supersession, observable retrieval, and post-write verification rather than coding-agent instruction files alone.
+Relevant neighboring systems include:
 
-### If you want something more advanced
+- **Context Spine v2** - more formal state, authority, handoff, and execution-evidence protocols.
+- **Letta / MemFS** - Git-backed memory in a stateful agent harness.
+- **Agent Zero** - richer persistent/vector memory in a full agent framework.
+- **ProjectMemory** - structured project memory exposed through MCP.
+- **context-repository** - formal context/provenance contracts and governance patterns.
 
-- **Context Spine v2** — https://github.com/BerniceHole/context-spine  
-  A small but more formal state-and-authority protocol for recoverable human-AI project work across chats, agents, coding tools, hosts, and unattended runs. It uses explicit current state, decisions, handoff, authority, and execution evidence. Consider it if you are managing software projects, multiple agents, automation, or stronger authority/evidence requirements.
-
-- **Letta / MemFS (Context Repositories)** — https://github.com/letta-ai/letta-code and https://github.com/letta-ai/letta-docs-md/blob/main/concepts/memfs/index.md  
-  A memory-first agent ecosystem with a Git-backed Markdown memory filesystem, always-loaded and selectively retrieved memory, direct editing, versioning, and agent-managed context. Consider it if you want a stateful agent harness rather than a lightweight ChatGPT workflow.
-
-- **Agent Zero** — https://github.com/agent0ai/agent-zero  
-  A full agent framework with persistent vector-based memory, automatic conversation memory, knowledge import, consolidation, scoped stores, and a memory-management UI. Consider it if you want autonomous/local agent behavior and richer memory infrastructure.
-
-- **ProjectMemory** — https://github.com/micsh/ProjectMemory  
-  An MCP server using a structured project knowledge store for conventions, decisions, lessons, known issues, consolidation, forgetting, and export/import. Consider it if you are a developer comfortable running MCP infrastructure and want project memory exposed as tools.
-
-- **context-repository** — https://github.com/evanfollis/context-repository  
-  A formal context/provenance specification and pattern lab covering claims, evidence, decisions, policy, promotion, realization, and event logs, plus a file-based resumable-context pattern. Consider it if your priority is formal contracts, provenance, validation, or context governance rather than minimal setup.
-
-### Research worth knowing about
-
-- **Supersede** — https://github.com/Vrin-cloud/supersede  
-  Research and tooling focused specifically on temporal fact-currency: teaching/evaluating agents to use the current fact instead of a stale superseded one. Its problem statement directly reinforces why this template distinguishes active decisions from superseded history.
-
-- **Filesystem-Based Memory for LLM Agents: Organization, Evolution, and Sustainability** — https://arxiv.org/abs/2607.26637  
-  Research on long-term filesystem-based agent memory. Among other findings, it cautions that maintaining organization as memory grows is difficult and that organization can degrade, supporting this template's deliberate bias toward a very small active memory surface instead of an ever-growing knowledge tree.
-
-These references are not endorsements of every design choice in those systems, and they do not imply that the practices in this template originated exclusively with them. They are useful neighboring work and stronger alternatives for users whose needs exceed this template's deliberately simple scope.
+These are useful graduation targets when this template's human-readable routing skeleton stops being sufficient.
 
 ## Validation status
 
 This repository has undergone design review, adversarial review, prior-art comparison, and live write/readback iteration during development.
 
-**Longitudinal multi-user reliability has not yet been established.** In particular, this project should not claim that it eliminates silent failures or that ordinary users will maintain correct state over months until that has been demonstrated empirically.
+The current multi-project/front-door/working-style architecture is newer than the original two-file design and has **not yet established longitudinal multi-user reliability**.
 
 Broader reliability claims should wait for repeated testing of:
 
-- fresh-chat retrieval;
+- fresh-chat front-door routing;
+- correct project selection without human coaching;
 - wrong-target and partial-retrieval detection;
+- working-style promotion/supersession without profile creep;
+- new-project creation and registry reconciliation;
 - concurrent/stale-write handling;
 - durable-decision supersession and semantic correctness;
-- coupled-file partial failures and recovery;
+- scale-status detection before uncontrolled knowledge growth;
 - longitudinal use by people who did not design the workflow.
-
-The template therefore prefers visible, recoverable failure over hidden success claims, but many safeguards remain behavioral instructions executed by ChatGPT rather than independently enforced controls.
 
 ## What this does not promise
 
 This is not an infallible memory system, objective source of truth, deterministic control plane, security boundary, compliance system, or background synchronization service.
 
-The repository preserves **recorded working state**. It cannot know about changes that were never recorded, guarantee automatic GitHub invocation in every new conversation, watch a conversation after that conversation has ended, or guarantee that future ChatGPT/plugin behavior will remain unchanged.
+It cannot know about changes that were never recorded, guarantee automatic GitHub invocation in every conversation, guarantee perfect routing by a nondeterministic model, or guarantee that future ChatGPT/plugin behavior will remain unchanged.
 
-The "watch for durable changes" behavior is an active-conversation instruction, not a background daemon.
-
-The Markdown state is portable. The automated writeback workflow described here depends on a supported OpenAI/GitHub integration that passes setup testing.
+The durable Markdown and routing structure are portable. Automated conversational writeback depends on a supported integration that passes setup testing.
 
 ## Disclaimer
 
