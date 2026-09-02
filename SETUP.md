@@ -1,518 +1,408 @@
 # Setup
 
-This document is for one-time installation, first-use testing, troubleshooting, and lightweight repository maintenance. It is not part of normal day-to-day operating state.
+This document covers first-time installation, testing, normal operation, troubleshooting, growth, and lightweight repository maintenance.
 
 The intended user should not need a terminal or Git expertise.
 
-## The setup in four steps
+## Setup at a glance
 
-Before you start, the whole process is:
+You will do five things:
 
-1. **Create a private repository** from this template and visibly confirm GitHub labels it **Private**.
-2. **Connect and authorize the write-capable GitHub integration** for that repository, then prove that read/create/update/delete actions actually work.
-3. **Paste one Custom Instruction** into ChatGPT so future chats know that the repository exists, how to retrieve it, what may be persisted, and how failures should be reported.
-4. **Run one fresh-chat recovery test** using a repository-only value that ChatGPT has never seen, then delete the test file and begin normal use.
+1. create a **private** working repository from this template;
+2. connect and authorize a **write-capable GitHub integration** for that repository;
+3. prove read/create/update/delete and readback actually work;
+4. add one persistent ChatGPT instruction that points future sessions to `START_HERE.md`;
+5. run one genuinely fresh-chat retrieval test using a value that exists only in GitHub.
 
-The detailed steps below implement and verify those four things. Setup is intentionally more careful than day-to-day use because it establishes whether your particular ChatGPT account, surface, GitHub connection, and permissions can actually support the workflow.
+After that, ordinary use should remain conversational.
 
 ## 1. Create and verify a private working copy
 
-Use this repository as a GitHub template to create your own working repository.
+Use this public repository as a GitHub template to create your own working repository.
 
 Make the new working repository **private**.
 
 Before connecting ChatGPT or storing any personal/project state, open the repository on GitHub and visibly confirm GitHub labels it **Private**.
 
-The public template is intentionally empty of personal state. Your working copy may eventually contain private project or personal information.
+The template is intentionally free of user-specific state. Your working copy can accumulate operational state over time.
 
-## 2. Connect the correct GitHub capability to ChatGPT
+## 2. Connect the correct GitHub capability
 
-ChatGPT product surfaces can expose GitHub in different ways. Use the **write-capable GitHub plugin by OpenAI** required by this template, not a read-only GitHub connection.
+This workflow requires a GitHub capability that can actually write files, not merely search/read them.
 
-On ChatGPT web or desktop:
+On the ChatGPT surface available to you:
 
-1. Open **Settings → Plugins** or the **Plugins** directory when that is what your account shows. Some surfaces may instead expose apps through **Settings → Apps**.
-2. Find the GitHub capability by OpenAI that includes **Write** support. The reference listing has been described as **"Triage PRs, issues, CI, and publish flows."**
-3. Select **Install** or **Connect** as shown.
-4. Complete the GitHub sign-in/authorization flow.
-5. On GitHub, authorize the account or organization that owns your private working repository.
-6. Grant the GitHub connection access to **that repository**. Prefer selected-repository access rather than broader access when the product allows it.
-7. Return to ChatGPT after authorization completes.
+1. open the Plugins/Apps area shown by your account;
+2. connect the GitHub capability that exposes write actions;
+3. complete GitHub authorization;
+4. authorize the account/organization that owns your private working repository;
+5. grant access to that repository, preferably selected-repository access when available.
 
-If your ChatGPT surface exposes only a GitHub connection that can search/read repositories but cannot perform the file writes required by this template, stop. That connection alone is not sufficient.
+Do not assume capability from the word “GitHub” or from your ChatGPT plan name. The next step tests what the integration can actually do in the current chat.
 
-Do not infer write support from the word "GitHub" or from your ChatGPT plan name. The next steps test the actions actually available.
+## 3. Confirm repository visibility and actions
 
-## 3. Explicitly invoke GitHub and confirm the repository is visible
+Invoke GitHub explicitly when available and ask:
 
-After connecting GitHub, start with explicit invocation so there is no ambiguity about whether ChatGPT is trying to use the integration.
+> `@GitHub Find my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Confirm that you can retrieve that exact repository. Then inspect the GitHub actions actually available in this chat and tell me whether you can read, create, update, and delete files there. Do not make changes yet and do not rely on my claim that you have access.`
 
-Use `@GitHub` when available. ChatGPT may also expose plugins through **+ → More**.
+If create/update capability cannot be established, stop. Resolve connection, authorization, repository selection, organization approval, workspace restrictions, or product-surface differences before continuing.
 
-Ask:
-
-> `@GitHub Find my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Confirm that you can retrieve that exact repository. Do not rely on native memory or my description of its contents.`
-
-If the repository cannot be found, go to **Troubleshooting GitHub access** below before continuing.
-
-## 4. Confirm the actions actually available in this chat
-
-Ask ChatGPT:
-
-> `Using the GitHub integration actually available in this chat, confirm whether you can read, create, update, and delete files in my operational-memory repository. Do not make any changes yet. Base your answer on the actions actually available in this session, not on a general assumption about ChatGPT and not on my statement that you should have access.`
-
-If ChatGPT cannot establish create/update capability from the actions actually available, setup fails for this workflow. Resolve the plugin, account, workspace, authorization, permission, or surface problem before continuing.
-
-Do **not** solve this by telling ChatGPT "you have read/write access." Capability must be established from the available integration.
-
-## 5. Run the write/readback and stale-write-safety test
+## 4. Run the write/readback and stale-write test
 
 Ask ChatGPT to:
 
 1. create `SETUP-TEST.md` with a temporary phrase;
-2. reread that exact path;
-3. identify the current file/blob/version identifier if the integration exposes one;
-4. update the file with a second temporary phrase using the current observed version as the update precondition when the action supports it;
-5. reread it again and verify the new state;
-6. report the repository owner/name, branch or ref if available, exact path, and resulting content;
-7. if GitHub returns or confirms the resulting commit SHA, show a shortened commit ID derived from that real SHA. If no commit SHA is available, say **commit ID unavailable** rather than inventing one.
+2. reread that exact path and verify it exists in the intended repository;
+3. identify the current blob/version identifier if GitHub exposes one;
+4. update the file with a second temporary phrase using the current observed blob/version as the update precondition when supported;
+5. reread and verify the resulting content;
+6. report repository owner/name, branch/ref, exact path, and resulting state when available;
+7. show a shortened commit ID only when it is derived from a real GitHub commit SHA.
 
-A successful tool response alone is not enough. The test passes only if ChatGPT rereads the repository and observes the intended state.
+A tool saying it accepted a write is not enough. The test passes only when ChatGPT rereads the repository and observes the intended state.
 
-For updates to an existing file, the preferred safety behavior is optimistic concurrency: retrieve the current target immediately before the write and use its current blob/version identifier as the write precondition when the integration exposes one. If the target changed and the write is rejected as stale/conflicting, that rejection is a safety success. ChatGPT should **not** force or blindly retry the stale write; it should reload and reconcile.
-
-If the integration provides no comparable current-version precondition, ChatGPT should say that mechanical concurrency protection is **not established** rather than claiming it exists.
+If the integration supports a current blob/version precondition, a stale write should be rejected rather than silently overwrite a newer file. If the integration exposes no comparable mechanism, ChatGPT should say mechanical concurrency protection is not established.
 
 Do **not** delete `SETUP-TEST.md` yet.
 
-## 6. Put a repository-only nonce into GitHub outside ChatGPT
+## 5. Put a repository-only nonce into GitHub outside ChatGPT
 
-This step prevents a false-positive fresh-chat test.
+Open `SETUP-TEST.md` yourself in the GitHub web interface.
 
-Open `SETUP-TEST.md` directly in GitHub's web interface and edit it yourself. Replace its contents with a new random phrase or nonce that ChatGPT has **never seen**.
+Replace its contents with a random phrase/nonce ChatGPT has never seen and commit it directly in GitHub.
 
 Example shape only:
 
 `fresh-check-7QX9-K2M4`
 
-Do not ask ChatGPT to generate the nonce. Do not paste the real nonce into any ChatGPT conversation before the test. Commit the edit in GitHub.
+Do not ask ChatGPT to generate the actual nonce and do not paste the real nonce into a chat before the fresh-session test.
 
-The test value must exist only in the repository.
+## 6. Add the persistent ChatGPT instruction
 
-## 7. Add repository awareness and persistence behavior to Custom Instructions
+In ChatGPT Custom Instructions, or the equivalent persistent instruction surface available to you, add the block below. Replace `<YOUR FULL PRIVATE REPOSITORY URL>` with the private working repository URL.
 
-Custom Instructions give future chats a standing instruction that this repository exists and how it should be used.
-
-On ChatGPT web or desktop, open **Settings → Personalization → Custom Instructions** and add the block below. Replace `<YOUR FULL PRIVATE REPOSITORY URL>` with your private working repository URL.
-
-> I use a GitHub repository as durable operational memory: <YOUR FULL PRIVATE REPOSITORY URL>.
+> I use this GitHub repository as durable operational memory: <YOUR FULL PRIVATE REPOSITORY URL>.
 >
-> When my request materially depends on prior work, an ongoing project, or a durable decision, retrieve both `CURRENT.md` and `DECISIONS.md` from that exact repository before relying on remembered prior context. `CURRENT.md` governs transient/current working state. Active entries in `DECISIONS.md` govern durable decisions. If they conflict, surface and reconcile the inconsistency rather than silently choosing one. My current explicit instruction wins.
+> When my request can materially depend on prior durable work, enter the repository through `START_HERE.md` before relying on remembered prior context. Follow its routing rules. Do not load the whole repository by default. No-repository-context is a valid route when durable state cannot materially change the answer.
 >
-> A complete operational-memory load requires both files. When GitHub exposes retrieval identifiers, give me a compact retrieval receipt identifying the repository/ref and real shortened file/blob/version identifiers derived from the retrieval metadata. Never invent those identifiers. If either required file was not retrieved, say "partial retrieval" and do not claim operational memory is fully loaded.
+> Route before retrieval. For global/cross-project work, use root `CURRENT.md` and `DECISIONS.md`. For project-specific work, use `PROJECTS.md` to locate the project, then retrieve that project's `PROJECT.md` front door and only the current authority it identifies as needed. Load `WORKING_STYLE.md` when stable collaboration preferences can materially affect how the task should be handled.
 >
-> During an active conversation, watch for clear, non-sensitive current-state changes that are likely to matter in future chats: changed objectives, active constraints, material changes to active work, and explicit corrections to current state. I authorize routine updates of that kind to `CURRENT.md` without asking me each time, provided you verify the resulting repository/ref/path/content and briefly tell me what you persisted. Keep `CURRENT.md` compact by replacing stale state rather than appending a transcript.
+> Treat my current explicit instruction as highest user authority. Project-local verified current state and active project decisions govern their project. Root current state and active root decisions govern cross-project/global state. Active `WORKING_STYLE.md` entries govern applicable collaboration preferences, but they do not override explicit user instructions or project decisions. Chat recollection is not authoritative when current durable state is available.
 >
-> Do not silently promote an ambiguous conversational inference into an active durable decision. If I explicitly say "make this a durable decision," "record this decision," or otherwise clearly state a final durable decision in a context that authorizes persistence, record it using the `DECISIONS.md` structure. Otherwise, if the decision or its durable status is ambiguous, ask before activating it. When you record a new durable decision, show me the exact stored one-sentence `Decision` field so I can inspect the semantic result.
+> Before persisting material, use the persistence-routing gate in `START_HERE.md`. Prefer an existing source of record. Route legitimate new material to the appropriate global CURRENT, global DECISION, WORKING STYLE, or registered PROJECT location. A request such as "record this in operational memory" authorizes correct routing, not arbitrary file creation. If no legitimate home exists, do not invent one; report `NOT-V1 / no legitimate home`. Repeated similar NOT-V1 material is a growth signal.
 >
-> Immediately before updating an existing file, retrieve the current target and use its current blob/version identifier as the update precondition when the GitHub action supports one. If a write is rejected because the target changed, fail closed: do not force or blindly retry. Re-read the current state, surface the competing change when material, reconcile it, then write against the current version.
+> Root `CURRENT.md` and `DECISIONS.md` are cross-project/global state only. Do not let project-specific detail accumulate there once a project has earned its own boundary.
 >
-> If a durable decision also requires a `CURRENT.md` change, treat the two files as coupled. If one write succeeds and the other fails, say "operational memory is temporarily inconsistent," re-read both files, and complete or deliberately reconcile the coupled state before claiming completion.
+> Create a project only when clearly justified by `START_HERE.md`: for example, I explicitly identify an ongoing project, the work is expected to span multiple sessions with its own state/constraints/decisions, or repeated project-specific durable material needs a separate retrieval boundary. If project status is ambiguous, ask first. When clearly authorized, create it from `projects/_TEMPLATE/`, register it in `PROJECTS.md`, verify the registry/front door/state files, and report any partial creation as `project routing is temporarily inconsistent` until reconciled.
 >
-> After a successful persistence write, give me a compact receipt containing what changed, the file, and a shortened commit ID when GitHub returned or confirmed a real commit SHA. Derive the short ID from that real SHA; never invent or guess a commit hash. If the commit SHA is unavailable, say "commit ID unavailable." A commit receipt supplements readback verification; it does not replace it.
+> During active conversation, watch for clear, non-sensitive current-state changes likely to matter later and persist them selectively to the correct current-state file. Keep current-state files compact by replacing stale state instead of appending transcripts.
 >
-> Ask before persisting anything sensitive, ambiguous, destructive, public, or authority-changing. A current instruction such as "do not persist this" overrides the routine persistence policy. Do not store secrets.
+> Do not silently promote ambiguous conversational inference into a durable decision. If I explicitly say "make this a durable decision," "record this decision," or clearly state a final durable decision in a context that authorizes persistence, record it in the correct global or project decision log. Otherwise ask if durable meaning is ambiguous. When recording a decision, show me the exact stored one-sentence `Decision` field.
 >
-> Default failure behavior is fail closed, fail loud, and preserve the last known good state. If retrieval is incomplete, a write is rejected, verification fails, the repository target is uncertain, coupled state is inconsistent, or GitHub is unavailable, do not pretend the operation succeeded. Tell me what failed, what remains known, and what recovery step is needed.
+> `WORKING_STYLE.md` is for stable preferences about how we work together, not biography or a personal dossier. Explicit durable preferences such as "remember that I prefer..." may be recorded directly. If you infer a preference from behavior, repeated acceptance, or a single correction without explicit durable intent, ask before promoting it. Do not infer or store sensitive identity/health/financial/legal/relationship facts merely for personalization.
 >
-> Do not assume the repository was retrieved or changed. Content agreement alone is not proof of retrieval. If GitHub was not retrieved, say so rather than substituting native memory. If automatic GitHub selection does not occur, explicit `@GitHub` invocation is an acceptable baseline. For consequential durable writes, read back and verify the intended target before claiming completion.
+> Immediately before updating an existing file, retrieve the current target and use its current blob/version identifier as the update precondition when supported. If a write is rejected because the target changed, fail closed: do not force or blindly retry. Re-read, reconcile the competing change when material, then write against the current version.
+>
+> For consequential persistence, read back and verify the intended repository/ref/path/content before claiming completion. After a successful write, give me a compact receipt with what changed, the file, and a shortened commit ID only when GitHub returned or confirmed a real commit SHA. Never invent hashes.
+>
+> Default failure behavior is fail closed, fail loud, and preserve the last known good state. If retrieval is incomplete, routing is uncertain, a write is rejected, verification fails, project creation partially succeeds, coupled state is inconsistent, or GitHub is unavailable, do not pretend success. Tell me what failed, what remains known, and what recovery step is needed.
+>
+> When I ask for a repository health check or maintenance check, include routing integrity, project-registry integrity, working-style hygiene, current/decision consistency, leftover setup artifacts, branch/protection state when available, and a `V1 scale status: Healthy | Watch | Outgrowing the template` using the criteria in `START_HERE.md`. Surface Watch conditions when you encounter them naturally; do not wait for the files to become huge.
+>
+> Ask before persisting anything sensitive, ambiguous, destructive, public, or authority-changing. A current instruction such as "do not persist this" or "ask before writing anything else this session" overrides routine persistence. Do not store secrets.
 
-This is the recommended **assisted-persistence** mode. It reduces the need for the human to act as a repository clerk while keeping explicit human override.
+This is the recommended assisted-persistence mode.
 
-If you prefer an **ask-first** mode, replace the sentence authorizing routine `CURRENT.md` updates without asking with:
+If you want all writes to require permission, additionally instruct:
 
-> `When you notice something that appears worth persisting, ask me before writing it.`
+> `Ask me before every repository write this session unless I explicitly authorize a specific sequence.`
 
-Custom Instructions make a future chat aware that durable repository state exists. They do **not** guarantee automatic GitHub tool invocation.
+Persistent instructions make future chats aware of the repository and routing protocol. They do **not** guarantee that ChatGPT will automatically invoke GitHub on every relevant turn.
 
-## 8. If you use ChatGPT Projects
+## 7. If you use ChatGPT Projects
 
-Project instructions apply inside that project and can override global Custom Instructions.
+Project instructions can override global Custom Instructions.
 
-For any ChatGPT Project that should use this operational-memory repository, copy the same repository-awareness and persistence instruction into the project's instructions, optionally narrowing it to that project's scope.
+For a ChatGPT Project that should use this repository, copy the repository-awareness/routing instruction into that Project's instructions or add a concise equivalent that still requires `START_HERE.md` routing.
 
-Do not assume the global Custom Instruction controls a Project whose Project instructions replace it.
+Do not assume global Custom Instructions govern a Project whose own instructions replace them.
 
-## 9. Test a genuinely fresh chat
+## 8. Test a genuinely fresh chat
 
-Start a completely new ordinary ChatGPT conversation after saving the Custom Instruction.
+Start a completely new ordinary ChatGPT conversation.
 
 ### First attempt: automatic selection
 
-Do not manually invoke `@GitHub` on the first attempt.
+Without manually invoking GitHub, ask:
 
-Ask:
+> `Enter my operational-memory repository through START_HERE.md. Then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
 
-> `Retrieve SETUP-TEST.md from my operational-memory repository and tell me its exact contents. Also identify the repository and exact path you retrieved.`
+The automatic-selection test passes only when GitHub retrieval is actually evidenced and the returned content matches the repository-only nonce.
 
-The automatic-selection test passes only if GitHub retrieval is actually evidenced and the answer matches the repository-only nonce.
+Correct content alone is not proof of retrieval.
 
-**Correct content alone is not enough if retrieval was not established. Content agreement is not proof of retrieval.**
+### Explicit invocation fallback
 
-### If automatic selection does not occur
+If automatic GitHub selection does not occur, repeat with explicit `@GitHub`.
 
-Use explicit `@GitHub` and repeat the same retrieval request.
+If explicit invocation retrieves the correct nonce from the correct repository/path, the core workflow passes. Use explicit GitHub invocation as the normal re-entry mechanism whenever certainty matters.
 
-If explicit invocation retrieves the correct repository-only nonce from the correct repository/path, the core workflow passes. Treat explicit `@GitHub` as your normal re-entry method whenever prior durable state materially matters.
+If explicit invocation cannot reliably retrieve the repository-only nonce, setup fails for this workflow.
 
-Automatic GitHub selection is an optional convenience, not a requirement for this template to function.
+## 9. Clean up the setup test
 
-If explicit invocation cannot reliably retrieve the intended repository, setup fails.
+After the fresh-chat test passes, ask ChatGPT to delete `SETUP-TEST.md`.
 
-## 10. Clean up the test file
+Then verify deletion by attempting to reread the same repository/path.
 
-After the retrieval test passes, ask ChatGPT to delete `SETUP-TEST.md`.
-
-Then verify deletion by attempting to reread that exact repository/path. When available, verify the repository owner/name and branch/ref as well.
-
-## 11. Initialize the repository for normal use
+## 10. Initialize normal use
 
 In a chat where GitHub is available, say:
 
-> `@GitHub Initialize my operational-memory repository for normal use. Retrieve both CURRENT.md and DECISIONS.md. Treat CURRENT.md as transient/current working state and active DECISIONS.md entries as durable decisions. If they conflict, surface and reconcile the inconsistency. Follow my Custom Instruction persistence and failure policy. Keep CURRENT.md compact, require clear authorization for new durable decisions, protect updates against stale overwrites when the integration exposes a current-version precondition, verify consequential GitHub writes by readback, and give me verified retrieval and commit receipts when GitHub exposes the underlying identifiers.`
+> `@GitHub Initialize my operational-memory repository for normal use. Enter through START_HERE.md, verify the root routing files, confirm there are no real projects yet unless the registry says otherwise, and report V1 scale status. Do not create project state just to initialize the repository.`
 
-Then begin normal work.
+Then begin ordinary work.
 
 # Normal human operation
 
-After setup, the user should not need to think in Git commands or manually edit repository files during ordinary work.
-
 ## Starting or resuming work
 
-When prior state matters, say:
+When prior state matters:
 
-> `@GitHub Load my operational-memory repository. Retrieve both CURRENT.md and DECISIONS.md before we continue.`
+> `@GitHub Enter through START_HERE.md in my operational-memory repository and load only the durable state relevant to this task.`
 
-A normal successful load should produce a compact receipt such as:
+For a known project you can simply name the project. ChatGPT should use `PROJECTS.md` to locate it rather than asking you to remember a path.
 
-`Loaded: CURRENT.md@1d8998f + DECISIONS.md@743fa79 · main · owner/repo`
+## During conversation
 
-Those identifiers must be derived from the actual GitHub retrieval metadata. If both required files were not retrieved, ChatGPT should report **partial retrieval** rather than claiming the memory load succeeded.
+Useful phrases:
 
-If automatic GitHub selection is reliable on your account/surface, you may omit `@GitHub`. If certainty matters, use it.
+- **“Record this in operational memory.”** Route to the correct existing home.
+- **“Update current state with this.”** Use the correct global or project current-state file.
+- **“Make this a durable decision.”** Use the correct global or project decision log.
+- **“Remember this as a working preference.”** Use `WORKING_STYLE.md` if appropriate.
+- **“This is an ongoing project.”** Create/register a project when clearly authorized.
+- **“Do not persist this.”** Block routine persistence.
+- **“Ask before writing anything else this session.”** Temporarily switch to ask-first.
+- **“What do you currently have recorded about this?”** Retrieve the appropriate durable source instead of answering from recollection.
+- **“Run a repository health check.”** Check structure, consistency, routing, project registry, working style, branch hygiene, and scale status.
 
-## During a conversation
+## What project creation should feel like
 
-With the recommended assisted-persistence Custom Instruction, ChatGPT should watch the active conversation for clear, non-sensitive **current-state** changes and selectively persist them.
+A user should not have to design folders.
 
-You can always direct it explicitly:
+When a workstream earns a project boundary, ChatGPT should:
 
-- **"Record this in operational memory."** Let ChatGPT determine the appropriate file from the semantics, asking if durable status is ambiguous.
-- **"Update current state with this."** Use for active objectives, work, constraints, or material open questions.
-- **"Make this a durable decision."** Use when the decision should govern future conversations until superseded.
-- **"Do not persist this."** Prevent this material from being written under the routine persistence policy.
-- **"Ask before writing anything else this session."** Temporarily switch to ask-first behavior.
-- **"What do you currently have recorded about this?"** Retrieve and show the relevant recorded state rather than answering from recollection.
-- **"Run a repository consistency check."** Check internal consistency without pretending this proves real-world freshness.
+1. identify that a project boundary is justified;
+2. ask only if project status is ambiguous;
+3. copy the three-file skeleton from `projects/_TEMPLATE/` into a stable project slug;
+4. register the project in `PROJECTS.md`;
+5. put the project's current state and decisions there going forward;
+6. tell the user what it created and verify the new routing path.
 
-After a successful write, ChatGPT should give you a compact receipt such as:
+The user should then be able to say the project name in a later fresh chat and have ChatGPT route there through the registry.
 
-`Persisted: changed launch date · CURRENT.md · commit a1b2c3d`
+## Working-style accumulation
 
-The commit prefix must come from a real GitHub commit SHA. A plausible-looking hash generated from memory or imagination is not acceptable. If the commit SHA is not available, the receipt should say **commit ID unavailable**.
+The repo can gradually learn the user's collaboration preferences without treating every interaction as profile data.
 
-For a new durable decision, ChatGPT should also show the exact one-sentence `Decision` field it stored. That is your semantic check; readback alone verifies bytes, not whether the summary accurately reflects your intent.
+Good durable examples:
 
-If ChatGPT says it saved something but you did not observe GitHub use/readback, ask it to verify the repository/ref/path/content before relying on the claim.
+- “Keep answers short unless I ask for a deep dive.”
+- “When a task is safe and reversible, continue without repeatedly asking permission.”
+- “For consequential research, show uncertainty and source conflicts.”
+- “Do not create new durable files without routing them from the project front door.”
+
+Bad durable examples:
+
+- a preference inferred from one accepted response;
+- sensitive personal facts unrelated to how work should be performed;
+- detailed personality speculation;
+- temporary mood or one-session formatting requests.
+
+When a durable working preference changes, supersede the old entry instead of keeping contradictory active rules.
 
 ## Closing out an important session
 
-A lightweight closeout catches durable changes that may have been discussed without being persisted.
-
 Say:
 
-> **"Close out operational memory."**
+> **“Close out operational memory.”**
 
 ChatGPT should:
 
-1. retrieve both `CURRENT.md` and `DECISIONS.md` from the intended repository;
-2. identify material durable changes from the active conversation that have not yet been persisted;
-3. apply the persistence policy, asking where required;
-4. update only what earns persistence;
-5. compact stale current state instead of appending a transcript;
-6. reconcile `CURRENT.md` with active durable decisions;
-7. protect each update against a stale target version when the integration supports it;
-8. verify consequential writes by readback;
-9. if a coupled write partially fails, report the repository as temporarily inconsistent and repair/reconcile it before claiming completion;
-10. briefly report what changed, any verified short commit IDs for the writes, and anything intentionally left unpersisted.
+1. route through `START_HERE.md`;
+2. identify the global/project scopes actually touched in the session;
+3. identify material durable changes not yet persisted;
+4. apply the persistence-routing gate;
+5. update only what earns persistence;
+6. compact stale current state;
+7. reconcile active decisions and working-style changes;
+8. verify consequential writes;
+9. report persistence receipts and any material intentionally left unpersisted;
+10. surface a scale Watch condition if the session exposed routing/sprawl problems.
 
-This closeout is optional. It is most useful after a session that materially changed plans, constraints, active work, or decisions.
+This is a conversational closeout, not a transcript archive.
 
-## Correcting recorded state
+# Repository health and growth
 
-If the repository is wrong, correct it explicitly rather than allowing stale state to continue governing:
+A health/maintenance check should report a compact result that includes:
 
-> `The recorded state is wrong. <state the correction>. Update operational memory and reconcile any affected decision/current-state entries.`
+- front door present and readable;
+- global current/decision consistency;
+- project registry integrity;
+- all registered active project front doors exist;
+- all non-template project folders are registered;
+- project-specific state is not leaking into global files;
+- working-style entries are active/superseded cleanly and not turning into a personal dossier;
+- recent consequential writes relevant to the check are observable;
+- no leftover `SETUP-TEST.md`;
+- canonical branch and protection state when available;
+- **`V1 scale status: Healthy | Watch | Outgrowing the template`**.
 
-A current explicit instruction wins over recorded state.
+## Scale status is structural, not just file size
 
-## Removing active information
+Do not wait for a numeric file-size threshold.
 
-You can say:
+**Healthy** means routing remains obvious and small.
 
-> `Remove this from active operational memory: <item>.`
+**Watch** means the system is beginning to misplace state, repeatedly lacks a legitimate home, has unregistered durable workstreams, or needs frequent compaction merely to remain understandable.
 
-That removes or retires the active record as appropriate. It does **not** guarantee erasure from prior Git history.
+**Outgrowing the template** means even routed project front doors and compaction are no longer enough, or reliability now requires structured/indexed retrieval, deterministic validation, typed tools, or a dedicated memory service.
+
+When status is Watch, recommend the smallest correction first. Do not jump directly to MCP/vector infrastructure when project routing or cleanup solves the problem.
+
+# Persistence routing and new durable homes
+
+Before creating a new file/category outside the provided structure, all of these should be true:
+
+- the content has a distinct durable role not served by an existing source;
+- the category is expected to recur;
+- future sessions have a clear retrieval trigger;
+- authority is clear;
+- the relevant `PROJECT.md` or root router will point to it;
+- the user is told that durable structure is expanding.
+
+If those conditions are not met, do not create the file.
+
+This gate is the primary defense against an uncontrolled knowledge base.
 
 # Failure behavior
 
 The safe default is **fail closed, fail loud, preserve the last known good state**.
 
-That means ChatGPT should not silently substitute a plausible answer when an operational-memory action fails.
+Examples:
 
-- If retrieval is incomplete, say **partial retrieval** and do not claim the repository is fully loaded.
-- If a write is rejected or cannot be read back, say **not persisted** or **not verified** as appropriate.
-- If the target changed since it was read, do not overwrite it. Reload and reconcile the concurrent change.
-- If one half of a coupled `CURRENT.md`/`DECISIONS.md` update fails, say **operational memory is temporarily inconsistent** and finish reconciliation before reporting completion.
-- If a proposed durable decision is semantically ambiguous, ask before making it active.
-- If the connector is unavailable, say the conversation change was **not persisted** and use the manual fallback below.
+- missing/partial required retrieval -> say so and do not claim the relevant memory is loaded;
+- no legitimate persistence destination -> report `NOT-V1 / no legitimate home`;
+- stale write -> reload and reconcile, never force or blindly retry;
+- unverified write -> report not verified;
+- partially created project -> report `project routing is temporarily inconsistent` and reconcile it;
+- coupled state partial failure -> report the inconsistency and finish or deliberately roll back/reconcile;
+- inferred working preference -> ask before activating it;
+- connector unavailable -> say the change was not persisted and use the manual fallback below.
 
-A loud recoverable stop is better than a quiet false success.
+# Troubleshooting
 
-# Troubleshooting GitHub access
-
-## ChatGPT does not appear to use GitHub
+## ChatGPT does not use GitHub
 
 Invoke it explicitly:
 
-> `@GitHub Retrieve CURRENT.md and DECISIONS.md from <YOUR REPOSITORY URL>. Identify the repository and paths you actually retrieved.`
+> `@GitHub Enter <YOUR REPOSITORY URL> through START_HERE.md and identify the repository/path you actually retrieved.`
 
-If `@GitHub` is not available, check **+ → More**, the Plugins directory, or your account's Apps/Plugins settings.
+If explicit invocation works reliably, it is an acceptable baseline.
 
-Custom Instructions are behavioral instructions, not a guarantee that ChatGPT will automatically select the GitHub tool.
+## ChatGPT cannot see the repository
 
-## ChatGPT says it cannot see the repository
+Check:
 
-Check these in order:
+1. correct GitHub account;
+2. repository authorization/selection;
+3. GitHub-side app/plugin installation;
+4. organization approval if applicable;
+5. newly authorized repository delay;
+6. whether the current ChatGPT surface exposes the required write-capable actions.
 
-1. **Correct GitHub account:** confirm the connected account is the account or organization that owns the private repository.
-2. **Repository authorization:** in ChatGPT **Settings → Apps/Plugins → GitHub** or the equivalent shown on your surface, open the repository-management/configuration option. Confirm the private operational-memory repository is selected for access.
-3. **GitHub-side installation:** if redirected to GitHub, confirm the OpenAI/ChatGPT GitHub app or plugin connection is installed on the correct account/organization and permitted to access this repository.
-4. **Organization approval:** an organization may require an owner/admin to approve the app or requested repository access.
-5. **New repository delay:** a newly created or newly authorized private repository may take several minutes to appear. Recheck repository authorization before repeatedly reconnecting.
-6. **Product surface:** GitHub capability can vary across standard ChatGPT, other ChatGPT experiences, plans, workspaces, roles, regions, and rollouts. A connection being available somewhere in ChatGPT does not prove the required write actions are available in this chat.
+Then retry explicit retrieval.
 
-Then retry explicit `@GitHub` retrieval.
+## ChatGPT can read but cannot write
 
-## ChatGPT retrieved only one state file
+Do not tell it to assume write access.
 
-Treat that as **partial retrieval**, not a complete operational-memory load.
-
-Ask:
-
-> `@GitHub Retrieve both CURRENT.md and DECISIONS.md from exactly <YOUR REPOSITORY URL>. Report the repository, ref/branch when available, both exact paths, and retrieval identifiers actually returned by GitHub.`
-
-Do not rely on a conflict check unless both files were actually retrieved.
-
-## ChatGPT can read the repository but cannot write
-
-Do not tell it that it has write permission and ask it to proceed anyway.
-
-Ask:
-
-> `@GitHub Inspect the GitHub actions actually available in this chat. Can you create and update a file in this repository, or is this connection read-only? Do not make a change yet.`
-
-If only read/search actions are available, you may be using the read-only GitHub app/connection rather than the write-capable plugin required by this template, or your account/surface/authorization may not expose the required actions.
-
-Return to the Plugins/Apps settings, verify the correct write-capable capability is installed and authorized, then repeat the CRUD test.
+Ask it to inspect the actions actually available in the chat. If create/update actions are absent, fix the connection/authorization/surface before relying on this workflow.
 
 ## A write is rejected because the file changed
 
-That is a concurrency protection event, not a reason to force the write.
+Treat this as concurrency protection.
 
-Ask ChatGPT to:
-
-1. re-fetch the current target file;
-2. identify the intervening change;
-3. compare it with the intended update;
-4. ask if user intent is ambiguous;
-5. write only after reconciliation, using the newly observed current version as the precondition.
-
-Do not force-push or blindly retry a stale file update.
+Re-fetch the current target, identify the intervening change, reconcile intent, and write only against the newly observed version. Do not force the stale write.
 
 ## ChatGPT claims a write succeeded but GitHub does not show it
 
-Treat the write as **unverified**, not successful.
+Treat the write as **unverified**. Reread the intended repository/ref/path and verify resulting content before relying on the claim.
 
-Ask ChatGPT to reread the intended repository/ref/path and report the resulting content. Verify that it targeted the correct owner/repository and branch/ref where those identifiers are available.
+## Project exists but routing is wrong
 
-If ChatGPT reports a commit ID, require that it be derived from the actual GitHub commit SHA. A short hash by itself is not proof of a successful write.
-
-If readback does not show the intended state, retry only after identifying the wrong-target, permission, stale-read, or tool failure.
-
-## One coupled file changed and the other did not
-
-Treat the repository as temporarily inconsistent.
-
-Ask:
-
-> `@GitHub Re-read CURRENT.md and DECISIONS.md. A coupled update partially failed. Preserve valid intervening edits, reconcile the two files, verify both final states, and do not report completion until they are consistent.`
+Start with `PROJECTS.md` and the project's `PROJECT.md`. Reconcile registry triggers, front-door pointers, and project current authority. Do not solve a routing defect by broad-loading all projects.
 
 ## GitHub is temporarily unavailable
 
-Do not pretend the conversation was persisted.
+Do not pretend conversation state was persisted.
 
-For a temporary manual fallback:
+You may edit the appropriate durable Markdown file directly in GitHub's web interface. When ChatGPT access returns, say:
 
-1. open your private repository in GitHub's web interface;
-2. edit `CURRENT.md` for current objectives/work/constraints or `DECISIONS.md` for a clearly authorized durable decision;
-3. follow the existing file structure and keep the change compact;
-4. commit the web edit;
-5. when ChatGPT GitHub access returns, say `@GitHub Reload both CURRENT.md and DECISIONS.md and reconcile operational memory before we continue.`
-
-This fallback preserves the durable Markdown state even when the conversational writeback layer is temporarily unavailable.
-
-## ChatGPT retrieves the wrong repository
-
-Provide the full repository URL and require target identity:
-
-> `@GitHub Use exactly <FULL REPOSITORY URL>. Before relying on its contents, identify the owner/repository and both state paths you retrieved.`
-
-If the wrong account remains connected, reconnect GitHub to the intended account or adjust repository authorization.
-
-## Custom Instructions seem to be ignored inside a Project
-
-Project instructions can override global Custom Instructions.
-
-Copy the operational-memory instruction into that Project's instructions and test retrieval again.
-
-## The repository state seems stale
-
-Ask:
-
-> `@GitHub Run a repository consistency check, then compare the recorded current state with the durable changes established in this conversation. Do not assume unrecorded conversation state was already persisted.`
-
-Correct or close out the state as needed.
-
-# Memory hygiene practices
-
-The repository should stay small enough to recover quickly.
-
-- Keep `CURRENT.md` compact and current. Replace stale state instead of appending history.
-- Put only future-relevant durable decisions in `DECISIONS.md`.
-- Use explicit supersession instead of leaving contradictory active decisions.
-- Let Git history preserve old versions rather than duplicating history inside the active files.
-- Use **"Close out operational memory"** after consequential sessions.
-- Periodically run a repository consistency check.
-- Do not add new files merely because a conversation produced more information.
-
-These practices borrow the useful parts of richer agent-memory systems—current-state recovery, selective persistence, conflict handling, handoff/closeout, provenance through version history, and write verification—without requiring their local tooling or infrastructure.
+> `@GitHub Enter through START_HERE.md, reload the affected global/project state, and reconcile the manual changes before continuing.`
 
 # Repository maintenance
 
-The desired steady state for this template is deliberately simple: **one canonical branch, `main`**.
+The desired Git branch model is simple: one canonical `main` branch for normal operation.
 
-Normal ChatGPT operational-memory writes should go directly to `main`. A normal user does not need feature branches, release branches, or a pull-request workflow for routine memory maintenance.
+Routine ChatGPT memory writes should go directly to `main`.
 
-## Branch cleanup rule
+If another branch exists, compare it with `main`, preserve unique work, verify the resulting canonical state, and delete the branch only when its unique work is safely incorporated or deliberately abandoned.
 
-If another branch is created manually or by a maintenance workflow:
-
-1. compare it with `main` before deleting anything;
-2. determine whether it contains any unique commits or state that should be preserved;
-3. merge or otherwise preserve intended changes;
-4. verify the resulting `main` state;
-5. delete the branch only when its unique work is safely incorporated or the user deliberately chooses to abandon it.
-
-If it is unclear whether a branch contains unique work, **fail closed and loud**: do not delete it until the difference is understood.
-
-Do not use force-pushes, hard resets, or history rewrites as routine cleanup. Those are exceptional recovery operations and can destroy durable history.
-
-## Periodic housekeeping check
-
-Run this after unusual manual Git activity, after a temporary maintenance branch was used, or periodically if you want an explicit repository check:
-
-1. confirm `main` is the default and canonical branch;
-2. list branches; the normal steady state is `main` only;
-3. confirm no leftover `SETUP-TEST.md` exists;
-4. confirm the root still contains the expected V1 files: `README.md`, `SETUP.md`, `CURRENT.md`, `DECISIONS.md`, and `LICENSE`;
-5. confirm `CURRENT.md` remains compact and current;
-6. confirm superseded decisions are not active in `DECISIONS.md`;
-7. confirm there is no unresolved coupled-state inconsistency;
-8. if optional branch protection is enabled, confirm it still blocks deletion and force pushes on `main` without blocking the direct-write workflow.
-
-You can ask ChatGPT:
-
-> `@GitHub Run repository maintenance on my operational-memory repo. Confirm main is canonical, list all branches, identify any branch not fully incorporated into main, check for leftover setup files and the expected V1 root files, check CURRENT.md and DECISIONS.md consistency, and report the current protection state. Do not delete branches or rewrite history if there is uncertainty.`
+Do not use force pushes, hard resets, or history rewrites as routine cleanup.
 
 ## Optional recommended `main` protection
 
-Branch protection is **optional hardening**, not a requirement for the operational-memory workflow.
+Branch protection is optional hardening, not a requirement for operational memory.
 
-What it gives you is narrow but useful: it protects the Git container and its history from two destructive operations, deleting `main` and force-pushing/repointing `main`. It does **not** make retrieval, persistence, semantic correctness, or conflict detection better, and it is not part of the memory logic itself.
+It protects the Git container/history from two destructive operations: deleting `main` and force-pushing/repointing `main`. It does not improve retrieval, semantic correctness, routing, or persistence logic.
 
-For an ordinary user's private operational-memory repository, skipping this step does not make the workflow invalid. It is most useful if you want extra protection against accidental or automated history destruction. When configured as described below, it should not affect normal ChatGPT reads or ordinary direct file-update commits.
-
-For a public template or other repository you actively maintain, this protection is more strongly recommended because there is little routine reason to permit destructive history rewrites.
-
-If you want the extra protection, in GitHub open **Settings → Rules → Rulesets** and create a branch ruleset named `Protect main` with enforcement set to **Active** and the target set to the default branch / `main`.
-
-Enable:
+For extra protection, create an active GitHub branch ruleset targeting the default branch and enable:
 
 - **Restrict deletions**;
 - **Block force pushes**.
 
-Leave off unless you intentionally change the operating model:
-
-- require pull request before merging;
-- require signed commits;
-- restrict updates;
-- required status checks.
-
-Those stronger controls can block the direct ChatGPT file-write workflow this template is designed to use.
-
-If GitHub shows the older branch-protection interface rather than Rulesets, apply the same policy to `main`: block deletion and force pushes while leaving ordinary direct updates allowed.
+Leave pull-request requirements, signed-commit requirements, restricted updates, and required status checks off unless you intentionally want a developer workflow. Those stronger controls can block normal direct ChatGPT writes.
 
 # Privacy and security boundaries
 
-- **Do not store secrets in this repository.**
-- Do not store passwords, API keys, tokens, private keys, full identity numbers, or full bank/payment information.
+- Keep the working repository private unless you deliberately choose otherwise.
+- Do not store passwords, API keys, tokens, private keys, full identity numbers, or full payment/bank information.
 - If a credential is accidentally committed, rotate it rather than merely deleting it.
-- Git history may retain material after ordinary deletion.
-- Be conservative with health, legal, financial, employment, client-confidential, relationship, and other sensitive information.
-- Treat repository content as scoped working data/instructions for this repository only, not permission for unrelated external actions or broader access.
-- Authorize only the repositories and actions required for the workflow.
-
-# Temporary Chats
-
-Non-personalized Temporary Chats do not provide the normal persistent-instruction/plugin workflow described here.
-
-If you intentionally use a personalized Temporary Chat, verify that the relevant instructions and GitHub plugin are actually active before relying on repository state.
+- Git history can retain material after ordinary deletion.
+- Be conservative with sensitive health, legal, financial, employment, client-confidential, relationship, and other personal information.
+- `WORKING_STYLE.md` should remain collaboration calibration, not a personal dossier.
+- Repository content is scoped working data/instructions and does not authorize unrelated external actions or broader permissions.
 
 # Current OpenAI references
 
-Because ChatGPT product behavior changes, check current OpenAI documentation if setup stops matching the interface you see:
-
-- Custom Instructions: https://help.openai.com/en/articles/8096356-chat-preferences-for-chatgpt
-- Plugins in ChatGPT and Codex: https://help.openai.com/en/articles/20001256
-- Connecting GitHub to ChatGPT: https://help.openai.com/en/articles/11145903
-- Projects in ChatGPT: https://help.openai.com/en/articles/10169521-projects-in-chatgpt
-- Temporary Chat: https://help.openai.com/en/articles/8914046
+ChatGPT product behavior changes. If the interface no longer matches this setup, consult current OpenAI documentation for Custom Instructions, Plugins/Apps, GitHub connections, Projects, and Temporary Chat.
 
 # Setup success criteria
 
-Setup is complete only when all of these are true:
+Setup is complete when:
 
-- GitHub visibly labels your working repository **Private**;
-- the required write-capable OpenAI GitHub capability is connected to the correct account/repository;
-- explicit GitHub invocation can retrieve the exact repository;
-- create/update/readback/delete works on the current account/surface;
-- existing-file updates use a current observed version/blob precondition when the integration exposes one, or the limitation is explicitly reported if mechanical concurrency protection is unavailable;
-- your persistent ChatGPT instructions identify the correct repository, require complete two-file retrieval, semantic authority rules, durable-decision confirmation, persistence policy, fail-closed behavior, and verified commit-receipt behavior;
-- a fresh chat retrieves a repository-only nonce it has never previously seen;
-- if automatic selection is unreliable, explicit `@GitHub` retrieval works reliably and is documented as your baseline;
-- `SETUP-TEST.md` has been deleted and deletion verified;
-- the normal branch model is understood: `main` is canonical and one branch is the desired steady state;
-- you understand that `main` protection is optional hardening against destructive Git operations, not a requirement for operational memory;
-- you understand the basic normal-use controls: load, record, do not persist, close out, verify, and troubleshoot explicit GitHub invocation;
-- you understand that a failed or unverified operation should be reported loudly rather than treated as successful.
+- the working repository is visibly private;
+- the required write-capable GitHub capability is connected to the correct repository;
+- explicit GitHub invocation can retrieve the intended repository;
+- create/update/readback/delete succeeds on the current surface;
+- current blob/version preconditions are used when available or the limitation is explicitly reported;
+- persistent instructions point fresh sessions to `START_HERE.md` and the routing/persistence rules;
+- a fresh chat retrieves the repository-only nonce it has never seen;
+- `SETUP-TEST.md` is deleted and deletion verified;
+- the user understands that project creation is routed through `PROJECTS.md`, working preferences through `WORKING_STYLE.md`, and new durable files require a promotion gate;
+- the user understands the `Healthy | Watch | Outgrowing the template` scale signal;
+- optional branch protection is understood as hardening rather than a core memory requirement;
+- failed or unverified operations are reported visibly instead of treated as success.
