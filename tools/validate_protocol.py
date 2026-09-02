@@ -67,6 +67,26 @@ def referenced_ids(value: str, prefix: str) -> Iterable[str]:
     return re.findall(rf"\b{re.escape(prefix)}-\d+\b", value)
 
 
+def field_value(block: str, label: str) -> str:
+    match = re.search(
+        rf"^- \*\*{re.escape(label)}:\*\*\s*([^\n]+)",
+        block,
+        re.MULTILINE,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def entry_blocks(text: str, prefix: str) -> dict[str, str]:
+    matches = list(
+        re.finditer(rf"^###\s+({re.escape(prefix)}-\d+)\b", text, re.MULTILINE)
+    )
+    blocks: dict[str, str] = {}
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        blocks[match.group(1)] = text[match.start():end]
+    return blocks
+
+
 def check_references(path: Path, prefix: str) -> None:
     text = read_text(path)
     known = set(ids_in(text, prefix))
@@ -78,6 +98,51 @@ def check_references(path: Path, prefix: str) -> None:
                     error(
                         f"{path.relative_to(ROOT)} references missing {ref} in {label}"
                     )
+
+
+def check_lifecycle_consistency(path: Path, prefix: str) -> None:
+    records = entry_blocks(read_text(path), prefix)
+    for item_id, block in records.items():
+        status = field_value(block, "Status").lower()
+        supersedes = set(referenced_ids(field_value(block, "Supersedes"), prefix))
+        superseded_by = set(
+            referenced_ids(field_value(block, "Superseded by"), prefix)
+        )
+
+        if status.startswith("active") and superseded_by:
+            error(
+                f"{path.relative_to(ROOT)} {item_id} is active but has Superseded by"
+            )
+        if status == "superseded" and not superseded_by:
+            error(
+                f"{path.relative_to(ROOT)} {item_id} is superseded but has no Superseded by ID"
+            )
+
+        for prior_id in supersedes:
+            prior_block = records.get(prior_id)
+            if prior_block is None:
+                continue
+            reciprocal = set(
+                referenced_ids(field_value(prior_block, "Superseded by"), prefix)
+            )
+            if item_id not in reciprocal:
+                error(
+                    f"{path.relative_to(ROOT)} {item_id} supersedes {prior_id}, "
+                    f"but {prior_id} does not reciprocally name {item_id} in Superseded by"
+                )
+
+        for later_id in superseded_by:
+            later_block = records.get(later_id)
+            if later_block is None:
+                continue
+            reciprocal = set(
+                referenced_ids(field_value(later_block, "Supersedes"), prefix)
+            )
+            if item_id not in reciprocal:
+                error(
+                    f"{path.relative_to(ROOT)} {item_id} is superseded by {later_id}, "
+                    f"but {later_id} does not reciprocally name {item_id} in Supersedes"
+                )
 
 
 def active_count(path: Path, prefix: str) -> int:
@@ -208,15 +273,18 @@ def main() -> int:
         if path.is_file():
             check_unique_ids(path, "D")
             check_references(path, "D")
+            check_lifecycle_consistency(path, "D")
     for path in knowledge_paths:
         if path.is_file():
             check_unique_ids(path, "K")
             check_references(path, "K")
+            check_lifecycle_consistency(path, "K")
 
     style_path = ROOT / str(global_map.get("working_style", "WORKING_STYLE.md"))
     if style_path.is_file():
         check_unique_ids(style_path, "WS")
         check_references(style_path, "WS")
+        check_lifecycle_consistency(style_path, "WS")
 
     budgets = manifest.get("soft_budgets", {}) or {}
     budget_bytes(front_door, int(budgets.get("START_HERE.md_bytes", 14000)), "START_HERE.md")
