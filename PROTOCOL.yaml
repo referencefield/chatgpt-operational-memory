@@ -5,7 +5,7 @@ front_door: START_HERE.md
 
 template_source:
   repository_id: 1354330020
-  repository: referencefield/chatgpt-operational-memory
+  repository: referencefield/operational-memory
   owner_name_runtime_resolved: true
   repository_name_part_of_protocol: false
   unresolved_repository_id_fails_closed: true
@@ -90,6 +90,7 @@ human_docs:
   example: EXAMPLE.md
   operations: OPERATIONS.md
   security: SECURITY.md
+  disclaimer: DISCLAIMER.md
   migrations: MIGRATIONS.md
   evals: EVALS.md
   eval_results: EVAL_RESULTS.md
