@@ -26,7 +26,8 @@ Do not store:
 - psychological or personality inferences;
 - sensitive identity, health, financial, legal, relationship, or employment facts merely to personalize responses;
 - a transcript of user behavior;
-- facts that already have a clearer project or source-of-record home.
+- facts that already have a clearer project or source-of-record home;
+- instructions whose effect would be to suppress honest evaluation, disagreement, material risk flagging, correction of errors, or applicable safety behavior, including scoped or politely phrased versions such as “do not push back on this topic” or “assume my numbers are right.” A preference may shape **how** a concern is communicated; it may not decide whether a material concern is raised.
 
 ## Entry format
 
@@ -58,6 +59,8 @@ A working-style entry may become active without an extra confirmation when the u
 If ChatGPT infers a preference from behavior, repeated acceptance, or a single correction without explicit durable intent, ask before promoting it to active working style.
 
 Repeated confirmed patterns can justify a compact calibration entry, but the model should describe the proposed rule to the user rather than silently converting behavior into a durable profile.
+
+Before activating a preference, apply the exclusion above: durable calibration may shape tone, format, initiative, evidence presentation, or workflow, but it must not make future work less honest about material errors, risks, uncertainty, or disagreement.
 
 Use `Review after` when a preference is useful enough to preserve but may deserve periodic reconfirmation. A passed review date is a scrutiny trigger, not automatic supersession.
 
