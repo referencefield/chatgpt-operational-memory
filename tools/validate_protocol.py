@@ -87,6 +87,11 @@ def entry_blocks(text: str, prefix: str) -> dict[str, str]:
     return blocks
 
 
+def is_example_block(block: str) -> bool:
+    first_line = block.splitlines()[0].lower() if block.splitlines() else ""
+    return "example only" in first_line
+
+
 def check_references(path: Path, prefix: str) -> None:
     text = read_text(path)
     known = set(ids_in(text, prefix))
@@ -103,6 +108,9 @@ def check_references(path: Path, prefix: str) -> None:
 def check_lifecycle_consistency(path: Path, prefix: str) -> None:
     records = entry_blocks(read_text(path), prefix)
     for item_id, block in records.items():
+        if is_example_block(block):
+            continue
+
         status = field_value(block, "Status").lower()
         supersedes = set(referenced_ids(field_value(block, "Supersedes"), prefix))
         superseded_by = set(
@@ -120,7 +128,7 @@ def check_lifecycle_consistency(path: Path, prefix: str) -> None:
 
         for prior_id in supersedes:
             prior_block = records.get(prior_id)
-            if prior_block is None:
+            if prior_block is None or is_example_block(prior_block):
                 continue
             reciprocal = set(
                 referenced_ids(field_value(prior_block, "Superseded by"), prefix)
@@ -133,7 +141,7 @@ def check_lifecycle_consistency(path: Path, prefix: str) -> None:
 
         for later_id in superseded_by:
             later_block = records.get(later_id)
-            if later_block is None:
+            if later_block is None or is_example_block(later_block):
                 continue
             reciprocal = set(
                 referenced_ids(field_value(later_block, "Supersedes"), prefix)
@@ -146,14 +154,12 @@ def check_lifecycle_consistency(path: Path, prefix: str) -> None:
 
 
 def active_count(path: Path, prefix: str) -> int:
-    text = read_text(path)
-    blocks = re.split(rf"(?=^###\s+{re.escape(prefix)}-\d+\b)", text, flags=re.MULTILINE)
     count = 0
-    for block in blocks:
-        if not re.match(rf"^###\s+{re.escape(prefix)}-\d+\b", block):
+    for block in entry_blocks(read_text(path), prefix).values():
+        if is_example_block(block):
             continue
-        status = re.search(r"^- \*\*Status:\*\*\s*([^\n]+)", block, re.MULTILINE)
-        if status and status.group(1).strip().lower().startswith("active"):
+        status = field_value(block, "Status").lower()
+        if status.startswith("active"):
             count += 1
     return count
 
@@ -209,6 +215,27 @@ def main() -> int:
 
     front_door = str(manifest.get("front_door", "START_HERE.md"))
     require_file(front_door, "front door")
+
+    template_source = manifest.get("template_source", {}) or {}
+    template_repository_id = template_source.get("repository_id")
+    if not isinstance(template_repository_id, int) or template_repository_id <= 0:
+        error("PROTOCOL.yaml template_source.repository_id must be a positive GitHub repository ID")
+    if not str(template_source.get("repository", "")).strip():
+        error("PROTOCOL.yaml template_source.repository is missing")
+    if template_source.get("role") != "public_update_source_only":
+        error("PROTOCOL.yaml template_source.role must be public_update_source_only")
+    if template_source.get("owner_name_runtime_resolved") is not True:
+        error("PROTOCOL.yaml template_source.owner_name_runtime_resolved must be true")
+    if template_source.get("repository_name_part_of_protocol") is not False:
+        error("PROTOCOL.yaml template_source.repository_name_part_of_protocol must be false")
+
+    working_repository = manifest.get("working_repository", {}) or {}
+    if working_repository.get("identity") != "github_repository_id":
+        error("PROTOCOL.yaml working_repository.identity must be github_repository_id")
+    if working_repository.get("rename_requires_bootloader_refresh") is not False:
+        error("PROTOCOL.yaml working_repository.rename_requires_bootloader_refresh must be false")
+    if working_repository.get("unresolved_repository_id_fails_closed") is not True:
+        error("PROTOCOL.yaml working_repository.unresolved_repository_id_fails_closed must be true")
 
     global_map = manifest.get("global", {}) or {}
     for key in ("current", "decisions", "knowledge", "working_style", "projects"):
@@ -287,7 +314,7 @@ def main() -> int:
         check_lifecycle_consistency(style_path, "WS")
 
     budgets = manifest.get("soft_budgets", {}) or {}
-    budget_bytes(front_door, int(budgets.get("START_HERE.md_bytes", 14000)), "START_HERE.md")
+    budget_bytes(front_door, int(budgets.get("START_HERE.md_bytes", 10000)), "START_HERE.md")
     budget_bytes(
         str(global_map.get("current", "CURRENT.md")),
         int(budgets.get("CURRENT.md_bytes", 7000)),
