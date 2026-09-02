@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Upstream project support and Discussions
-    url: https://github.com/referencefield/chatgpt-operational-memory/discussions
+    url: https://github.com/referencefield/operational-memory/discussions
     about: Use the public upstream Discussions for open-ended questions, experiences, and ideas that are not yet actionable issues. This link intentionally points outside a private template copy.
