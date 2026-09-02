@@ -38,7 +38,7 @@ When the user explicitly establishes a clear, non-sensitive change that will mat
 
 Ask before writing when durable intent or future relevance is inferred rather than explicit, when the material is sensitive, when routing is ambiguous, when a new structural home would be required, or when the user has selected ask-first behavior.
 
-Do not persist brainstorming, alternatives under consideration, casual facts, transient preferences, or conversational detail merely because they might be useful later.
+Do not persist brainstorming, alternatives under consideration, casual facts, transient preferences, or conversational detail merely because they might be useful later. Working-style candidates must also pass the behavioral-authority boundary in `WORKING_STYLE.md` and `SECURITY.md`.
 
 At closeout, reconcile any persistence-watch candidates still pending and report anything intentionally left unpersisted.
 
@@ -98,7 +98,7 @@ Never treat “all API calls returned OK” as equivalent to the write-set being
 
 ## Persistence receipts
 
-For consequential writes, verify the resulting repository/ref/path/content before claiming success.
+`START_HERE.md` defines **consequential write**. For those writes, verify the resulting repository/ref/path/content before claiming success.
 
 When GitHub returns or confirms a real commit SHA, report a compact receipt:
 
@@ -158,7 +158,7 @@ A health check has two layers.
 
 Use the advisory validator declared in `PROTOCOL.yaml` when available. It checks machine-verifiable invariants such as required files, project registration/template structure, identifier uniqueness/reference integrity, supersession lifecycle consistency, manifest identity fields, and soft budget warnings.
 
-The GitHub Action is advisory. It is **not** a required status check and does not block ordinary direct ChatGPT writes to `main`.
+The included GitHub Action is advisory and intentionally does **not** run on every direct operational-memory write. It runs for pull requests or when manually dispatched. It is **not** a required status check and does not block ordinary direct ChatGPT writes to `main`.
 
 ### Semantic layer
 
@@ -168,7 +168,7 @@ ChatGPT should additionally inspect what deterministic tooling cannot reliably d
 - whether durable knowledge belongs globally or in a project;
 - whether knowledge appears stale despite missing/weak lifecycle metadata;
 - whether two project entries are really duplicate workstreams;
-- whether a working-style entry is overbroad, contradictory, or drifting into personal profiling;
+- whether a working-style entry is overbroad, contradictory, drifting into personal profiling, or would suppress honest evaluation/risk flagging;
 - whether the minimum useful retrieval path is still obvious;
 - whether persistence-watch behavior is missing obvious durable changes or producing noisy/overbroad writes.
 
@@ -228,9 +228,9 @@ Default to fail closed, fail loud, preserve the last known good state, and offer
 - Unverified write -> report `not verified`.
 - Partial write-set -> report temporary inconsistency and reconcile.
 - Inferred working preference -> ask before activation.
-- Connector unavailable -> state that changes were not persisted.
+- Required GitHub write actions unavailable -> state that changes were not persisted.
 
-If GitHub is temporarily unavailable, a human may make the appropriate edit directly in the GitHub web interface. When access returns, enter through `START_HERE.md`, reread affected state, and reconcile the manual change before proceeding.
+If GitHub write actions are temporarily unavailable, a human may make the appropriate edit directly in the GitHub web interface. When access returns, enter through `START_HERE.md`, reread affected state, and reconcile the manual change before proceeding.
 
 ## Repository maintenance
 
