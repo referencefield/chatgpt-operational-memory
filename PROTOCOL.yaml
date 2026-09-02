@@ -4,7 +4,11 @@ canonical_branch: main
 front_door: START_HERE.md
 
 template_source:
+  repository_id: 1354330020
   repository: referencefield/chatgpt-operational-memory
+  owner_name_runtime_resolved: true
+  repository_name_part_of_protocol: false
+  unresolved_repository_id_fails_closed: true
   manifest: PROTOCOL.yaml
   role: public_update_source_only
   check_on_request: true
