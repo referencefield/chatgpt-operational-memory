@@ -19,12 +19,29 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: plan
+    attributes:
+      label: ChatGPT plan
+      description: This release supports Plus or higher for the ChatGPT setup path; Free and Go are unsupported.
+      options:
+        - Plus
+        - Pro
+        - Business
+        - Enterprise
+        - Edu
+        - Go
+        - Free
+        - Other / not sure
+    validations:
+      required: false
+
   - type: checkboxes
     id: github-plugin
     attributes:
       label: GitHub plugin
       options:
-        - label: I installed/authenticated the GitHub plugin and invoked `@GitHub` when the workflow required repository access.
+        - label: I installed/selected `@GitHub`, authenticated it to GitHub, authorized the relevant repository, and invoked `@GitHub` when repository access was required.
           required: false
 
   - type: textarea
