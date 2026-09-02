@@ -6,6 +6,20 @@ The goal is simple: keep the small amount of state that actually needs to surviv
 
 This is designed for ordinary ChatGPT users. You do not need a terminal, local agent framework, vector database, MCP server, or Git expertise for normal use.
 
+## Who this is for
+
+This template is intentionally narrow.
+
+It is for people who:
+
+- primarily work in ordinary ChatGPT chats or Projects;
+- want important working state to survive across conversations;
+- are comfortable creating a private GitHub repository and connecting ChatGPT to it;
+- want a small, inspectable state surface rather than an autonomous memory stack;
+- do not want to install local agent frameworks, databases, MCP servers, or command-line tooling just to preserve continuity.
+
+It is probably **not** the right endpoint if you want autonomous agents, vector retrieval, multi-agent orchestration, local execution, formal evidence/authority contracts, automatic memory consolidation, or a developer-facing memory API. See **Prior art and advanced alternatives** below for projects that go further in those directions.
+
 ## 60-second operating model
 
 After completing [`SETUP.md`](SETUP.md), normal use is intentionally simple.
@@ -205,6 +219,43 @@ Start with explicit invocation:
 > `@GitHub Find my operational-memory repository and tell me whether the GitHub actions actually available in this chat can read, create, update, and delete files there. Do not assume capability from my statement.`
 
 Then follow the troubleshooting section in [`SETUP.md`](SETUP.md).
+
+## Prior art, lineage, and advanced alternatives
+
+This template did **not** begin as a reimplementation of another memory repository.
+
+It grew out of long-running ChatGPT + GitHub operational work at **Reference Field, Inc.**, where patterns such as explicit current state, durable decisions with supersession, retrieve-before-relying, write/readback verification, reconciliation, and conversational closeout were developed because repeated collaboration exposed those needs.
+
+During later adversarial review and prior-art research, we found substantial overlap with public work that had independently developed related ideas. Some of those projects also sharpened or validated practices used here. They are cited below both for fair attribution and because users who want more machinery may be better served by them.
+
+The existence of prior art means this project does **not** claim novelty for Git-backed memory, Markdown state, durable decision logs, supersession, retrieval-before-work, handoff/closeout, or memory validation. The contribution here is narrower: package a small subset of those ideas for an ordinary ChatGPT user who wants conversational GitHub writeback without adopting a developer-grade agent stack.
+
+### If you want something more advanced
+
+- **Context Spine v2** — https://github.com/BerniceHole/context-spine  
+  A small but more formal state-and-authority protocol for recoverable human-AI project work across chats, agents, coding tools, hosts, and unattended runs. It uses explicit current state, decisions, handoff, authority, and execution evidence. Consider it if you are managing software projects, multiple agents, automation, or stronger authority/evidence requirements.
+
+- **Letta / MemFS (Context Repositories)** — https://github.com/letta-ai/letta-code and https://github.com/letta-ai/letta-docs-md/blob/main/concepts/memfs/index.md  
+  A memory-first agent ecosystem with a Git-backed Markdown memory filesystem, always-loaded and selectively retrieved memory, direct editing, versioning, and agent-managed context. Consider it if you want a stateful agent harness rather than a lightweight ChatGPT workflow.
+
+- **Agent Zero** — https://github.com/agent0ai/agent-zero  
+  A full agent framework with persistent vector-based memory, automatic conversation memory, knowledge import, consolidation, scoped stores, and a memory-management UI. Consider it if you want autonomous/local agent behavior and richer memory infrastructure.
+
+- **ProjectMemory** — https://github.com/micsh/ProjectMemory  
+  An MCP server using a structured project knowledge store for conventions, decisions, lessons, known issues, consolidation, forgetting, and export/import. Consider it if you are a developer comfortable running MCP infrastructure and want project memory exposed as tools.
+
+- **context-repository** — https://github.com/evanfollis/context-repository  
+  A formal context/provenance specification and pattern lab covering claims, evidence, decisions, policy, promotion, realization, and event logs, plus a file-based resumable-context pattern. Consider it if your priority is formal contracts, provenance, validation, or context governance rather than minimal setup.
+
+### Research worth knowing about
+
+- **Supersede** — https://github.com/Vrin-cloud/supersede  
+  Research and tooling focused specifically on temporal fact-currency: teaching/evaluating agents to use the current fact instead of a stale superseded one. Its problem statement directly reinforces why this template distinguishes active decisions from superseded history.
+
+- **Filesystem-Based Memory for LLM Agents: Organization, Evolution, and Sustainability** — https://arxiv.org/abs/2607.26637  
+  Research on long-term filesystem-based agent memory. Among other findings, it cautions that maintaining organization as memory grows is difficult and that organization can degrade, supporting this template's deliberate bias toward a very small active memory surface instead of an ever-growing knowledge tree.
+
+These references are not endorsements of every design choice in those systems, and they do not imply that the practices in this template originated exclusively with them. They are useful neighboring work and stronger alternatives for users whose needs exceed this template's deliberately simple scope.
 
 ## What this does not promise
 
