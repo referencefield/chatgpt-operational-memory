@@ -8,7 +8,7 @@ The goal is not to make ChatGPT remember everything. It is to keep the smaller s
 
 Operational Memory is an independent open-source project created by **Reference Field, Inc.** It is not an OpenAI or GitHub product and is not sponsored by or endorsed by either company. See [`DISCLAIMER.md`](DISCLAIMER.md) for practical boundaries and third-party independence.
 
-**Supported release baseline:** a **paid ChatGPT plan** plus the `@GitHub` plugin with repository write actions. Free ChatGPT accounts are not supported by this release. A paid plan alone does not guarantee that the required plugin/actions are available on every account, region, workspace, or surface, so setup verifies the actual capability.
+**Supported release baseline:** **ChatGPT Plus (currently $20/month) or a higher ChatGPT plan**, plus the installed/selected and authenticated **`@GitHub` plugin** authorized for the intended repository and exposing repository read/write actions. **Free and ChatGPT Go are unsupported by this release.** A qualifying plan alone does not establish readiness; setup verifies the actual GitHub capability before reporting READY.
 
 Not sure whether this is worth installing? Read **[`WHAT_TO_EXPECT.md`](WHAT_TO_EXPECT.md)** first. It is the short human-facing description of what should feel different in practice.
 
@@ -24,9 +24,9 @@ GitHub should open a new-repository form using this template with **Private** pr
 
 ### 2. Connect
 
-In ChatGPT, install/select the **`@GitHub` plugin**, sign in to GitHub, and authorize the private memory repository you just created. Prefer access to only that repository when available; unrelated repositories are not needed.
+In ChatGPT, install/select the **`@GitHub` plugin** in the message composer, authenticate it to GitHub, and authorize the private memory repository you just created. Prefer access to only that repository when available; unrelated repositories are not needed.
 
-**Requires:** `@GitHub` with repository write actions. Setup checks this automatically. OpenAI also documents a separate GitHub app/connection used for repository search and analysis that may be read-only; that separate limitation is not proof that the `@GitHub` plugin cannot write.
+**Requires:** the selected `@GitHub` plugin must be authenticated and expose repository read/write actions for the exact repository. Merely seeing GitHub or the Plugin Directory is not enough. OpenAI also documents a separate GitHub app/connection used for repository search and analysis that may be read-only; that separate limitation is not proof that the selected `@GitHub` plugin cannot write.
 
 ### 3. Activate
 
@@ -36,7 +36,7 @@ Copy the URL of your new private repository and send:
 
 That's it.
 
-ChatGPT should verify the exact repository, Private visibility, safe read/write, verified readback, cleanup of its temporary setup test, and protocol structure without making you perform those technical checks.
+ChatGPT should verify the supported plan, active/authenticated GitHub plugin, exact repository, Private visibility, safe read/write, verified readback, cleanup of its temporary setup test, and protocol structure without making you perform those technical checks.
 
 Success begins:
 
@@ -114,7 +114,7 @@ When sources conflict, the user's current instruction wins. Current verified ope
 
 ## What changes in practice
 
-| Situation | Paid ChatGPT without this repo | With this repo |
+| Situation | ChatGPT Plus without this repo | With this repo |
 | --- | --- | --- |
 | Fresh chat later | Prior context may be useful but its basis may be unclear. | ChatGPT can retrieve explicit durable state through a scoped front door. |
 | “Where were we?” | Reconstruct from available chat/native context. | `@GitHub` retrieves current project/global state and active decisions. |
@@ -212,9 +212,9 @@ The repository also includes an advisory deterministic validator for structural 
 
 ### ChatGPT Chat
 
-The supported lay-user baseline for this release is a **paid ChatGPT account** with the authenticated **`@GitHub` plugin** exposing repository read/write actions for the private working repository. Free ChatGPT accounts are outside this release's supported setup.
+The supported lay-user baseline is **ChatGPT Plus (currently $20/month) or higher**. **Free and ChatGPT Go are unsupported.** In addition, the `@GitHub` plugin must be installed/selected, authenticated to GitHub, authorized for the exact private working repository, and expose repository read/write actions.
 
-A paid account is necessary for this release's support policy but does not itself prove that `@GitHub` write actions are available on the user's current surface; activation verifies actual capability.
+A supported plan is necessary but not sufficient. Plugin availability and actions can vary by account, workspace, role, region, surface, and rollout, so activation verifies the actual capability. A visible plugin listing or a separate read-only GitHub connection does not satisfy this persistence protocol.
 
 OpenAI separately documents a GitHub app/connection used for repository search and analysis as read-only. That surface can support retrieval but cannot satisfy this persistence protocol. Do not generalize its read-only limitation to the selected `@GitHub` plugin; `SETUP.md` uses actual exposed actions plus reversible CRUD/readback to determine readiness.
 
@@ -226,7 +226,7 @@ The repository includes a tiny root `AGENTS.md` bootloader. Codex enters through
 
 ### ChatGPT Work
 
-When equivalent write-capable GitHub actions are available in Work, the same repository and front door apply. Longer multi-step execution does not weaken persistence authorization, routing, privacy, write-set, or readback rules.
+When equivalent write-capable GitHub actions are available in Work on a supported plan/workspace, the same repository and front door apply. Longer multi-step execution does not weaken persistence authorization, routing, privacy, write-set, or readback rules.
 
 ### Other models
 
@@ -273,7 +273,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - `PROTOCOL.yaml` — machine-readable protocol and compatibility manifest
 - `COMPANION.md` — generic fallback collaboration baseline; never replaces an existing user companion
 - `AGENTS.md` — Codex bootloader
-- `OPERATIONS.md` — project creation, write-sets, health, closeout, recovery, maintenance
+- `OPERATIONS.md` — project creation, write-sets, health, recovery, maintenance
 - `SECURITY.md` — privacy, secrets, recovery boundaries, optional Git hardening
 - `DISCLAIMER.md` — project independence, warranty/reliability boundaries, and user responsibility
 - `MIGRATIONS.md` — release/update rules and controlled release cleanup
