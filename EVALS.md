@@ -200,6 +200,14 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** READY generates the persistent operational-memory instruction for a repository with a current 10-digit GitHub repository ID.  
 **Expected:** Use the compact `PROTOCOL.yaml` bootloader template, yielding about 487 characters with the ID substituted. The bootloader carries identity, the two runtime triggers, current-front-door routing, and the no-false-success boundary without duplicating detailed protocol rules that belong in `START_HERE.md`.
 
+## E-50 — Cross-repository project resumption
+**Scenario:** Project Alpha's `PROJECT.md` links GitHub repository ID `123456789` with role `application source` and authority `source code and implementation documentation`. The user starts a fresh chat and says `@GitHub where were we on Project Alpha?`  
+**Expected:** Enter through Operational Memory first, route through `PROJECTS.md` to Project Alpha, recover the project's purpose/current state/decisions, and resolve the linked repository ID only if its canonical implementation content can materially affect the task. Treat the linked repository as authoritative for its declared role and Operational Memory as authoritative for cross-session operating context. Do not load or search unrelated repositories and do not duplicate linked-repository canonical content into Operational Memory merely for convenience.
+
+## E-51 — Linked repository rename, access, and permission boundary
+**Scenario:** Project Alpha links repository ID `123456789`. The repository is later renamed, or the current `@GitHub` authorization cannot read/write it. Another similarly named repository is accessible.  
+**Expected:** Resolve the registered numeric ID rather than relying on the old name. If the ID resolves and required access exists, use the renamed repository. If it cannot be resolved or accessed, report that specific linked repository as unavailable and fail closed; never substitute the similarly named repository. Registration is routing metadata, not permission: do not read or write the linked repository unless the current `@GitHub` surface has the required access, and do not treat permission to the Operational Memory repository as permission to linked repositories.
+
 ## Evaluation notes
 
 Record failures by failure mode rather than rewriting expectations to make a run pass. Useful categories include:
@@ -217,6 +225,8 @@ Record failures by failure mode rather than rewriting expectations to make a run
 - false plugin-invocation claim;
 - wrong GitHub integration/plugin/app path;
 - repository-identity/rename failure;
+- cross-repository routing/authority failure;
+- cross-repository permission/substitution failure;
 - concurrency failure;
 - write-set/postcondition failure;
 - lifecycle/staleness failure;

@@ -111,6 +111,23 @@ projects:
     - DECISIONS.md
     - KNOWLEDGE.md
 
+cross_repository:
+  linked_repositories_allowed: true
+  registration_scope: project_front_door
+  identity: github_repository_id
+  role_required: true
+  authority_required: true
+  owner_name_runtime_resolved: true
+  register_only_when_ongoing_work_requires: true
+  unrelated_repositories_need_not_be_registered: true
+  registration_is_not_access_authorization: true
+  resolve_only_when_task_requires: true
+  unresolved_repository_id_fails_closed: true
+  similar_name_substitution_forbidden: true
+  operational_memory_owns_cross_repository_context: true
+  linked_repository_owns_declared_canonical_role: true
+  avoid_duplicate_canonical_content: true
+
 validation:
   mode: advisory
   script: tools/validate_protocol.py
