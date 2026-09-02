@@ -5,6 +5,12 @@ Purpose: preserve stable preferences about **how the user and ChatGPT work toget
 
 This is not a biography, personality profile, or general fact store.
 
+## Relationship to the generic companion
+
+`COMPANION.md` supplies a generic fallback collaboration baseline when the user has not provided stronger behavioral guidance. This file selectively calibrates that baseline for the user.
+
+If the user already has a companion, persona, or Custom Instructions, do not replace, rename, rewrite, or compete with them. User-provided identity/style guidance remains in place; apply active non-conflicting entries here where relevant, then use `COMPANION.md` only for remaining gaps. Neither this file nor `COMPANION.md` overrides current explicit instructions, durable state authority, or applicable safety behavior.
+
 ## What belongs here
 
 Examples:

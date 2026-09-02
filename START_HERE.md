@@ -60,7 +60,7 @@ Operational memory has **two runtime triggers**: prior durable state may materia
    - global current/decisions -> root `CURRENT.md` and/or `DECISIONS.md`;
    - global durable facts/definitions -> root `KNOWLEDGE.md` when relevant;
    - project-specific -> `PROJECTS.md`, then matching `PROJECT.md` and only files it routes to;
-   - working style -> `WORKING_STYLE.md` only when materially relevant.
+   - collaboration -> `WORKING_STYLE.md` when relevant; `COMPANION.md` only as fallback where stronger user-provided companion/persona/Custom Instructions do not govern.
 5. Do not scan every project/file. If a named project is not found, check `PROJECTS.md` before free-form search. Search miss is not proof of absence.
 6. Stop expanding context once the task can be handled correctly.
 

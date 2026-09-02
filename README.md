@@ -1,12 +1,14 @@
 # ChatGPT Operational Memory
 
-A low-infrastructure GitHub template for giving ChatGPT durable, user-owned working state across conversations: current state, decisions, durable knowledge, working preferences, and routed projects.
+A low-infrastructure GitHub template for giving ChatGPT durable, user-owned working state across conversations: current state, decisions, durable knowledge, working preferences, routed projects, and cross-repository continuity.
 
 The goal is not to make ChatGPT remember everything. It is to keep the smaller set of information that genuinely needs to survive a conversation somewhere you can inspect, correct, version, and own.
 
 > **A portable continuity layer for serious ongoing ChatGPT work.**
 
 **Supported release baseline:** a **paid ChatGPT plan** plus the `@GitHub` plugin with repository write actions. Free ChatGPT accounts are not supported by this release. A paid plan alone does not guarantee that the required plugin/actions are available on every account, region, workspace, or surface, so setup verifies the actual capability.
+
+Not sure whether this is worth installing? Read **[`WHAT_TO_EXPECT.md`](WHAT_TO_EXPECT.md)** first. It is the short human-facing description of what should feel different in practice.
 
 ## Get started: Create → Connect → Activate
 
@@ -79,6 +81,10 @@ That second trigger matters even when a conversation began with no need for repo
 
 Explicit `@GitHub` is the dependable execution path. The bootloader removes repository-identity and routing complexity; it should not be treated as proof that a product surface actually invoked the plugin automatically.
 
+The template also includes a **latent generic working companion** in [`COMPANION.md`](COMPANION.md). It supplies sensible fallback collaboration behavior for users who have not built their own companion or detailed Custom Instructions. It is not a named persona and must not replace, rename, rewrite, or compete with an existing user companion/persona/Custom Instructions. [`WORKING_STYLE.md`](WORKING_STYLE.md) can selectively calibrate that fallback as durable preferences emerge.
+
+Projects may also link other GitHub repositories when ongoing work genuinely spans repositories. Operational Memory can retain the cross-session purpose, decisions, current context, and relationship between those repos while each linked repo remains authoritative for the content assigned to it, such as code, implementation docs, issues, or releases. Unrelated repos do not need to be registered, and registration is never treated as access permission.
+
 If the user clearly changes something that should govern future work, such as a finalized decision or active project target, a conservative persistence watch can route and persist that change under normal verification rules without requiring a magic “remember this” phrase. Ambiguous, inferred, sensitive, or structurally novel persistence still requires confirmation.
 
 Later, a fresh conversation can ask `@GitHub where were we?` and reconstruct the situation from explicit current state and active decisions rather than relying only on conversational recollection.
@@ -96,36 +102,47 @@ A useful mental model is:
 - **conversation** — normal working surface;
 - **tools, files, and web sources** — evidence and execution when needed;
 - **native ChatGPT memory** — continuity and personalization;
-- **operational memory** — explicit state, decisions, durable knowledge, and working preferences important enough to govern future work.
+- **user companion / Custom Instructions** — any identity/style guidance the user already chose;
+- **`COMPANION.md`** — generic fallback collaboration quality only where stronger user guidance is absent;
+- **operational memory** — explicit state, decisions, durable knowledge, working preferences, project routing, and cross-repository relationships important enough to govern future work.
 
 The repository should stay selective. It is not a transcript archive. If durable state cannot materially change the task and the conversation has not created a clear future-governing change, using no repository context is a valid route.
 
-When sources conflict, the user's current instruction wins. Current verified operational state and active decisions can then serve as explicit authority rather than allowing older memory or recollection to quietly overrule them.
+When sources conflict, the user's current instruction wins. Current verified operational state and active decisions can then serve as explicit authority rather than allowing older memory or recollection to quietly overrule them. `COMPANION.md` is behavioral fallback, not state authority.
 
 ## What changes in practice
 
-| Situation | ChatGPT without this repo | With this repo |
+| Situation | Paid ChatGPT without this repo | With this repo |
 | --- | --- | --- |
 | Fresh chat later | Prior context may be useful but its basis may be unclear. | ChatGPT can retrieve explicit durable state through a scoped front door. |
 | “Where were we?” | Reconstruct from available chat/native context. | `@GitHub` retrieves current project/global state and active decisions. |
-| Important decision changes | Old and new positions may coexist. | New decision can explicitly supersede the old one. |
+| Important decision changes | Old and new positions may coexist. | New decision can explicitly supersede the old one and reconcile current state. |
 | Durable fact becomes stale | Freshness may be unclear. | Knowledge can carry verification/review metadata. |
-| Repeated working preference | May need to be re-taught. | Explicit collaboration preferences can be stored compactly. |
+| Repeated working preference | May need to be re-taught or depend on native personalization. | Explicit collaboration preferences can be stored selectively in `WORKING_STYLE.md`. |
+| Starting collaboration quality | Default ChatGPT behavior plus existing personalization. | Adds a generic, non-persona companion baseline only where stronger user guidance is absent. |
+| Existing companion/persona | Whatever the user has configured. | Keeps it. The generic companion must not overwrite or compete with it. |
 | Several ongoing projects | Context can blur. | `PROJECTS.md` routes to the correct project front door. |
+| Work spans several GitHub repos | Cross-repo context may be reconstructed ad hoc. | A project can link relevant repos by immutable ID while each repo remains canonical for its declared role. |
 | Write claims success | No Git-style receipt is inherent to chat memory. | Consequential writes are reread and verified. |
 | Concurrent/manual edit | Silent overwrite is possible in an unversioned store. | Current version/blob preconditions can reject stale writes. |
-| Repository renamed | A name-based pointer may become stale. | The bootloader resolves the same GitHub repository ID to its new owner/name. |
+| Memory repository renamed | A name-based pointer may become stale. | The bootloader resolves the same GitHub repository ID to its new owner/name. |
+| Linked repository renamed | Cross-repo references may become stale if name-based. | Project links use immutable repository IDs and resolve current owner/name at runtime. |
 | Conversation creates a firm decision late | It may vanish with the chat. | The persistence trigger can engage operational memory even if prior state was not needed initially. |
 | One-off casual question | Just chat. | Also just chat. No-repository-context is valid. |
 
 The practical difference is not **“ChatGPT remembers more.”** It is:
 
-**For information important enough to govern ongoing work, the user can inspect what is current, what was superseded, where it belongs, and whether changes actually persisted.**
+**For information important enough to govern ongoing work, the user can inspect what is current, what was superseded, where it belongs, how related repositories fit together, and whether changes actually persisted.**
+
+For the shorter human version of this comparison, see [`WHAT_TO_EXPECT.md`](WHAT_TO_EXPECT.md).
 
 ## Architecture
 
 ```text
-START_HERE.md
+                     COMPANION.md
+                  generic fallback only
+                          |
+START_HERE.md ------------+
     |
     +-- global state
     |      CURRENT.md
@@ -141,6 +158,8 @@ START_HERE.md
                        +-- CURRENT.md
                        +-- DECISIONS.md
                        +-- KNOWLEDGE.md
+                       +-- optional linked GitHub repositories
+                           (immutable repository ID + role + authority)
 ```
 
 `PROTOCOL.yaml` is the machine-readable manifest. `START_HERE.md` is the runtime front door. Detailed procedures live in `OPERATIONS.md` so normal sessions do not need to load the whole protocol library.
@@ -168,6 +187,8 @@ Repository resolution and front-door entry are internal steps, not user commands
 ## Controlled persistence
 
 Before writing durable material, the protocol routes it to an existing source of record, global current state, a durable decision, durable knowledge, working style, the correct registered project, or `UNROUTED / no legitimate home`.
+
+If a project registers a linked repository as canonical for a specific role, material belonging to that role stays there rather than being copied into Operational Memory merely for convenience.
 
 The system should not automatically persist brainstorming, discarded alternatives, casual conversation, one-off preferences, or sensitive material merely because it could be useful later.
 
@@ -224,7 +245,7 @@ See [`SECURITY.md`](SECURITY.md) for details.
 Two different test surfaces are included:
 
 - `tools/validate_protocol.py` checks machine-verifiable structural invariants and soft warning budgets.
-- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, activation, GitHub surface selection, onboarding failure recovery, late-conversation persistence activation, repository identity/rename behavior, working-style safety, compatibility, and maintenance failures.
+- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, activation, GitHub surface selection, onboarding failure recovery, late-conversation persistence activation, repository identity/rename behavior, cross-repository authority/permission behavior, companion precedence, working-style safety, compatibility, and maintenance failures.
 
 The included GitHub Actions workflow is advisory and intentionally does not run on every direct operational-memory write. It runs for pull requests or when manually dispatched. Runtime write/readback verification protects individual operational writes; the structural validator protects releases, PRs, maintenance, and explicit health checks.
 
@@ -244,9 +265,11 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 ## Repository map
 
 - `README.md` — product overview and beginner start
+- `WHAT_TO_EXPECT.md` — short human-facing install/value guide
 - `SETUP.md` — beginner setup plus advanced verification/troubleshooting
 - `START_HERE.md` — compact runtime authority/front door
 - `PROTOCOL.yaml` — machine-readable protocol and compatibility manifest
+- `COMPANION.md` — generic fallback collaboration baseline; never replaces an existing user companion
 - `AGENTS.md` — Codex bootloader
 - `OPERATIONS.md` — project creation, write-sets, health, closeout, recovery, maintenance
 - `SECURITY.md` — privacy, secrets, recovery boundaries, optional Git hardening
@@ -257,17 +280,17 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - `CONTRIBUTING.md` — contribution routes and design guardrails
 - `CURRENT.md`, `DECISIONS.md`, `KNOWLEDGE.md`, `WORKING_STYLE.md` — global durable state
 - `PROJECTS.md` — project registry/router
-- `projects/_TEMPLATE/` — project skeleton
+- `projects/_TEMPLATE/` — project skeleton, including optional linked-repository registration
 - `tools/` — advisory structural validator
 - `.github/` — contribution forms and advisory validation workflow
 
 ## Prior art and positioning
 
-This project grew out of long-running ChatGPT + GitHub operational work at **Reference Field, Inc.** It does **not** claim novelty for Git-backed memory, Markdown state, durable decision logs, supersession, repository-local AI instructions, retrieval-before-work, or validation.
+This project grew out of long-running ChatGPT + GitHub operational work at **Reference Field, Inc.** It does **not** claim novelty for Git-backed memory, Markdown state, durable decision logs, supersession, repository-local AI instructions, retrieval-before-work, generic assistant behavior guidelines, or validation.
 
 Repository-local AI instruction files are established prior art, including OpenAI Codex `AGENTS.md`, Anthropic Claude Code `CLAUDE.md`, and Cursor project rules. Neighboring or more infrastructure-heavy systems include Context Spine, Letta/MemFS, Agent Zero, ProjectMemory, context-repository, Supersede, and filesystem-based memory research.
 
-This template's narrower proposition is a low-infrastructure, human-readable operational-memory layer for ordinary ChatGPT users who want conversational GitHub writeback, scoped routing, explicit supersession, and post-write verification without first adopting an agent framework or database.
+This template's narrower proposition is a low-infrastructure, human-readable operational-memory layer for ordinary ChatGPT users who want conversational GitHub writeback, scoped routing, explicit supersession, cross-repository continuity, a non-destructive generic collaboration baseline, and post-write verification without first adopting an agent framework or database.
 
 ## Validation status and limits
 
@@ -277,7 +300,7 @@ The repository has undergone design review, adversarial review, prior-art compar
 
 This is not an infallible memory system, objective source of truth, deterministic control plane, background synchronization service, security boundary, or universal replacement for native ChatGPT memory/Projects.
 
-It cannot know about changes that were never recorded, guarantee automatic plugin invocation, or guarantee future product behavior.
+It cannot know about changes that were never recorded, guarantee automatic plugin invocation, guarantee that a generic companion will dominate stronger user-provided guidance, or guarantee future product behavior.
 
 Licensed under the MIT License. See [`LICENSE`](LICENSE).
 
