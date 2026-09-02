@@ -181,13 +181,14 @@ The candidate passes only when there are **zero unresolved blockers**, every rem
 Only after Gates 1–6 pass:
 
 - assign the first real protocol release identifier and set `protocol_status: released`;
+- replace the **pre-first-release bootstrap lifecycle** in `PROTOCOL.yaml`, `AGENTS.md`, and `tools/validate_protocol.py` with a post-release lifecycle that can represent the last/current released protocol and a future development/acceptance target without reverting a released protocol ambiguously to `unreleased`; define and validate that transition before tagging the first release;
 - execute the controlled one-time history cleanup if still desired;
 - restore and verify the intended public-repository protection/settings;
 - rerun deterministic validation against the final release tree;
 - tag/publish the release;
 - create one final private copy using **Use this template** and repeat the activation smoke test against what GitHub actually ships.
 
-The prescribed release/version/history changes in Gate 7 are the release transition after the frozen candidate has passed; they are not an acceptance-candidate defect that sends the repository back through Gate 6. Any unrelated or opportunistic change discovered during Gate 7 still invalidates the release transition and must be handled through the normal corrective path.
+The prescribed release/version/lifecycle/history changes in Gate 7 are the release transition after the frozen candidate has passed; they are not an acceptance-candidate defect that sends the repository back through Gate 6. Any unrelated or opportunistic change discovered during Gate 7 still invalidates the release transition and must be handled through the normal corrective path.
 
 That final private-copy activation is the release artifact check. A successful test against the source repository alone is not sufficient.
 
@@ -218,15 +219,16 @@ When the first public release is actually cut:
 
 1. freeze the release-candidate structure and behavior;
 2. replace `protocol_version: "unreleased"` with the chosen first real release identifier in `PROTOCOL.yaml` and set `protocol_status: released`;
-3. update the `PROTOCOL.yaml` `release_rule` from pre-release guidance to the released lifecycle rule;
-4. remove or replace pre-release-only wording explicitly in **`README.md` (Development status), `MIGRATIONS.md` (Current pre-release rule), and `AGENTS.md` (the public-template unreleased-version instruction)**, then sweep for any other remaining `unreleased` wording that would confuse a working copy created from the release;
-5. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;
-6. verify that `template_source.repository_id` resolves the public upstream and update discovery does not depend on its current owner/name;
-7. run deterministic structural validation and the semantic repository health check;
-8. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, and failure handling;
-9. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
-10. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
-11. only then treat the public template as the migration source for user-created copies.
+3. replace the pre-first-release lifecycle metadata/rules and validator assumptions with the post-release lifecycle described in Gate 7, and prove that future development can be represented without losing or ambiguously overwriting the last released protocol identity;
+4. update the `PROTOCOL.yaml` `release_rule` from pre-release guidance to the released lifecycle rule;
+5. remove or replace pre-release-only wording explicitly in **`README.md` (Development status), `MIGRATIONS.md` (Current pre-release rule), and `AGENTS.md` (the public-template unreleased-version instruction)**, then sweep for any other remaining `unreleased` wording that would confuse a working copy created from the release;
+6. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;
+7. verify that `template_source.repository_id` resolves the public upstream and update discovery does not depend on its current owner/name;
+8. run deterministic structural validation and the semantic repository health check;
+9. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, failure handling, closeout, and release lifecycle;
+10. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
+11. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
+12. only then treat the public template as the migration source for user-created copies.
 
 ## Future release entries
 
