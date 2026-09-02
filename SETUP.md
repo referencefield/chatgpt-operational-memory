@@ -12,7 +12,7 @@ You do **not** need to know Git, use a terminal, understand repository IDs, or e
 
 ### 1. Create your private memory repository
 
-[**Create my private memory repository**](https://github.com/new?owner=%40me&template_owner=referencefield&template_name=chatgpt-operational-memory&visibility=private)
+[**Create my private memory repository**](https://github.com/new?owner=%40me&template_owner=referencefield&template_name=operational-memory&visibility=private)
 
 GitHub should open the new-repository form with this template selected and **Private** preselected. Choose any repository name you want, visibly confirm **Private**, then create it.
 
