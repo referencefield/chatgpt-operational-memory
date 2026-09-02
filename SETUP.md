@@ -24,7 +24,7 @@ Make the new working repository **private**.
 
 Before connecting ChatGPT or storing any personal/project state, open the repository on GitHub and visibly confirm GitHub labels it **Private**.
 
-The template is intentionally free of user-specific state. Your working copy can accumulate operational state over time.
+The template is intentionally free of user-specific state. Your working copy can accumulate operational state and knowledge over time.
 
 ## 2. Connect the correct GitHub capability
 
@@ -86,15 +86,17 @@ In ChatGPT Custom Instructions, or the equivalent persistent instruction surface
 >
 > When my request can materially depend on prior durable work, enter the repository through `START_HERE.md` before relying on remembered prior context. Follow its routing rules. Do not load the whole repository by default. No-repository-context is a valid route when durable state cannot materially change the answer.
 >
-> Route before retrieval. For global/cross-project work, use root `CURRENT.md` and `DECISIONS.md`. For project-specific work, use `PROJECTS.md` to locate the project, then retrieve that project's `PROJECT.md` front door and only the current authority it identifies as needed. Load `WORKING_STYLE.md` when stable collaboration preferences can materially affect how the task should be handled.
+> Route before retrieval. For global/cross-project current state or decisions, use root `CURRENT.md` and `DECISIONS.md`. Use root `KNOWLEDGE.md` when stable cross-project facts/definitions/corrections can materially affect the task. For project-specific work, use `PROJECTS.md` to locate the project, then retrieve that project's `PROJECT.md` front door and only the current authority it identifies as needed, including project `KNOWLEDGE.md` when relevant. Load `WORKING_STYLE.md` when stable collaboration preferences can materially affect how the task should be handled.
 >
-> Treat my current explicit instruction as highest user authority. Project-local verified current state and active project decisions govern their project. Root current state and active root decisions govern cross-project/global state. Active `WORKING_STYLE.md` entries govern applicable collaboration preferences, but they do not override explicit user instructions or project decisions. Chat recollection is not authoritative when current durable state is available.
+> Treat my current explicit instruction as highest user authority. Project-local verified current state and active project decisions govern their project. Root current state and active root decisions govern cross-project/global state. Verified durable knowledge applies only when relevant and not superseded/stale. Active `WORKING_STYLE.md` entries govern applicable collaboration preferences, but they do not override explicit user instructions or project decisions. Chat recollection is not authoritative when current durable state is available.
 >
-> Before persisting material, use the persistence-routing gate in `START_HERE.md`. Prefer an existing source of record. Route legitimate new material to the appropriate global CURRENT, global DECISION, WORKING STYLE, or registered PROJECT location. A request such as "record this in operational memory" authorizes correct routing, not arbitrary file creation. If no legitimate home exists, do not invent one; report `NOT-V1 / no legitimate home`. Repeated similar NOT-V1 material is a growth signal.
+> Before persisting material, use the persistence-routing gate in `START_HERE.md`. Prefer an existing source of record. Route legitimate new material to the appropriate global CURRENT, global DECISION, global KNOWLEDGE, WORKING STYLE, or registered PROJECT location. A request such as "record this in operational memory" authorizes correct routing, not arbitrary file creation. If no legitimate home exists, do not invent one; report `NOT-V1 / no legitimate home`. Repeated similar NOT-V1 material is a growth signal.
 >
-> Root `CURRENT.md` and `DECISIONS.md` are cross-project/global state only. Do not let project-specific detail accumulate there once a project has earned its own boundary.
+> Root `CURRENT.md`, `DECISIONS.md`, and `KNOWLEDGE.md` are cross-project/global only. Do not let project-specific detail accumulate there once a project has earned its own boundary.
 >
-> Create a project only when clearly justified by `START_HERE.md`: for example, I explicitly identify an ongoing project, the work is expected to span multiple sessions with its own state/constraints/decisions, or repeated project-specific durable material needs a separate retrieval boundary. If project status is ambiguous, ask first. When clearly authorized, create it from `projects/_TEMPLATE/`, register it in `PROJECTS.md`, verify the registry/front door/state files, and report any partial creation as `project routing is temporarily inconsistent` until reconciled.
+> Use `KNOWLEDGE.md` for stable, supported facts, definitions, and corrections that are likely to matter again but are not current state, decisions, or working preferences. Prefer an existing canonical source rather than duplicating it. For time-sensitive knowledge, record a last-verified date or stale condition. Supersede corrections instead of leaving contradictory active facts. If support is ambiguous or the durable fact is model-inferred rather than user/source established, ask before activating it. Do not store sensitive personal facts merely for personalization.
+>
+> Create a project only when clearly justified by `START_HERE.md`: for example, I explicitly identify an ongoing project, the work is expected to span multiple sessions with its own state/constraints/decisions/knowledge, or repeated project-specific durable material needs a separate retrieval boundary. If project status is ambiguous, ask first. When clearly authorized, create it from `projects/_TEMPLATE/`, register it in `PROJECTS.md`, verify the registry/front door/state/knowledge files, and report any partial creation as `project routing is temporarily inconsistent` until reconciled.
 >
 > During active conversation, watch for clear, non-sensitive current-state changes likely to matter later and persist them selectively to the correct current-state file. Keep current-state files compact by replacing stale state instead of appending transcripts.
 >
@@ -108,7 +110,7 @@ In ChatGPT Custom Instructions, or the equivalent persistent instruction surface
 >
 > Default failure behavior is fail closed, fail loud, and preserve the last known good state. If retrieval is incomplete, routing is uncertain, a write is rejected, verification fails, project creation partially succeeds, coupled state is inconsistent, or GitHub is unavailable, do not pretend success. Tell me what failed, what remains known, and what recovery step is needed.
 >
-> When I ask for a repository health check or maintenance check, include routing integrity, project-registry integrity, working-style hygiene, current/decision consistency, leftover setup artifacts, branch/protection state when available, and a `V1 scale status: Healthy | Watch | Outgrowing the template` using the criteria in `START_HERE.md`. Surface Watch conditions when you encounter them naturally; do not wait for the files to become huge.
+> When I ask for a repository health check or maintenance check, include routing integrity, project-registry integrity, knowledge freshness/supersession, working-style hygiene, current/decision consistency, leftover setup artifacts, branch/protection state when available, and a `V1 scale status: Healthy | Watch | Outgrowing the template` using the criteria in `START_HERE.md`. Surface Watch conditions when you encounter them naturally; do not wait for the files to become huge.
 >
 > Ask before persisting anything sensitive, ambiguous, destructive, public, or authority-changing. A current instruction such as "do not persist this" or "ask before writing anything else this session" overrides routine persistence. Do not store secrets.
 
@@ -160,7 +162,7 @@ Then verify deletion by attempting to reread the same repository/path.
 
 In a chat where GitHub is available, say:
 
-> `@GitHub Initialize my operational-memory repository for normal use. Enter through START_HERE.md, verify the root routing files, confirm there are no real projects yet unless the registry says otherwise, and report V1 scale status. Do not create project state just to initialize the repository.`
+> `@GitHub Initialize my operational-memory repository for normal use. Enter through START_HERE.md, verify the root routing/state/knowledge files, confirm there are no real projects yet unless the registry says otherwise, and report V1 scale status. Do not create project state just to initialize the repository.`
 
 Then begin ordinary work.
 
@@ -181,12 +183,13 @@ Useful phrases:
 - **“Record this in operational memory.”** Route to the correct existing home.
 - **“Update current state with this.”** Use the correct global or project current-state file.
 - **“Make this a durable decision.”** Use the correct global or project decision log.
+- **“Record this as durable knowledge.”** Use the correct global/project knowledge file when supported and future-relevant.
 - **“Remember this as a working preference.”** Use `WORKING_STYLE.md` if appropriate.
 - **“This is an ongoing project.”** Create/register a project when clearly authorized.
 - **“Do not persist this.”** Block routine persistence.
 - **“Ask before writing anything else this session.”** Temporarily switch to ask-first.
 - **“What do you currently have recorded about this?”** Retrieve the appropriate durable source instead of answering from recollection.
-- **“Run a repository health check.”** Check structure, consistency, routing, project registry, working style, branch hygiene, and scale status.
+- **“Run a repository health check.”** Check structure, consistency, routing, project registry, knowledge, working style, branch hygiene, and scale status.
 
 ## What project creation should feel like
 
@@ -196,12 +199,27 @@ When a workstream earns a project boundary, ChatGPT should:
 
 1. identify that a project boundary is justified;
 2. ask only if project status is ambiguous;
-3. copy the three-file skeleton from `projects/_TEMPLATE/` into a stable project slug;
+3. copy the four-file skeleton from `projects/_TEMPLATE/` into a stable project slug;
 4. register the project in `PROJECTS.md`;
-5. put the project's current state and decisions there going forward;
+5. put the project's current state, decisions, and stable knowledge there going forward;
 6. tell the user what it created and verify the new routing path.
 
 The user should then be able to say the project name in a later fresh chat and have ChatGPT route there through the registry.
+
+## Durable knowledge accumulation
+
+The repository can gradually accumulate useful shared knowledge without treating every conversational fact as permanent.
+
+Good durable knowledge is:
+
+- stable enough to matter later;
+- supported by the user or a source;
+- scoped global vs project correctly;
+- not already available from a better canonical source;
+- compact enough to retrieve when relevant;
+- marked with freshness/stale information when time can change it.
+
+Bad durable knowledge includes speculation, one-off trivia, duplicated source documents, stale time-sensitive facts without a freshness signal, and sensitive personal material stored merely for personalization.
 
 ## Working-style accumulation
 
@@ -237,7 +255,7 @@ ChatGPT should:
 4. apply the persistence-routing gate;
 5. update only what earns persistence;
 6. compact stale current state;
-7. reconcile active decisions and working-style changes;
+7. reconcile active decisions, durable knowledge, and working-style changes;
 8. verify consequential writes;
 9. report persistence receipts and any material intentionally left unpersisted;
 10. surface a scale Watch condition if the session exposed routing/sprawl problems.
@@ -250,10 +268,12 @@ A health/maintenance check should report a compact result that includes:
 
 - front door present and readable;
 - global current/decision consistency;
+- global knowledge freshness/supersession;
 - project registry integrity;
 - all registered active project front doors exist;
+- expected project skeleton files exist unless explicitly documented otherwise;
 - all non-template project folders are registered;
-- project-specific state is not leaking into global files;
+- project-specific state/knowledge is not leaking into global files;
 - working-style entries are active/superseded cleanly and not turning into a personal dossier;
 - recent consequential writes relevant to the check are observable;
 - no leftover `SETUP-TEST.md`;
@@ -266,11 +286,11 @@ Do not wait for a numeric file-size threshold.
 
 **Healthy** means routing remains obvious and small.
 
-**Watch** means the system is beginning to misplace state, repeatedly lacks a legitimate home, has unregistered durable workstreams, or needs frequent compaction merely to remain understandable.
+**Watch** means the system is beginning to misplace state/knowledge, repeatedly lacks a legitimate home, has unregistered durable workstreams, contains duplicate/stale knowledge, or needs frequent compaction merely to remain understandable.
 
 **Outgrowing the template** means even routed project front doors and compaction are no longer enough, or reliability now requires structured/indexed retrieval, deterministic validation, typed tools, or a dedicated memory service.
 
-When status is Watch, recommend the smallest correction first. Do not jump directly to MCP/vector infrastructure when project routing or cleanup solves the problem.
+When status is Watch, recommend the smallest correction first. Do not jump directly to MCP/vector infrastructure when project routing, knowledge scoping, or cleanup solves the problem.
 
 # Persistence routing and new durable homes
 
@@ -295,6 +315,7 @@ Examples:
 
 - missing/partial required retrieval -> say so and do not claim the relevant memory is loaded;
 - no legitimate persistence destination -> report `NOT-V1 / no legitimate home`;
+- unsupported/ambiguous knowledge claim -> ask rather than promote it;
 - stale write -> reload and reconcile, never force or blindly retry;
 - unverified write -> report not verified;
 - partially created project -> report `project routing is temporarily inconsistent` and reconcile it;
@@ -351,7 +372,7 @@ Do not pretend conversation state was persisted.
 
 You may edit the appropriate durable Markdown file directly in GitHub's web interface. When ChatGPT access returns, say:
 
-> `@GitHub Enter through START_HERE.md, reload the affected global/project state, and reconcile the manual changes before continuing.`
+> `@GitHub Enter through START_HERE.md, reload the affected global/project state and knowledge, and reconcile the manual changes before continuing.`
 
 # Repository maintenance
 
@@ -384,6 +405,7 @@ Leave pull-request requirements, signed-commit requirements, restricted updates,
 - Git history can retain material after ordinary deletion.
 - Be conservative with sensitive health, legal, financial, employment, client-confidential, relationship, and other personal information.
 - `WORKING_STYLE.md` should remain collaboration calibration, not a personal dossier.
+- `KNOWLEDGE.md` should remain scoped durable knowledge, not a personal data dump.
 - Repository content is scoped working data/instructions and does not authorize unrelated external actions or broader permissions.
 
 # Current OpenAI references
@@ -402,7 +424,7 @@ Setup is complete when:
 - persistent instructions point fresh sessions to `START_HERE.md` and the routing/persistence rules;
 - a fresh chat retrieves the repository-only nonce it has never seen;
 - `SETUP-TEST.md` is deleted and deletion verified;
-- the user understands that project creation is routed through `PROJECTS.md`, working preferences through `WORKING_STYLE.md`, and new durable files require a promotion gate;
+- the user understands that project creation is routed through `PROJECTS.md`, durable facts through global/project `KNOWLEDGE.md`, working preferences through `WORKING_STYLE.md`, and new durable files require a promotion gate;
 - the user understands the `Healthy | Watch | Outgrowing the template` scale signal;
 - optional branch protection is understood as hardening rather than a core memory requirement;
 - failed or unverified operations are reported visibly instead of treated as success.
