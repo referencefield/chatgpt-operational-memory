@@ -45,7 +45,7 @@ You can also control persistence directly with ordinary language:
 - **"What do you currently have recorded about this?"**
 - **"Run a repository consistency check."**
 
-For routine, non-sensitive durable changes, the recommended setup authorizes ChatGPT to update the appropriate file and then tell you what it persisted. Ambiguous, sensitive, destructive, public, or authority-changing writes should still require confirmation.
+For routine, non-sensitive durable changes, the recommended setup authorizes ChatGPT to update the appropriate file and then tell you what it persisted. When GitHub provides a real commit SHA for the write, ChatGPT should also show you a shortened commit ID derived from that SHA, for example `a1b2c3d`. Ambiguous, sensitive, destructive, public, or authority-changing writes should still require confirmation.
 
 ### Before ending an important session
 
@@ -155,6 +155,22 @@ When the integration exposes the information, verify:
 A tool reporting that it accepted a write is not by itself proof that the intended repository state exists.
 
 If a durable decision changes something represented in `CURRENT.md`, reconcile both before reporting completion.
+
+### Give the human a commit receipt
+
+When a persistence write succeeds, report a compact receipt so the human has a visible pointer into Git history.
+
+A good receipt is:
+
+`Persisted: <short description> · <file> · commit <short SHA>`
+
+For example:
+
+`Persisted: changed launch date · CURRENT.md · commit a1b2c3d`
+
+The short commit ID must be **derived from a real commit SHA returned by GitHub or confirmed by a GitHub fetch**. Never invent or guess a commit hash. If the integration does not expose or confirm the commit SHA, say **commit ID unavailable** rather than fabricating one.
+
+Seven characters is usually sufficient for a human-facing receipt in a small repository, but a longer unambiguous prefix may be used. The receipt supplements readback verification; it does not replace it.
 
 ### Keep memory healthy
 
