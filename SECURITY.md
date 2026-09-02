@@ -67,9 +67,11 @@ This reduces risk from malicious or accidental instructions in durable content, 
 
 ## GitHub plugin/app boundary
 
-The normal ChatGPT setup for this template requires the authenticated **GitHub plugin with an underlying GitHub app/connection that exposes repository read/write actions**, as described in `SETUP.md`, and uses `@GitHub` when explicit invocation is needed.
+The normal ChatGPT setup for this release requires **ChatGPT Plus or higher**; Free and ChatGPT Go are unsupported. It also requires the **`@GitHub` plugin to be installed/selected in ChatGPT, authenticated to GitHub, authorized for the exact private working repository, and exposing repository read/write actions**, as described in `SETUP.md`.
 
-OpenAI product surfaces may also expose a separate GitHub app/connection that is read-only. Read-only GitHub access is useful for retrieval but is insufficient for operational-memory persistence. Do not treat the existence or limitation of that separate connection as proof that the write-capable plugin path is unavailable; verify the actions actually exposed on the user's current surface.
+A qualifying ChatGPT plan alone is not proof that the required plugin/actions are available. Plugin availability and permissions can vary by account, workspace, role, region, surface, and rollout, so activation verifies the actual exposed capability before READY.
+
+OpenAI product surfaces may also expose a separate GitHub app/connection that is read-only. Read-only GitHub access is useful for retrieval but is insufficient for operational-memory persistence. Do not treat the existence or limitation of that separate connection as proof that the selected write-capable plugin path is unavailable; verify the actions actually exposed on the user's current surface.
 
 Authorize only the GitHub account, organization, repositories, and actions required for the workflow. Prefer selected-repository access when available.
 
@@ -134,6 +136,8 @@ Do not treat a green validation run as a security attestation.
 
 For security-relevant uncertainty, prefer visible incompleteness over invented success:
 
+- unsupported ChatGPT plan -> do not attempt activation;
+- `@GitHub` not installed/selected/authenticated -> do not claim repository access;
 - uncertain target -> do not write;
 - configured repository ID cannot be resolved -> stop rather than switching to a similarly named repository;
 - ambiguous authority-changing change -> ask;
