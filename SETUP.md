@@ -1,6 +1,6 @@
 # Setup
 
-This document is for one-time installation, first-use testing, and troubleshooting. It is not part of normal day-to-day operating state.
+This document is for one-time installation, first-use testing, troubleshooting, and lightweight repository maintenance. It is not part of normal day-to-day operating state.
 
 The intended user should not need a terminal or Git expertise.
 
@@ -408,6 +408,65 @@ The repository should stay small enough to recover quickly.
 
 These practices borrow the useful parts of richer agent-memory systems—current-state recovery, selective persistence, conflict handling, handoff/closeout, provenance through version history, and write verification—without requiring their local tooling or infrastructure.
 
+# Repository maintenance
+
+The desired steady state for this template is deliberately simple: **one canonical branch, `main`**.
+
+Normal ChatGPT operational-memory writes should go directly to `main`. A normal user does not need feature branches, release branches, or a pull-request workflow for routine memory maintenance.
+
+## Branch cleanup rule
+
+If another branch is created manually or by a maintenance workflow:
+
+1. compare it with `main` before deleting anything;
+2. determine whether it contains any unique commits or state that should be preserved;
+3. merge or otherwise preserve intended changes;
+4. verify the resulting `main` state;
+5. delete the branch only when its unique work is safely incorporated or the user deliberately chooses to abandon it.
+
+If it is unclear whether a branch contains unique work, **fail closed and loud**: do not delete it until the difference is understood.
+
+Do not use force-pushes, hard resets, or history rewrites as routine cleanup. Those are exceptional recovery operations and can destroy durable history.
+
+## Periodic housekeeping check
+
+Run this after unusual manual Git activity, after a temporary maintenance branch was used, or periodically if you want an explicit repository check:
+
+1. confirm `main` is the default and canonical branch;
+2. list branches; the normal steady state is `main` only;
+3. confirm no leftover `SETUP-TEST.md` exists;
+4. confirm the root still contains the expected V1 files: `README.md`, `SETUP.md`, `CURRENT.md`, `DECISIONS.md`, and `LICENSE`;
+5. confirm `CURRENT.md` remains compact and current;
+6. confirm superseded decisions are not active in `DECISIONS.md`;
+7. confirm there is no unresolved coupled-state inconsistency;
+8. confirm branch protection still blocks deletion and force pushes on `main` without blocking the direct-write workflow.
+
+You can ask ChatGPT:
+
+> `@GitHub Run repository maintenance on my operational-memory repo. Confirm main is canonical, list all branches, identify any branch not fully incorporated into main, check for leftover setup files and the expected V1 root files, check CURRENT.md and DECISIONS.md consistency, and report the current protection state. Do not delete branches or rewrite history if there is uncertainty.`
+
+## Recommended `main` protection
+
+Use light protection that prevents destructive history changes without forcing a developer workflow onto ordinary users.
+
+In GitHub, open **Settings → Rules → Rulesets** and create a branch ruleset named `Protect main` with enforcement set to **Active** and the target set to the default branch / `main`.
+
+Enable:
+
+- **Restrict deletions**;
+- **Block force pushes**.
+
+Leave off unless you intentionally change the operating model:
+
+- require pull request before merging;
+- require signed commits;
+- restrict updates;
+- required status checks.
+
+Those stronger controls can block the direct ChatGPT file-write workflow this template is designed to use.
+
+If GitHub shows the older branch-protection interface rather than Rulesets, apply the same policy to `main`: block deletion and force pushes while leaving ordinary direct updates allowed.
+
 # Privacy and security boundaries
 
 - **Do not store secrets in this repository.**
@@ -447,5 +506,7 @@ Setup is complete only when all of these are true:
 - a fresh chat retrieves a repository-only nonce it has never previously seen;
 - if automatic selection is unreliable, explicit `@GitHub` retrieval works reliably and is documented as your baseline;
 - `SETUP-TEST.md` has been deleted and deletion verified;
+- the normal branch model is understood: `main` is canonical and one branch is the desired steady state;
+- `main` protection blocks deletion and force pushes while preserving direct ordinary updates;
 - you understand the basic normal-use controls: load, record, do not persist, close out, verify, and troubleshoot explicit GitHub invocation;
 - you understand that a failed or unverified operation should be reported loudly rather than treated as successful.
