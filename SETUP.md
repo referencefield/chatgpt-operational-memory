@@ -439,17 +439,23 @@ Run this after unusual manual Git activity, after a temporary maintenance branch
 5. confirm `CURRENT.md` remains compact and current;
 6. confirm superseded decisions are not active in `DECISIONS.md`;
 7. confirm there is no unresolved coupled-state inconsistency;
-8. confirm branch protection still blocks deletion and force pushes on `main` without blocking the direct-write workflow.
+8. if optional branch protection is enabled, confirm it still blocks deletion and force pushes on `main` without blocking the direct-write workflow.
 
 You can ask ChatGPT:
 
 > `@GitHub Run repository maintenance on my operational-memory repo. Confirm main is canonical, list all branches, identify any branch not fully incorporated into main, check for leftover setup files and the expected V1 root files, check CURRENT.md and DECISIONS.md consistency, and report the current protection state. Do not delete branches or rewrite history if there is uncertainty.`
 
-## Recommended `main` protection
+## Optional recommended `main` protection
 
-Use light protection that prevents destructive history changes without forcing a developer workflow onto ordinary users.
+Branch protection is **optional hardening**, not a requirement for the operational-memory workflow.
 
-In GitHub, open **Settings → Rules → Rulesets** and create a branch ruleset named `Protect main` with enforcement set to **Active** and the target set to the default branch / `main`.
+What it gives you is narrow but useful: it protects the Git container and its history from two destructive operations, deleting `main` and force-pushing/repointing `main`. It does **not** make retrieval, persistence, semantic correctness, or conflict detection better, and it is not part of the memory logic itself.
+
+For an ordinary user's private operational-memory repository, skipping this step does not make the workflow invalid. It is most useful if you want extra protection against accidental or automated history destruction. When configured as described below, it should not affect normal ChatGPT reads or ordinary direct file-update commits.
+
+For a public template or other repository you actively maintain, this protection is more strongly recommended because there is little routine reason to permit destructive history rewrites.
+
+If you want the extra protection, in GitHub open **Settings → Rules → Rulesets** and create a branch ruleset named `Protect main` with enforcement set to **Active** and the target set to the default branch / `main`.
 
 Enable:
 
@@ -507,6 +513,6 @@ Setup is complete only when all of these are true:
 - if automatic selection is unreliable, explicit `@GitHub` retrieval works reliably and is documented as your baseline;
 - `SETUP-TEST.md` has been deleted and deletion verified;
 - the normal branch model is understood: `main` is canonical and one branch is the desired steady state;
-- `main` protection blocks deletion and force pushes while preserving direct ordinary updates;
+- you understand that `main` protection is optional hardening against destructive Git operations, not a requirement for operational memory;
 - you understand the basic normal-use controls: load, record, do not persist, close out, verify, and troubleshoot explicit GitHub invocation;
 - you understand that a failed or unverified operation should be reported loudly rather than treated as successful.
