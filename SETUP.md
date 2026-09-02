@@ -62,7 +62,8 @@ Ask ChatGPT to:
 2. reread that exact path;
 3. update the file with a second temporary phrase;
 4. reread it again and verify the new state;
-5. report the repository owner/name, branch or ref if available, exact path, and resulting content.
+5. report the repository owner/name, branch or ref if available, exact path, and resulting content;
+6. if GitHub returns or confirms the resulting commit SHA, show a shortened commit ID derived from that real SHA. If no commit SHA is available, say **commit ID unavailable** rather than inventing one.
 
 A successful tool response alone is not enough. The test passes only if ChatGPT rereads the repository and observes the intended state.
 
@@ -93,6 +94,8 @@ On ChatGPT web or desktop, open **Settings → Personalization → Custom Instru
 > When my request materially depends on prior work, an ongoing project, or a durable decision, retrieve this repository before relying on remembered prior context. `CURRENT.md` governs transient/current working state. Active entries in `DECISIONS.md` govern durable decisions. If they conflict, surface and reconcile the inconsistency rather than silently choosing one. My current explicit instruction wins.
 >
 > During an active conversation, watch for clear, non-sensitive changes that are likely to matter in future chats: changed objectives, active constraints, material changes to active work, durable decisions, and explicit corrections to durable state. I authorize routine updates of that kind to `CURRENT.md` or `DECISIONS.md` without asking me each time, provided you verify the resulting repository/ref/path/content and briefly tell me what you persisted. Keep `CURRENT.md` compact by replacing stale state rather than appending a transcript. Mark durable decisions superseded when they no longer govern.
+>
+> After a successful persistence write, give me a compact receipt containing what changed, the file, and a shortened commit ID when GitHub returned or confirmed a real commit SHA. Derive the short ID from that real SHA; never invent or guess a commit hash. If the commit SHA is unavailable, say "commit ID unavailable." A commit receipt supplements readback verification; it does not replace it.
 >
 > Ask before persisting anything sensitive, ambiguous, destructive, public, or authority-changing. A current instruction such as "do not persist this" overrides the routine persistence policy. Do not store secrets.
 >
@@ -150,7 +153,7 @@ Then verify deletion by attempting to reread that exact repository/path. When av
 
 In a chat where GitHub is available, say:
 
-> `@GitHub Initialize my operational-memory repository for normal use. Read CURRENT.md and DECISIONS.md. Treat CURRENT.md as transient/current working state and active DECISIONS.md entries as durable decisions. If they conflict, surface and reconcile the inconsistency. During our conversations, follow my Custom Instruction persistence policy. Keep CURRENT.md compact, persist only information worth carrying into future chats, and verify consequential GitHub writes by readback.`
+> `@GitHub Initialize my operational-memory repository for normal use. Read CURRENT.md and DECISIONS.md. Treat CURRENT.md as transient/current working state and active DECISIONS.md entries as durable decisions. If they conflict, surface and reconcile the inconsistency. During our conversations, follow my Custom Instruction persistence policy. Keep CURRENT.md compact, persist only information worth carrying into future chats, verify consequential GitHub writes by readback, and give me a verified short commit receipt when GitHub exposes the commit SHA.`
 
 Then begin normal work.
 
@@ -180,6 +183,12 @@ You can always direct it explicitly:
 - **"What do you currently have recorded about this?"** Retrieve and show the relevant recorded state rather than answering from recollection.
 - **"Run a repository consistency check."** Check internal consistency without pretending this proves real-world freshness.
 
+After a successful write, ChatGPT should give you a compact receipt such as:
+
+`Persisted: changed launch date · CURRENT.md · commit a1b2c3d`
+
+The commit prefix must come from a real GitHub commit SHA. A plausible-looking hash generated from memory or imagination is not acceptable. If the commit SHA is not available, the receipt should say **commit ID unavailable**.
+
 If ChatGPT says it saved something but you did not observe GitHub use/readback, ask it to verify the repository/ref/path/content before relying on the claim.
 
 ## Closing out an important session
@@ -199,7 +208,7 @@ ChatGPT should:
 5. compact stale current state instead of appending a transcript;
 6. reconcile `CURRENT.md` with active durable decisions;
 7. verify consequential writes by readback;
-8. briefly report what changed and anything intentionally left unpersisted.
+8. briefly report what changed, any verified short commit IDs for the writes, and anything intentionally left unpersisted.
 
 This closeout is optional. It is most useful after a session that materially changed plans, constraints, active work, or decisions.
 
@@ -261,6 +270,8 @@ Return to the Plugins/Apps settings, verify the correct write-capable capability
 Treat the write as **unverified**, not successful.
 
 Ask ChatGPT to reread the intended repository/ref/path and report the resulting content. Verify that it targeted the correct owner/repository and branch/ref where those identifiers are available.
+
+If ChatGPT reports a commit ID, require that it be derived from the actual GitHub commit SHA. A short hash by itself is not proof of a successful write.
 
 If readback does not show the intended state, retry only after identifying the wrong-target, permission, stale-read, or tool failure.
 
@@ -334,8 +345,8 @@ Setup is complete only when all of these are true:
 - the required write-capable OpenAI GitHub capability is connected to the correct account/repository;
 - explicit GitHub invocation can retrieve the exact repository;
 - create/update/readback/delete works on the current account/surface;
-- your persistent ChatGPT instructions identify the correct repository, semantic authority rules, and persistence policy;
+- your persistent ChatGPT instructions identify the correct repository, semantic authority rules, persistence policy, and verified commit-receipt behavior;
 - a fresh chat retrieves a repository-only nonce it has never previously seen;
 - if automatic selection is unreliable, explicit `@GitHub` retrieval works reliably and is documented as your baseline;
 - `SETUP-TEST.md` has been deleted and deletion verified;
-- you understand the basic normal-use controls: load, record, do not persist, close out, and troubleshoot explicit GitHub invocation.
+- you understand the basic normal-use controls: load, record, do not persist, close out, verify, and troubleshoot explicit GitHub invocation.
