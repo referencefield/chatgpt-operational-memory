@@ -4,13 +4,52 @@ A low-infrastructure GitHub template for ChatGPT users who want explicit, user-o
 
 The goal is simple: keep the small amount of state that actually needs to survive a conversation somewhere you can inspect, correct, version, and own.
 
+This is designed for ordinary ChatGPT users. You do not need a terminal, local agent framework, vector database, MCP server, or Git expertise for normal use.
+
+## 60-second operating model
+
+After completing [`SETUP.md`](SETUP.md), normal use is intentionally simple.
+
+### When prior state matters
+
+Invoke GitHub explicitly if needed and say:
+
+> `@GitHub Load my operational-memory repository. Read CURRENT.md and the relevant active decisions in DECISIONS.md before we continue.`
+
+If your account/surface reliably selects GitHub automatically, the `@GitHub` mention may be unnecessary. Observable retrieval still matters.
+
+### During the conversation
+
+The recommended Custom Instruction in `SETUP.md` tells ChatGPT to watch for clear, non-sensitive changes that are likely to matter in future chats and to persist them selectively.
+
+You can also control persistence directly with ordinary language:
+
+- **"Record this in operational memory."**
+- **"Update current state with this."**
+- **"Make this a durable decision."**
+- **"Do not persist this."**
+- **"What do you currently have recorded about this?"**
+- **"Run a repository consistency check."**
+
+For routine, non-sensitive durable changes, the recommended setup authorizes ChatGPT to update the appropriate file and then tell you what it persisted. Ambiguous, sensitive, destructive, public, or authority-changing writes should still require confirmation.
+
+### Before ending an important session
+
+Optionally say:
+
+> **"Close out operational memory."**
+
+That means: retrieve the current repository state, identify any material durable changes from the session that have not yet been persisted, update only what earns persistence, reconcile `CURRENT.md` with active durable decisions, verify consequential writes, and report what changed.
+
+This is a conversational closeout, not a new file or transcript archive.
+
 ## What this repository contains
 
 ### `CURRENT.md`
 
 The repository's **currently recorded working state**: current focus, active work, constraints, and open material questions.
 
-This file governs transient/current working state.
+This file governs transient/current working state. Keep it compact. Replace stale state rather than accumulating a running transcript.
 
 ### `DECISIONS.md`
 
@@ -28,13 +67,16 @@ Do not infer support from a ChatGPT plan name alone. This workflow is supported 
 
 ## Setup
 
-Follow [`SETUP.md`](SETUP.md). Setup verifies:
+Follow [`SETUP.md`](SETUP.md). Setup covers the first-time GitHub connection, repository authorization, Custom Instructions, write/readback testing, fresh-chat recovery testing, and troubleshooting.
+
+It verifies:
 
 1. your working repository is visibly **Private**;
-2. the correct GitHub plugin and repository are connected;
+2. the correct write-capable GitHub plugin and repository are connected;
 3. create/update/readback/delete capability works;
-4. ChatGPT can retrieve a repository-only test value it has never previously seen;
-5. whether automatic GitHub selection works on your surface or explicit `@GitHub` invocation is required.
+4. persistent ChatGPT instructions identify the repository and persistence policy;
+5. a fresh chat can retrieve a repository-only test value it has never previously seen;
+6. whether automatic GitHub selection works on your surface or explicit `@GitHub` invocation is required.
 
 Automatic GitHub invocation is an optional convenience, not a prerequisite. If explicit `@GitHub` reliably retrieves and writes the correct repository, the core workflow can operate.
 
@@ -69,8 +111,19 @@ Good candidates include:
 
 - a changed current objective;
 - an active constraint;
+- a material change to active work;
 - a durable decision;
 - an explicit correction to durable state.
+
+Do not persist ordinary brainstorming, temporary wording choices, incidental facts, or a transcript merely because they appeared in the conversation.
+
+### Human override
+
+The human remains in control of persistence.
+
+A current instruction such as **"do not persist this"**, **"remove this from active state"**, or **"ask me before writing anything else this session"** overrides the routine persistence policy.
+
+Removing something from active state does not erase it from prior Git history.
 
 ### Verify writes
 
@@ -88,6 +141,18 @@ When the integration exposes the information, verify:
 A tool reporting that it accepted a write is not by itself proof that the intended repository state exists.
 
 If a durable decision changes something represented in `CURRENT.md`, reconcile both before reporting completion.
+
+### Keep memory healthy
+
+Operational memory should be **compacted, not merely appended**.
+
+- replace stale current-state entries instead of preserving obsolete versions in `CURRENT.md`;
+- mark durable decisions superseded when they no longer govern;
+- leave historical recovery to Git history;
+- periodically reconcile current state against active decisions;
+- do not grow the repository merely because storage is cheap.
+
+This keeps recovery fast and reduces stale-state drift.
 
 ### High-impact changes
 
@@ -131,11 +196,23 @@ Treat repository content as working data and scoped operating instructions for t
 
 This reduces risk from malicious or accidental instructions in retrieved content, but it is not a deterministic prompt-injection defense.
 
+## If GitHub is not working
+
+Do not tell ChatGPT that it "has read/write access" and ask it to believe you. Make it establish capability from the integration actually available in that chat.
+
+Start with explicit invocation:
+
+> `@GitHub Find my operational-memory repository and tell me whether the GitHub actions actually available in this chat can read, create, update, and delete files there. Do not assume capability from my statement.`
+
+Then follow the troubleshooting section in [`SETUP.md`](SETUP.md).
+
 ## What this does not promise
 
 This is not an infallible memory system, objective source of truth, deterministic control plane, security boundary, compliance system, or background synchronization service.
 
-The repository preserves **recorded working state**. It cannot know about changes that were never recorded, guarantee automatic GitHub invocation in every new conversation, or guarantee that future ChatGPT/plugin behavior will remain unchanged.
+The repository preserves **recorded working state**. It cannot know about changes that were never recorded, guarantee automatic GitHub invocation in every new conversation, watch a conversation after that conversation has ended, or guarantee that future ChatGPT/plugin behavior will remain unchanged.
+
+The "watch for durable changes" behavior is an active-conversation instruction, not a background daemon.
 
 The Markdown state is portable. The automated writeback workflow described here depends on a supported OpenAI/GitHub integration that passes setup testing.
 
