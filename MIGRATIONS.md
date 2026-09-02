@@ -139,9 +139,10 @@ Using a fresh ChatGPT conversation and only the documented beginner **Create →
 2. require the Plus-or-higher plan check, selected/authenticated/authorized `@GitHub`, correct repository ID, privacy check, reversible CRUD/readback, cleanup, and `Operational memory: READY` receipt;
 3. install the repository-ID bootloader supplied by activation;
 4. create a small piece of genuine durable project state through normal conversation;
-5. start another fresh conversation and recover that state from the repository;
-6. rename the private repository;
-7. start another fresh conversation and verify the same repository ID resolves to the renamed repository, the state is recovered, and a verified write succeeds without changing the bootloader.
+5. for the exact `main` commit created by that durable-state write, verify the derived copy's **Operational-memory protocol validation** workflow starts from a `push` event on `main` and completes successfully with `RESULT: PASS`; a source-repository run or manual dispatch is not a substitute;
+6. start another fresh conversation and recover that state from the repository;
+7. rename the private repository;
+8. start another fresh conversation and verify the same repository ID resolves to the renamed repository, the state is recovered, and a verified write succeeds without changing the bootloader.
 
 Failure or user confusion is release evidence. Fix the smallest root cause, return the public template to development, and, when the existing acceptance authorization remains in force, re-enter with a new candidate after corrective work.
 

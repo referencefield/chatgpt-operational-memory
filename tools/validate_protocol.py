@@ -219,6 +219,77 @@ def check_removed_or_ambiguous_product_wording() -> None:
             )
 
 
+def check_validation_workflow(manifest: dict) -> None:
+    validation = manifest.get("validation", {}) or {}
+    workflow_rel = str(validation.get("workflow", "")).strip()
+    if not workflow_rel:
+        error("PROTOCOL.yaml validation.workflow is missing")
+        return
+
+    workflow_path = require_file(workflow_rel, "validation workflow")
+    if validation.get("runs_on_pull_request") is not True:
+        error("PROTOCOL.yaml validation.runs_on_pull_request must be true")
+    if validation.get("runs_on_main_push") is not True:
+        error("PROTOCOL.yaml validation.runs_on_main_push must be true")
+    if not workflow_path.is_file():
+        return
+
+    workflow_text = read_text(workflow_path)
+    on_match = re.search(
+        r"(?ms)^on:\s*\n(?P<body>.*?)(?=^[^\s#])",
+        workflow_text,
+    )
+    if not on_match:
+        error(f"{workflow_rel} is missing a readable top-level on: trigger block")
+        return
+
+    trigger_block = on_match.group("body")
+    if not re.search(r"(?m)^  pull_request:\s*$", trigger_block):
+        error(f"{workflow_rel} must run on pull_request")
+
+    push_match = re.search(
+        r"(?ms)^  push:\s*\n(?P<body>(?: {4,}.*\n?)*)",
+        trigger_block,
+    )
+    if not push_match:
+        error(f"{workflow_rel} must run on push to canonical main")
+        return
+
+    push_block = push_match.group("body")
+    if not re.search(r"(?m)^    branches:\s*$", push_block):
+        error(f"{workflow_rel} push trigger must declare branches")
+    if not re.search(r"(?m)^      - main\s*$", push_block):
+        error(f"{workflow_rel} push trigger must include canonical main")
+
+
+def check_documented_bootloader(manifest: dict) -> None:
+    bootloader = str(manifest.get("custom_instruction_template", "")).strip()
+    if not bootloader:
+        error("PROTOCOL.yaml custom_instruction_template is missing")
+        return
+
+    setup_rel = str((manifest.get("human_docs", {}) or {}).get("setup", "SETUP.md"))
+    setup_path = require_file(setup_rel, "setup documentation")
+    if not setup_path.is_file():
+        return
+
+    setup_text = read_text(setup_path)
+    match = re.search(
+        r"<!-- BOOTLOADER-DOC-START -->\s*\n>\s*(?P<text>[^\n]+)\n<!-- BOOTLOADER-DOC-END -->",
+        setup_text,
+    )
+    if not match:
+        error(f"{setup_rel} is missing the marked canonical bootloader documentation block")
+        return
+
+    documented = match.group("text").strip()
+    if documented != bootloader:
+        error(
+            f"{setup_rel} documented bootloader does not match "
+            "PROTOCOL.yaml custom_instruction_template"
+        )
+
+
 def load_manifest() -> dict:
     manifest_path = require_file("PROTOCOL.yaml", "protocol manifest")
     if not manifest_path.is_file():
@@ -263,6 +334,8 @@ def main() -> int:
 
     check_legacy_project_naming()
     check_removed_or_ambiguous_product_wording()
+    check_validation_workflow(manifest)
+    check_documented_bootloader(manifest)
 
     version = str(manifest.get("protocol_version", "")).strip()
     if not version:
