@@ -7,7 +7,9 @@ This file is the **runtime protocol authority**. Do not begin by loading the who
 
 ## Activation handshake
 
-When the user explicitly asks to **activate**, **initialize**, **wake up**, or **start using** a newly created operational-memory repository and identifies the repository:
+When the user explicitly asks to **set up**, **activate**, **initialize**, **wake up**, or **start using** a newly created operational-memory repository and identifies the repository, treat that as activation intent.
+
+The user's normal setup prompt does **not** need to mention `START_HERE.md`, `PROTOCOL.yaml`, or an “activation handshake.” Those are repository implementation details that ChatGPT should discover and apply after the user identifies the repository and asks to set up operational memory.
 
 1. confirm the exact working repository, default branch, visibility, and GitHub repository ID. The working repository may have any owner/name; its name is not part of the memory schema and does not need to match the public template source;
 2. require the personal working copy to be **private** before storing personal/project state;

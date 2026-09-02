@@ -36,6 +36,7 @@ compatibility:
 
 activation:
   trigger_intents:
+    - set up operational memory
     - activate operational memory
     - initialize operational memory
     - wake up operational memory

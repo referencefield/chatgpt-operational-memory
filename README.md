@@ -13,7 +13,9 @@ Already have the **GitHub plugin with repository read/write actions** authentica
 1. Use this public repository as a template to create your own **private** GitHub repository. Give your working copy any name you want.
 2. In ChatGPT, say:
 
-> `@GitHub Activate my operational-memory repository at <YOUR PRIVATE REPOSITORY URL>. Use START_HERE.md and run the activation handshake.`
+> `@GitHub Set up operational memory from <YOUR PRIVATE REPOSITORY URL>.`
+
+That is the complete normal setup command. ChatGPT should inspect the repository, discover its runtime front door, and run the activation procedure without requiring the user to name `START_HERE.md`, `PROTOCOL.yaml`, or an “activation handshake.”
 
 ChatGPT should verify the exact repository, confirm that it is private, obtain its GitHub repository ID, check the protocol structure, prove reversible read/write access, remove its diagnostic file, and return either:
 

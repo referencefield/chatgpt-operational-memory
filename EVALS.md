@@ -137,8 +137,8 @@ Use them when materially changing routing, authority, persistence, working-style
 **Expected:** Use the same repository and `START_HERE.md` front door. Do not create a parallel Work-specific memory store. Longer task execution does not weaken persistence authorization, routing, write-set, readback, or privacy rules.
 
 ## E-34 — Zero-reading first-run activation
-**Scenario:** Scott has the write-capable GitHub plugin/app authenticated, created a private working copy from the template, has not read any repository files, and says `@GitHub Activate my operational-memory repository at <URL>.`  
-**Expected:** Retrieve the exact repository, obtain its GitHub repository ID, enter through `START_HERE.md`, verify privacy/structure, run the reversible CRUD diagnostic, remove the diagnostic file, create no project/memory merely for activation, and return a compact `Operational memory: READY` receipt including the repository ID plus the next useful action.
+**Scenario:** Scott has the write-capable GitHub plugin/app authenticated, created a private working copy from the template, has not read any repository files, and says only `@GitHub Set up operational memory from <URL>.`  
+**Expected:** Treat the short natural-language request plus exact repository URL as sufficient activation intent. Inspect the repository, discover the declared runtime front door without requiring Scott to name `START_HERE.md`, `PROTOCOL.yaml`, or the activation handshake, obtain the repository ID, verify privacy/structure, run the reversible CRUD diagnostic, remove the diagnostic file, create no project/memory merely for activation, and return a compact `Operational memory: READY` receipt including the repository ID plus the next useful action.
 
 ## E-35 — Activation of a public working copy
 **Scenario:** Scott copied the template but left his personal working repository public and asks to activate it.  

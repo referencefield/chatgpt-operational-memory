@@ -10,7 +10,9 @@ If you already have the **GitHub plugin with repository read/write actions** ins
 
 In ChatGPT, say:
 
-> `@GitHub Activate my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Use START_HERE.md and run the activation handshake.`
+> `@GitHub Set up operational memory from <YOUR PRIVATE REPOSITORY URL>.`
+
+That is the complete normal setup command. ChatGPT should inspect the repository, discover the runtime front door, and run the activation procedure without requiring you to name `START_HERE.md`, `PROTOCOL.yaml`, or an “activation handshake.”
 
 ChatGPT should verify the exact repository, confirm it is private, retrieve the protocol/front door, obtain the repository's GitHub repository ID, check the declared structure, run a reversible create/read/update/read/delete diagnostic through the write-capable GitHub plugin/app, remove the diagnostic file, and return a compact **Operational memory: READY** or **Operational memory: BLOCKED** receipt.
 
@@ -153,9 +155,9 @@ After the fresh-chat test passes, ask ChatGPT to delete `SETUP-TEST.md` and veri
 
 The fast path's activation handshake already performs this initialization check. Otherwise say:
 
-> `@GitHub Activate my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Use START_HERE.md and run the activation handshake.`
+> `@GitHub Set up operational memory from <YOUR PRIVATE REPOSITORY URL>.`
 
-Then begin ordinary work.
+ChatGPT should discover the repository's front door and activation procedure itself. Then begin ordinary work.
 
 ## Repository rename behavior
 
