@@ -117,19 +117,33 @@ From that point through Gates 2-6, do not make opportunistic improvements. Any a
 
 Against the frozen candidate:
 
+- run `tools/test_validate_protocol.py` and require all validator regression self-tests to pass;
 - run `tools/validate_protocol.py` and require `RESULT: PASS` or consciously adjudicate every `Watch` signal;
 - verify repository visibility/template status, default branch, branch set, and intended public-repository ruleset/settings;
 - verify no setup/probe files or unintended artifacts remain;
 - verify `START_HERE.md` and other declared soft budgets;
 - verify the public template-source repository ID resolves correctly.
 
-Record the exact candidate SHA used. A validator result from an earlier commit does not satisfy this gate.
+Record the exact candidate SHA used. A validator or self-test result from an earlier commit does not satisfy this gate.
+
+### Gate 2B — Independent behavioral qualification
+
+Before any zero-reading template-copy acceptance session, qualify the exact frozen candidate against the maintained behavioral/adversarial suite in `EVALS.md`.
+
+- use fresh conversation/context for the evaluated model/surface and do not expose the corresponding `Expected` section before the model acts;
+- exercise every scenario applicable to the public release claims; any scenario classified as not applicable must be explicitly recorded with the reason rather than silently omitted;
+- judge observed behavior after the fact and do not count ambiguous outcomes as passes;
+- distinguish protocol/model behavior failures from tool outage or capability unavailability;
+- record the qualifying run in `EVAL_RESULTS.md` with date, model/surface, candidate SHA, scenario coverage, pass/fail/blocked or not-applicable classifications, and material failure modes;
+- same-session self-review after the expected answers have been seen may inform development but does **not** satisfy Gate 2B.
+
+Gate 2B passes only when there is no unresolved behavioral failure that contradicts a public release claim or a required safety/authority/persistence invariant. If qualification exposes a repository change that should be made, invalidate the candidate and enter the Gate 6 corrective loop before proceeding to Gate 3.
 
 ### Gate 3 — Zero-reading template-copy acceptance test
 
 Create a new **private** repository using GitHub **Use this template**, give it an arbitrary name, and approach it as a first-time non-expert user who has not read the repository files.
 
-The minimum public ChatGPT support claim for this release is **ChatGPT Plus**. Free and ChatGPT Go are explicitly unsupported and are not eligible substitutes for this acceptance test. Run Gate 3 on a normal Plus account/surface, not a maintainer-only, administrator-only, internal, development, or unusually privileged environment. Record the exact plan/surface and GitHub plugin/app path actually used.
+The minimum public ChatGPT support claim for this release is **ChatGPT Plus**. Free and ChatGPT Go are explicitly unsupported and are not eligible substitutes for this acceptance test. Run Gate 3 on a normal Plus account/surface, not a maintainer-only, administrator-only, internal, development, or unusually privileged environment.
 
 Before activation, prove that the user-facing prerequisite path itself works: `@GitHub` can be installed/selected in ChatGPT, authenticated to GitHub, authorized for the exact private template copy, and exposes the repository create/update/delete actions required by activation. Plugin visibility alone is not enough. If any of those prerequisites is unavailable on the tested Plus surface, Gate 3 is **BLOCKED** and the release cannot claim Plus support until the capability path is established or the public support boundary is deliberately changed.
 
@@ -143,6 +157,8 @@ Using a fresh ChatGPT conversation and only the documented beginner **Create →
 6. start another fresh conversation and recover that state from the repository;
 7. rename the private repository;
 8. start another fresh conversation and verify the same repository ID resolves to the renamed repository, the state is recovered, and a verified write succeeds without changing the bootloader.
+
+For the Gate 3 evidence record, capture at minimum: date/time with timezone, frozen candidate SHA and tree SHA, ChatGPT model, plan, surface, GitHub integration/plugin path actually used, derived repository ID, activation READY/BLOCKED outcome, durable-state write commit SHA, and the derived-copy validator workflow run ID/result. Keep the record focused on reproducibility; do not copy private memory content merely for instrumentation.
 
 Failure or user confusion is release evidence. Fix the smallest root cause, return the public template to development, and, when the existing acceptance authorization remains in force, re-enter with a new candidate after corrective work.
 
@@ -167,17 +183,18 @@ Do not accept or reject a finding merely because it agrees or disagrees with pri
 
 ### Gate 6 — Post-fix regression gate
 
-If Gates 2–5 identify any repository change that should be made:
+If Gates 2–5, including Gate 2B, identify any repository change that should be made:
 
 1. invalidate the current candidate and restore `protocol_status: development` as part of corrective work;
 2. make and verify the accepted fixes in development;
 3. if the existing acceptance authorization remains in force and the work stayed within the corrective loop, change `protocol_status` back to `acceptance_candidate` without a redundant approval prompt; otherwise obtain a new explicit entry decision;
 4. freeze the resulting new canonical `main` SHA/tree;
-5. rerun deterministic validation against that exact candidate;
-6. rerun the portions of the zero-reading/surface tests affected by the changes;
-7. rerun the independent audit as a regression/delta audit, explicitly checking accepted fixes for newly introduced failures.
+5. rerun validator regression self-tests and deterministic validation against that exact candidate;
+6. rerun the behavioral scenarios affected by the changes, plus any scenarios needed to establish that the new candidate still satisfies Gate 2B;
+7. rerun the portions of the zero-reading/surface tests affected by the changes;
+8. rerun the independent audit as a regression/delta audit, explicitly checking accepted fixes for newly introduced failures.
 
-The candidate passes only when there are **zero unresolved blockers**, every remaining warning is consciously classified, and no new material regression is found.
+The candidate passes only when there are **zero unresolved blockers**, no unresolved applicable behavioral failure contradicts the release claims/invariants, every remaining warning is consciously classified, and no new material regression is found.
 
 ### Gate 7 — Release transition
 
@@ -187,7 +204,7 @@ Only after Gates 1–6 pass:
 - replace the **pre-first-release bootstrap lifecycle** in `PROTOCOL.yaml`, `AGENTS.md`, and `tools/validate_protocol.py` with a post-release lifecycle that can represent the last/current released protocol and a future development/acceptance target without reverting a released protocol ambiguously to `unreleased`; define and validate that transition before tagging the first release;
 - execute the controlled one-time history cleanup if still desired;
 - restore and verify the intended public-repository protection/settings;
-- rerun deterministic validation against the final release tree;
+- rerun validator regression self-tests and deterministic validation against the final release tree;
 - tag/publish the release;
 - create one final private copy using **Use this template** and repeat the activation smoke test against what GitHub actually ships.
 
@@ -227,8 +244,8 @@ When the first public release is actually cut:
 5. remove or replace pre-release-only wording explicitly in **`README.md` (Development status), `MIGRATIONS.md` (Current pre-release rule), and `AGENTS.md` (the public-template unreleased-version instruction)**, then sweep for any other remaining `unreleased` wording that would confuse a working copy created from the release;
 6. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;
 7. verify that `template_source.repository_id` resolves the public upstream and update discovery does not depend on its current owner/name;
-8. run deterministic structural validation and the semantic repository health check;
-9. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, failure handling, plan/plugin readiness, and release lifecycle;
+8. run validator regression self-tests, deterministic structural validation, and the semantic repository health check;
+9. confirm the Gate 2B behavioral evidence remains applicable to the release tree and rerun any behavioral/adversarial scenarios affected by the prescribed Gate 7 lifecycle/release transition;
 10. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
 11. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
 12. only then treat the public template as the migration source for user-created copies.
