@@ -6,6 +6,14 @@ The goal is simple: keep the small amount of state that actually needs to surviv
 
 This is designed for ordinary ChatGPT users. You do not need a terminal, local agent framework, vector database, MCP server, or Git expertise for normal use.
 
+## What this is architecturally
+
+This is a **lightweight operating protocol**, not a server-side enforcement engine.
+
+GitHub provides the durable files, version history, and some mechanical protections such as current-version/blob preconditions when the available integration exposes them. ChatGPT performs retrieval, interpretation, selective persistence, reconciliation, and most failure reporting by following the operating instructions in this repository and your ChatGPT instructions.
+
+That distinction matters. The repository makes important state more explicit, inspectable, correctable, and verifiable, but many safeguards remain behavioral rather than independently enforced. If you require typed APIs, deterministic schema validation, atomic multi-file transactions, CI-enforced invariants, automated secret scanning, or a memory service that can reject invalid state outside the model's discretion, this lightweight template is not the right endpoint. See **Prior art and advanced alternatives** below.
+
 ## Who this is for
 
 This template is intentionally narrow.
@@ -285,6 +293,14 @@ Operational memory should be **compacted, not merely appended**.
 
 This keeps recovery fast and reduces stale-state drift.
 
+### Know when you have outgrown V1
+
+This design assumes `CURRENT.md` and `DECISIONS.md` remain small enough that ChatGPT can retrieve both completely and a human can inspect them without specialized tooling.
+
+If whole-file retrieval becomes slow, token-heavy, or difficult to reason about, treat that as a **scaling boundary**, not a reason to keep expanding the template indefinitely. First compact stale current state, supersede obsolete decisions, and rely on Git history for old versions. If the active durable state is still too large for the two-file model, move to a system with structured storage, indexing, scoped retrieval, or typed memory tools rather than proliferating more loosely governed Markdown files.
+
+The simplicity of this template is a design constraint, not a promise that two files scale without limit.
+
 ### High-impact changes
 
 Before destructive, public, authority-changing, or otherwise high-impact durable changes:
@@ -349,6 +365,19 @@ It grew out of long-running ChatGPT + GitHub operational work at **Reference Fie
 During later adversarial review and prior-art research, we found substantial overlap with public work that had independently developed related ideas. Some of those projects also sharpened or validated practices used here. They are cited below both for fair attribution and because users who want more machinery may be better served by them.
 
 The existence of prior art means this project does **not** claim novelty for Git-backed memory, Markdown state, durable decision logs, supersession, retrieval-before-work, handoff/closeout, or memory validation. The contribution here is narrower: package a small subset of those ideas for an ordinary ChatGPT user who wants conversational GitHub writeback without adopting a developer-grade agent stack.
+
+### Repository-local instruction files: neighboring read-side prior art
+
+Repository-versioned instructions for AI tools are already an established pattern. Examples include:
+
+- **OpenAI Codex `AGENTS.md`** — https://github.com/openai/codex/blob/main/docs/agents_md.md  
+  Repository-local instructions tell a coding agent how to work in a codebase and can be scoped by directory.
+- **Anthropic Claude Code `CLAUDE.md`** — https://code.claude.com/docs/en/memory  
+  Claude Code loads persistent project instructions from version-controlled Markdown files and also distinguishes those instructions from auto memory.
+- **Cursor Project Rules / `AGENTS.md`** — https://docs.cursor.com/context/rules  
+  Cursor supports version-controlled project rules and `AGENTS.md`; its older `.cursorrules` format is legacy/deprecated.
+
+These systems are important prior art for the **read side** of the pattern: putting durable instructions or context in a repository so an AI tool can load them in later sessions. This template overlaps with that idea but has a different center of gravity. It targets ordinary ChatGPT users and emphasizes a small mutable operational-state surface, conversational writeback, explicit decision supersession, observable retrieval, and post-write verification rather than coding-agent instruction files alone.
 
 ### If you want something more advanced
 
