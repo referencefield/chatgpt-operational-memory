@@ -18,7 +18,7 @@ The user's normal setup prompt does **not** need to mention `START_HERE.md`, `PR
 5. create **no** project, decision, knowledge, working-style, or current-state entry merely to mark activation;
 6. return a compact receipt beginning **`Operational memory: READY`** or **`Operational memory: BLOCKED`**, covering current owner/name, GitHub repository ID, privacy, read/write verification, protocol/status, structural health, project count, durable-state empty/non-empty, persistence-watch status, and the next useful action.
 
-The repository URL supplied during setup selects the exact working repository even when the GitHub connection can access many unrelated repositories. Do not substitute another connected repository by name similarity, search rank, or convenience. Once activation records the numeric repository ID, future bootloader routing uses that ID only.
+The setup URL selects the exact working repository even when GitHub can access many others. Never substitute another repository. After activation, future bootloader routing uses that repository's numeric ID.
 
 Activation is idempotent. Cloning/naming the repository alone is not activation.
 
@@ -30,7 +30,7 @@ If no persistent ChatGPT bootloader is configured, offer the simple URL fallback
 
 `@GitHub Use operational memory from <repository URL>.`
 
-The user should not have to name repository-ID resolution, owner/name resolution, `START_HERE.md`, or other routing mechanics in a normal command.
+Repository resolution and front-door routing are internal, not user syntax.
 
 ## Normal route
 
