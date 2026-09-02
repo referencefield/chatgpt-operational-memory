@@ -39,10 +39,12 @@ activation:
 human_docs:
   readme: README.md
   setup: SETUP.md
+  example: EXAMPLE.md
   operations: OPERATIONS.md
   security: SECURITY.md
   migrations: MIGRATIONS.md
   evals: EVALS.md
+  eval_results: EVAL_RESULTS.md
   contributing: CONTRIBUTING.md
 
 global:
@@ -86,7 +88,7 @@ maintenance:
 
 soft_budgets:
   # Warning indicators only. Crossing one means inspect structure, not delete content.
-  START_HERE.md_bytes: 15000
+  START_HERE.md_bytes: 10000
   CURRENT.md_bytes: 7000
   PROJECT.md_bytes: 9000
   project_CURRENT.md_bytes: 7000
