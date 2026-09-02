@@ -68,9 +68,9 @@ Selective persistence is the point.
 
 Two weeks later the user opens a fresh ChatGPT conversation and says:
 
-> `@GitHub Use my operational memory at <repository URL>. Where were we on Northstar?`
+> `@GitHub Use my operational memory repository ID <repository ID>. Resolve its current owner/name, then enter through START_HERE.md. Where were we on Northstar?`
 
-ChatGPT should enter through `START_HERE.md`, use `PROJECTS.md` to locate Northstar, and retrieve only the minimum current project authority.
+ChatGPT should resolve the same repository ID even if the user renamed the private repository since activation, enter through `START_HERE.md`, use `PROJECTS.md` to locate Northstar, and retrieve only the minimum current project authority.
 
 A useful response would look approximately like:
 
@@ -97,9 +97,10 @@ The user does not need to know which Markdown file received each item.
 The intended interaction remains conversational:
 
 1. activate the private repository once;
-2. talk normally;
-3. let ChatGPT route clear durable changes conservatively;
-4. return later and ask where things stand;
-5. inspect or correct the GitHub state whenever desired.
+2. install the tiny repository-ID bootloader if automatic future routing is desired;
+3. talk normally;
+4. let ChatGPT route clear durable changes conservatively;
+5. return later and ask where things stand;
+6. inspect or correct the GitHub state whenever desired.
 
 The files are the control layer. The conversation is the user interface.
