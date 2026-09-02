@@ -151,6 +151,11 @@ validation:
   mode: advisory
   script: tools/validate_protocol.py
   workflow: .github/workflows/protocol-validation.yml
+  runs_on_pull_request: true
+  runs_on_main_push: true
+  manual_dispatch_available: true
+  main_push_is_post_write_integrity_check: true
+  immediate_persistence_claim_depends_on_readback_not_ci: true
   blocking_required_check: false
 
 release_lifecycle:
