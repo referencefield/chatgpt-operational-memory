@@ -12,7 +12,7 @@ A private working copy may have any GitHub owner/name. Its durable ChatGPT routi
 
 Renaming a working repository does not change its internal protocol or durable state, does not require a protocol migration, and does not require changing the repository-ID bootloader. If a rename changes only owner/name, future sessions resolve the same repository ID to the new current location.
 
-If repository ownership/organization changes and the GitHub plugin loses access, reauthorize the plugin. Treat that as an access problem, not a state migration. If the configured repository ID cannot be resolved, fail closed rather than guessing a similarly named repository.
+If repository ownership/organization changes and the GitHub plugin/app loses access, reauthorize the connection. Treat that as an access problem, not a state migration. If the configured repository ID cannot be resolved, fail closed rather than guessing a similarly named repository.
 
 Do not rewrite `template_source.repository_id` or `template_source.repository` to the private working repository. Doing so would confuse the upstream update source with the user's runtime repository.
 
@@ -90,9 +90,9 @@ Do not treat this as a requirement to erase every GitHub development artifact. P
 When the first public release is actually cut:
 
 1. freeze the release-candidate structure and behavior;
-2. replace `protocol_version: "unreleased"` with the chosen first real release identifier;
-3. set an appropriate released status in `PROTOCOL.yaml`;
-4. remove any remaining pre-release-only wording that would confuse a working copy created from the release;
+2. replace `protocol_version: "unreleased"` with the chosen first real release identifier in `PROTOCOL.yaml` and set the appropriate released status there;
+3. update the `PROTOCOL.yaml` `release_rule` from pre-release guidance to the released lifecycle rule;
+4. remove or replace pre-release-only wording explicitly in **`README.md` (Development status), `MIGRATIONS.md` (Current pre-release rule), and `AGENTS.md` (the public-template unreleased-version instruction)**, then sweep for any other remaining `unreleased` wording that would confuse a working copy created from the release;
 5. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;
 6. verify that `template_source.repository_id` resolves the public upstream and update discovery does not depend on its current owner/name;
 7. run deterministic structural validation and the semantic repository health check;
