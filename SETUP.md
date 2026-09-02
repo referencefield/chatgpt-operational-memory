@@ -73,7 +73,9 @@ Then it should say **One final step** and tell you exactly where to install the 
 
 ChatGPT supplies the completed block with your repository ID already filled in. Its compact form is:
 
+<!-- BOOTLOADER-DOC-START -->
 > Operational Memory: I use GitHub repository ID `<ID>` for durable operational memory. When prior durable state could affect the task, or this conversation creates/changes clear future-governing state, use `@GitHub`, resolve this ID to its current repository, and follow `START_HERE.md`. Do not claim retrieval or persistence unless GitHub actions actually ran and writes were verified. If the ID cannot resolve or a write cannot be verified, say so; never guess another repository.
+<!-- BOOTLOADER-DOC-END -->
 
 With a current 10-digit GitHub repository ID, this is about **487 characters**. You copy the completed block as-is; you do not need to understand, remember, or type the numeric ID yourself.
 
@@ -157,7 +159,7 @@ The rest of this file is optional. Use it when setup is blocked, when you want s
 
 GitHub template copies do **not** inherit this public repository's branch-protection/ruleset configuration. Protection is optional hardening you may configure separately; see **Optional `main` protection** below.
 
-The template includes an advisory GitHub Actions validator. In a derived working copy it does **not** run on every direct operational-memory write; it runs for pull requests or when manually dispatched. It is not a required status check.
+The template includes an advisory GitHub Actions validator. In a derived working copy it runs after every push to canonical `main` (including normal Operational Memory writes), for pull requests, or when manually dispatched. It is not a required status check and does not replace immediate write/readback verification.
 
 Having many unrelated repositories connected does not make setup ambiguous. The activation URL selects one exact repository. ChatGPT captures that repository's numeric GitHub repository ID for future routing. If that exact repository later cannot be resolved or accessed, ChatGPT should stop rather than select another repository.
 
