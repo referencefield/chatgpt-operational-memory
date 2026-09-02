@@ -8,7 +8,7 @@ You only need to do this once.
 
 You do **not** need to know Git, use a terminal, understand repository IDs, or edit memory files yourself.
 
-**Supported release baseline:** a **paid ChatGPT plan** plus the `@GitHub` plugin with repository write actions. Free ChatGPT accounts are not supported by this release. A paid plan alone does not guarantee that the required plugin/actions are available on every account, region, workspace, or surface, so setup still verifies the actual capability.
+**Supported release baseline:** **ChatGPT Plus (currently $20/month) or a higher ChatGPT plan** plus the installed/selected and authenticated `@GitHub` plugin with repository read/write actions. **Free and ChatGPT Go are not supported by this release.** A supported plan alone does not guarantee that the required plugin/actions are available on every account, region, workspace, or surface, so setup still verifies the actual capability.
 
 ### 1. Create your private memory repository
 
@@ -22,9 +22,9 @@ Do not store passwords, API keys, recovery codes, full payment/bank information,
 
 ### 2. Connect GitHub to ChatGPT
 
-In ChatGPT, install/select the **`@GitHub` plugin**, sign in to GitHub when asked, and authorize the private memory repository you just created. Prefer selected-repository access when available; you do not need to authorize unrelated repositories.
+In ChatGPT, install/select the **`@GitHub` plugin** in the message composer, authenticate it to GitHub, and authorize the private memory repository you just created. Prefer selected-repository access when available; you do not need to authorize unrelated repositories.
 
-**Required capability:** the selected `@GitHub` plugin must expose repository read/write actions. OpenAI also documents a separate GitHub app/connection used for repository search/analysis that may be read-only. That separate limitation does **not** prove that the `@GitHub` plugin cannot write.
+**Required capability:** the selected `@GitHub` plugin must be authenticated, authorized for the exact repository, and expose repository read/write actions. Merely seeing GitHub or the Plugin Directory is not enough. OpenAI also documents a separate GitHub app/connection used for repository search/analysis that may be read-only. That separate limitation does **not** prove that the selected `@GitHub` plugin cannot write.
 
 ### 3. Activate it
 
@@ -34,7 +34,7 @@ Copy the GitHub URL of your new private repository. In ChatGPT, send:
 
 That's it.
 
-ChatGPT should handle the technical checks itself: exact repository, Private visibility, safe read/write, verified readback, cleanup of the temporary setup test, and protocol structure.
+ChatGPT should handle the technical checks itself: supported plan, selected/authenticated `@GitHub`, exact repository, Private visibility, safe read/write, verified readback, cleanup of the temporary setup test, and protocol structure.
 
 You should not have to perform those tests or name `START_HERE.md`, `PROTOCOL.yaml`, CRUD, repository IDs, blob versions, or an activation handshake.
 
@@ -46,6 +46,8 @@ ChatGPT should return:
 
 It should show a compact human-facing result such as:
 
+- supported ChatGPT plan ✓
+- `@GitHub` authenticated ✓
 - repository connected ✓
 - Private ✓
 - GitHub read/write verified ✓
@@ -106,11 +108,14 @@ It should show **one problem and one next action**, not a technical diagnostic d
 
 Examples:
 
-**This release is not supported on a Free ChatGPT account.**  
-**Fix:** Use a paid ChatGPT account with the `@GitHub` plugin, then tell me `Retry setup.`
+**This release requires ChatGPT Plus or higher. Free and ChatGPT Go are unsupported.**  
+**Fix:** Use ChatGPT Plus or a higher supported plan, then tell me `Retry setup.`
+
+**The `@GitHub` plugin isn't installed, selected, or authenticated.**  
+**Fix:** Install/select `@GitHub` in ChatGPT and authenticate it to GitHub. Then tell me `Retry setup.`
 
 **I can't access your memory repository.**  
-**Fix:** Give the `@GitHub` plugin access to that repository. Then tell me `Retry setup.`
+**Fix:** Give the authenticated `@GitHub` plugin access to that repository. Then tell me `Retry setup.`
 
 **Your memory repository isn't private yet.**  
 **Fix:** Change it to Private in GitHub. Then tell me `Retry setup.`
@@ -137,7 +142,7 @@ The intended product experience is:
 Before READY, the user should make at most three meaningful setup decisions:
 
 1. create the private repository;
-2. allow `@GitHub` access to that repository;
+2. install/select/authenticate `@GitHub` and allow it access to that repository;
 3. give ChatGPT the repository URL.
 
 Everything technical after that belongs to ChatGPT.
@@ -162,9 +167,9 @@ If you want a separate access check, say:
 
 > `@GitHub Check operational-memory access to <YOUR PRIVATE REPOSITORY URL>. Don't change anything.`
 
-ChatGPT should retrieve that exact repository and determine whether the selected `@GitHub` plugin exposes the repository actions needed for setup.
+ChatGPT should retrieve that exact repository and determine whether the selected/authenticated `@GitHub` plugin exposes the repository actions needed for setup.
 
-If ChatGPT says “GitHub is read-only,” verify that `@GitHub` was actually selected. Do not stop solely because the model remembers documentation for the separate read-only GitHub app/connection. The selected plugin's actual actions and the reversible setup test determine readiness.
+If ChatGPT says “GitHub is read-only,” verify that `@GitHub` was actually selected and authenticated. Do not stop solely because the model remembers documentation for the separate read-only GitHub app/connection. The selected plugin's actual actions and the reversible setup test determine readiness.
 
 ## Detailed write/readback test
 
@@ -227,7 +232,7 @@ Codex is optional and not required for the lay-user workflow. Root `AGENTS.md` p
 
 ## ChatGPT Work
 
-When equivalent write-capable `@GitHub` actions are available in Work, use the same repository, bootloader identity, and `START_HERE.md`. Do not create a Work-specific memory store.
+When equivalent write-capable `@GitHub` actions are available in Work on a supported plan/workspace, use the same repository, bootloader identity, and `START_HERE.md`. Do not create a Work-specific memory store.
 
 ## Optional `main` protection
 
@@ -239,13 +244,14 @@ If desired, configure lightweight protection against deleting or force-pushing t
 
 Setup is technically complete when:
 
-- the supported release baseline is satisfied;
+- ChatGPT Plus or a higher supported plan is in use; Free and Go are unsupported;
+- `@GitHub` is installed/selected and authenticated to GitHub;
 - the working repository is visibly private;
-- the selected `@GitHub` plugin is authenticated and authorized for that exact repository;
+- the selected `@GitHub` plugin is authorized for that exact repository;
 - required repository create/update/delete actions are available;
 - create/update/readback/delete succeeds and cleanup is verified;
 - stale-write protection is used when the integration exposes a current version/blob precondition;
 - no temporary setup file remains unless intentionally retained for the optional fresh-chat proof;
 - failures are reported as BLOCKED rather than represented as READY.
 
-For normal use, return to conversation. Consult `OPERATIONS.md` only for project creation, closeout, health checks, recovery, update checks, or maintenance.
+For normal use, return to conversation. Consult `OPERATIONS.md` only for project creation, health checks, recovery, update checks, or maintenance.
