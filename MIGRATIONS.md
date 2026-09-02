@@ -134,7 +134,8 @@ Before any zero-reading template-copy acceptance session, qualify the exact froz
 - exercise every scenario applicable to the public release claims; any scenario classified as not applicable must be explicitly recorded with the reason rather than silently omitted;
 - judge observed behavior after the fact and do not count ambiguous outcomes as passes;
 - distinguish protocol/model behavior failures from tool outage or capability unavailability;
-- record the qualifying run in `EVAL_RESULTS.md` with date, model/surface, candidate SHA, scenario coverage, pass/fail/blocked or not-applicable classifications, and material failure modes;
+- record the qualification in an acceptance evidence record **outside the frozen candidate tree**, including date, model/surface, candidate SHA, scenario coverage, pass/fail/blocked or not-applicable classifications, and material failure modes;
+- do **not** update `EVAL_RESULTS.md` while Gates 1–6 freeze is active, because that would mutate and invalidate the candidate; publish the compact qualifying summary there during the prescribed Gate 7 release transition;
 - same-session self-review after the expected answers have been seen may inform development but does **not** satisfy Gate 2B.
 
 Gate 2B passes only when there is no unresolved behavioral failure that contradicts a public release claim or a required safety/authority/persistence invariant. If qualification exposes a repository change that should be made, invalidate the candidate and enter the Gate 6 corrective loop before proceeding to Gate 3.
@@ -158,7 +159,7 @@ Using a fresh ChatGPT conversation and only the documented beginner **Create →
 7. rename the private repository;
 8. start another fresh conversation and verify the same repository ID resolves to the renamed repository, the state is recovered, and a verified write succeeds without changing the bootloader.
 
-For the Gate 3 evidence record, capture at minimum: date/time with timezone, frozen candidate SHA and tree SHA, ChatGPT model, plan, surface, GitHub integration/plugin path actually used, derived repository ID, activation READY/BLOCKED outcome, durable-state write commit SHA, and the derived-copy validator workflow run ID/result. Keep the record focused on reproducibility; do not copy private memory content merely for instrumentation.
+For the Gate 3 acceptance evidence record, capture at minimum: date/time with timezone, frozen candidate SHA and tree SHA, ChatGPT model, plan, surface, GitHub integration/plugin path actually used, derived repository ID, activation READY/BLOCKED outcome, durable-state write commit SHA, and the derived-copy validator workflow run ID/result. Keep the record outside the frozen candidate tree during Gates 1–6 and focused on reproducibility; do not copy private memory content merely for instrumentation.
 
 Failure or user confusion is release evidence. Fix the smallest root cause, return the public template to development, and, when the existing acceptance authorization remains in force, re-enter with a new candidate after corrective work.
 
@@ -202,13 +203,14 @@ Only after Gates 1–6 pass:
 
 - assign the first real protocol release identifier and set `protocol_status: released`;
 - replace the **pre-first-release bootstrap lifecycle** in `PROTOCOL.yaml`, `AGENTS.md`, and `tools/validate_protocol.py` with a post-release lifecycle that can represent the last/current released protocol and a future development/acceptance target without reverting a released protocol ambiguously to `unreleased`; define and validate that transition before tagging the first release;
+- publish the compact Gate 2B qualifying behavioral summary from the external acceptance evidence record into `EVAL_RESULTS.md`, rerunning and updating any scenarios materially affected by the prescribed release/lifecycle transition;
 - execute the controlled one-time history cleanup if still desired;
 - restore and verify the intended public-repository protection/settings;
 - rerun validator regression self-tests and deterministic validation against the final release tree;
 - tag/publish the release;
 - create one final private copy using **Use this template** and repeat the activation smoke test against what GitHub actually ships.
 
-The prescribed release/version/lifecycle/history changes in Gate 7 are the release transition after the frozen candidate has passed; they are not an acceptance-candidate defect that sends the repository back through Gate 6. Any unrelated or opportunistic change discovered during Gate 7 still invalidates the release transition and must be handled through the normal corrective path.
+The prescribed release/version/lifecycle/evidence/history changes in Gate 7 are the release transition after the frozen candidate has passed; they are not an acceptance-candidate defect that sends the repository back through Gate 6. Any unrelated or opportunistic change discovered during Gate 7 still invalidates the release transition and must be handled through the normal corrective path.
 
 That final private-copy activation is the release artifact check. A successful test against the source repository alone is not sufficient.
 
@@ -245,7 +247,7 @@ When the first public release is actually cut:
 6. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;
 7. verify that `template_source.repository_id` resolves the public upstream and update discovery does not depend on its current owner/name;
 8. run validator regression self-tests, deterministic structural validation, and the semantic repository health check;
-9. confirm the Gate 2B behavioral evidence remains applicable to the release tree and rerun any behavioral/adversarial scenarios affected by the prescribed Gate 7 lifecycle/release transition;
+9. publish the Gate 2B behavioral summary into `EVAL_RESULTS.md` and confirm the evidence remains applicable to the release tree, rerunning any behavioral/adversarial scenarios affected by the prescribed Gate 7 lifecycle/release transition;
 10. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
 11. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
 12. only then treat the public template as the migration source for user-created copies.
