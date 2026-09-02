@@ -26,13 +26,18 @@ jobs:
       - name: Install validator dependency
         run: python -m pip install "PyYAML==6.0.2"
 
+      - name: Run validator regression self-tests
+        run: python tools/test_validate_protocol.py
+
       - name: Validate protocol structure
         run: python tools/validate_protocol.py
 
 # This workflow is intentionally advisory. It runs for pull requests, every
 # push to canonical main (including normal operational-memory writes), or when
-# manually dispatched. Main-push validation is a post-write repository-integrity
-# check; immediate persistence claims still depend on write readback/verification,
+# manually dispatched. Validator regression self-tests run before repository
+# validation so high-value failure detectors are exercised on every workflow
+# run. Main-push validation is a post-write repository-integrity check;
+# immediate persistence claims still depend on write readback/verification,
 # not on waiting for this workflow. PROTOCOL.yaml declares
 # blocking_required_check: false, and the recommended main-branch ruleset does
 # not require this status check.
