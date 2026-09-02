@@ -4,6 +4,17 @@ This document is for one-time installation, first-use testing, and troubleshooti
 
 The intended user should not need a terminal or Git expertise.
 
+## The setup in four steps
+
+Before you start, the whole process is:
+
+1. **Create a private repository** from this template and visibly confirm GitHub labels it **Private**.
+2. **Connect and authorize the write-capable GitHub integration** for that repository, then prove that read/create/update/delete actions actually work.
+3. **Paste one Custom Instruction** into ChatGPT so future chats know that the repository exists, how to retrieve it, what may be persisted, and how failures should be reported.
+4. **Run one fresh-chat recovery test** using a repository-only value that ChatGPT has never seen, then delete the test file and begin normal use.
+
+The detailed steps below implement and verify those four things. Setup is intentionally more careful than day-to-day use because it establishes whether your particular ChatGPT account, surface, GitHub connection, and permissions can actually support the workflow.
+
 ## 1. Create and verify a private working copy
 
 Use this repository as a GitHub template to create your own working repository.
