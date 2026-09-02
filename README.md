@@ -20,6 +20,35 @@ It is for people who:
 
 It is probably **not** the right endpoint if you want autonomous agents, vector retrieval, multi-agent orchestration, local execution, formal evidence/authority contracts, automatic memory consolidation, or a developer-facing memory API. See **Prior art and advanced alternatives** below for projects that go further in those directions.
 
+## What this is good for
+
+This template is most useful when a normal ChatGPT conversation produces a small amount of working state that will matter later.
+
+Typical examples:
+
+- **Long-running project continuity:** carry forward the current objective, active work, constraints, and open material questions without reconstructing them from old chats.
+- **Durable decisions:** preserve a decision such as “we chose option B” together with the brief reason it should continue governing future work.
+- **Corrections that should stick:** record that an earlier assumption was wrong or superseded so it does not keep resurfacing as active state.
+- **Resuming after time away:** return days or weeks later and reload the explicitly recorded current state before continuing research, planning, writing, or other ongoing work.
+
+This is not intended to archive every conversation or replace ChatGPT's native personalization features. It is for the smaller class of state that is important enough to survive the chat and explicit enough that you want to inspect and own it.
+
+## Before and after
+
+**Without operational memory**
+
+New chat → “Where were we?” → ChatGPT reconstructs from whatever conversation context or native memory happens to be available → important constraints or decisions may be missing, stale, or blended with recollection.
+
+**With operational memory**
+
+New chat → retrieve `CURRENT.md` + `DECISIONS.md` from the intended repository → receive a retrieval receipt showing what was actually loaded → continue from the explicitly recorded state.
+
+When something important changes during the session, ChatGPT can persist it and return a visible receipt such as:
+
+`Persisted: venue decision · DECISIONS.md · commit 4ac02d1`
+
+That receipt is useful only when the commit prefix is derived from a real GitHub commit SHA. The write still requires readback verification.
+
 ## 60-second operating model
 
 After completing [`SETUP.md`](SETUP.md), normal use is intentionally simple.
