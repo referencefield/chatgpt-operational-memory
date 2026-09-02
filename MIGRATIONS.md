@@ -129,12 +129,14 @@ Record the exact candidate SHA used. A validator result from an earlier commit d
 
 Create a new **private** repository using GitHub **Use this template**, give it an arbitrary name, and approach it as a first-time non-expert user who has not read the repository files.
 
-Run this test on a ChatGPT account, plan, and surface representative of the **minimum public support claim**. Record the plan/surface and the GitHub plugin/app path actually used. Do not treat a maintainer-only, administrator-only, internal, development, or unusually privileged GitHub capability as proof that ordinary users at the claimed baseline can perform setup. Before calling the gate runnable, confirm the documented GitHub capability is discoverable/invokable on that surface and actually exposes the repository create/update/delete actions required by activation. If the available GitHub path is read-only, this gate is BLOCKED for that claimed baseline and the public compatibility wording must be narrowed or the required capability path must be established before release.
+The minimum public ChatGPT support claim for this release is **ChatGPT Plus**. Free and ChatGPT Go are explicitly unsupported and are not eligible substitutes for this acceptance test. Run Gate 3 on a normal Plus account/surface, not a maintainer-only, administrator-only, internal, development, or unusually privileged environment. Record the exact plan/surface and GitHub plugin/app path actually used.
+
+Before activation, prove that the user-facing prerequisite path itself works: `@GitHub` can be installed/selected in ChatGPT, authenticated to GitHub, authorized for the exact private template copy, and exposes the repository create/update/delete actions required by activation. Plugin visibility alone is not enough. If any of those prerequisites is unavailable on the tested Plus surface, Gate 3 is **BLOCKED** and the release cannot claim Plus support until the capability path is established or the public support boundary is deliberately changed.
 
 Using a fresh ChatGPT conversation and only the documented beginner **Create → Connect → Activate** path:
 
 1. run activation from the private repository URL;
-2. require the correct repository ID, privacy check, reversible CRUD/readback, cleanup, and `Operational memory: READY` receipt;
+2. require the Plus-or-higher plan check, selected/authenticated/authorized `@GitHub`, correct repository ID, privacy check, reversible CRUD/readback, cleanup, and `Operational memory: READY` receipt;
 3. install the repository-ID bootloader supplied by activation;
 4. create a small piece of genuine durable project state through normal conversation;
 5. start another fresh conversation and recover that state from the repository;
@@ -148,7 +150,7 @@ Failure or user confusion is release evidence. Fix the smallest root cause, retu
 On the frozen candidate:
 
 - **Codex:** verify root `AGENTS.md` enters through `PROTOCOL.yaml` / `START_HERE.md`, uses the existing memory topology, and can perform a verified repository-backed state change without creating a competing memory system.
-- **ChatGPT Work:** when the required write-capable GitHub plugin/app is available, verify it uses the same repository ID/front door and preserves the same routing, privacy, write-set, and readback rules. If the required capability is unavailable on the tested Work surface, record that limitation and qualify public compatibility wording rather than inventing a pass.
+- **ChatGPT Work:** when the required write-capable GitHub plugin/app is available on a supported plan/workspace, verify it uses the same repository ID/front door and preserves the same routing, privacy, write-set, and readback rules. If the required capability is unavailable on the tested Work surface, record that limitation and qualify public compatibility wording rather than inventing a pass.
 
 ### Gate 5 — Independent adversarial release audit
 
@@ -225,7 +227,7 @@ When the first public release is actually cut:
 6. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;
 7. verify that `template_source.repository_id` resolves the public upstream and update discovery does not depend on its current owner/name;
 8. run deterministic structural validation and the semantic repository health check;
-9. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, failure handling, closeout, and release lifecycle;
+9. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, failure handling, plan/plugin readiness, and release lifecycle;
 10. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
 11. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
 12. only then treat the public template as the migration source for user-created copies.
