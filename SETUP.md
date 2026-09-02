@@ -54,18 +54,23 @@ If ChatGPT cannot establish create/update capability from the actions actually a
 
 Do **not** solve this by telling ChatGPT "you have read/write access." Capability must be established from the available integration.
 
-## 5. Run the write/readback test
+## 5. Run the write/readback and stale-write-safety test
 
 Ask ChatGPT to:
 
 1. create `SETUP-TEST.md` with a temporary phrase;
 2. reread that exact path;
-3. update the file with a second temporary phrase;
-4. reread it again and verify the new state;
-5. report the repository owner/name, branch or ref if available, exact path, and resulting content;
-6. if GitHub returns or confirms the resulting commit SHA, show a shortened commit ID derived from that real SHA. If no commit SHA is available, say **commit ID unavailable** rather than inventing one.
+3. identify the current file/blob/version identifier if the integration exposes one;
+4. update the file with a second temporary phrase using the current observed version as the update precondition when the action supports it;
+5. reread it again and verify the new state;
+6. report the repository owner/name, branch or ref if available, exact path, and resulting content;
+7. if GitHub returns or confirms the resulting commit SHA, show a shortened commit ID derived from that real SHA. If no commit SHA is available, say **commit ID unavailable** rather than inventing one.
 
 A successful tool response alone is not enough. The test passes only if ChatGPT rereads the repository and observes the intended state.
+
+For updates to an existing file, the preferred safety behavior is optimistic concurrency: retrieve the current target immediately before the write and use its current blob/version identifier as the write precondition when the integration exposes one. If the target changed and the write is rejected as stale/conflicting, that rejection is a safety success. ChatGPT should **not** force or blindly retry the stale write; it should reload and reconcile.
+
+If the integration provides no comparable current-version precondition, ChatGPT should say that mechanical concurrency protection is **not established** rather than claiming it exists.
 
 Do **not** delete `SETUP-TEST.md` yet.
 
@@ -91,19 +96,29 @@ On ChatGPT web or desktop, open **Settings → Personalization → Custom Instru
 
 > I use a GitHub repository as durable operational memory: <YOUR FULL PRIVATE REPOSITORY URL>.
 >
-> When my request materially depends on prior work, an ongoing project, or a durable decision, retrieve this repository before relying on remembered prior context. `CURRENT.md` governs transient/current working state. Active entries in `DECISIONS.md` govern durable decisions. If they conflict, surface and reconcile the inconsistency rather than silently choosing one. My current explicit instruction wins.
+> When my request materially depends on prior work, an ongoing project, or a durable decision, retrieve both `CURRENT.md` and `DECISIONS.md` from that exact repository before relying on remembered prior context. `CURRENT.md` governs transient/current working state. Active entries in `DECISIONS.md` govern durable decisions. If they conflict, surface and reconcile the inconsistency rather than silently choosing one. My current explicit instruction wins.
 >
-> During an active conversation, watch for clear, non-sensitive changes that are likely to matter in future chats: changed objectives, active constraints, material changes to active work, durable decisions, and explicit corrections to durable state. I authorize routine updates of that kind to `CURRENT.md` or `DECISIONS.md` without asking me each time, provided you verify the resulting repository/ref/path/content and briefly tell me what you persisted. Keep `CURRENT.md` compact by replacing stale state rather than appending a transcript. Mark durable decisions superseded when they no longer govern.
+> A complete operational-memory load requires both files. When GitHub exposes retrieval identifiers, give me a compact retrieval receipt identifying the repository/ref and real shortened file/blob/version identifiers derived from the retrieval metadata. Never invent those identifiers. If either required file was not retrieved, say "partial retrieval" and do not claim operational memory is fully loaded.
+>
+> During an active conversation, watch for clear, non-sensitive current-state changes that are likely to matter in future chats: changed objectives, active constraints, material changes to active work, and explicit corrections to current state. I authorize routine updates of that kind to `CURRENT.md` without asking me each time, provided you verify the resulting repository/ref/path/content and briefly tell me what you persisted. Keep `CURRENT.md` compact by replacing stale state rather than appending a transcript.
+>
+> Do not silently promote an ambiguous conversational inference into an active durable decision. If I explicitly say "make this a durable decision," "record this decision," or otherwise clearly state a final durable decision in a context that authorizes persistence, record it using the `DECISIONS.md` structure. Otherwise, if the decision or its durable status is ambiguous, ask before activating it. When you record a new durable decision, show me the exact stored one-sentence `Decision` field so I can inspect the semantic result.
+>
+> Immediately before updating an existing file, retrieve the current target and use its current blob/version identifier as the update precondition when the GitHub action supports one. If a write is rejected because the target changed, fail closed: do not force or blindly retry. Re-read the current state, surface the competing change when material, reconcile it, then write against the current version.
+>
+> If a durable decision also requires a `CURRENT.md` change, treat the two files as coupled. If one write succeeds and the other fails, say "operational memory is temporarily inconsistent," re-read both files, and complete or deliberately reconcile the coupled state before claiming completion.
 >
 > After a successful persistence write, give me a compact receipt containing what changed, the file, and a shortened commit ID when GitHub returned or confirmed a real commit SHA. Derive the short ID from that real SHA; never invent or guess a commit hash. If the commit SHA is unavailable, say "commit ID unavailable." A commit receipt supplements readback verification; it does not replace it.
 >
 > Ask before persisting anything sensitive, ambiguous, destructive, public, or authority-changing. A current instruction such as "do not persist this" overrides the routine persistence policy. Do not store secrets.
 >
+> Default failure behavior is fail closed, fail loud, and preserve the last known good state. If retrieval is incomplete, a write is rejected, verification fails, the repository target is uncertain, coupled state is inconsistent, or GitHub is unavailable, do not pretend the operation succeeded. Tell me what failed, what remains known, and what recovery step is needed.
+>
 > Do not assume the repository was retrieved or changed. Content agreement alone is not proof of retrieval. If GitHub was not retrieved, say so rather than substituting native memory. If automatic GitHub selection does not occur, explicit `@GitHub` invocation is an acceptable baseline. For consequential durable writes, read back and verify the intended target before claiming completion.
 
 This is the recommended **assisted-persistence** mode. It reduces the need for the human to act as a repository clerk while keeping explicit human override.
 
-If you prefer an **ask-first** mode, replace the sentence authorizing routine updates without asking with:
+If you prefer an **ask-first** mode, replace the sentence authorizing routine `CURRENT.md` updates without asking with:
 
 > `When you notice something that appears worth persisting, ask me before writing it.`
 
@@ -153,7 +168,7 @@ Then verify deletion by attempting to reread that exact repository/path. When av
 
 In a chat where GitHub is available, say:
 
-> `@GitHub Initialize my operational-memory repository for normal use. Read CURRENT.md and DECISIONS.md. Treat CURRENT.md as transient/current working state and active DECISIONS.md entries as durable decisions. If they conflict, surface and reconcile the inconsistency. During our conversations, follow my Custom Instruction persistence policy. Keep CURRENT.md compact, persist only information worth carrying into future chats, verify consequential GitHub writes by readback, and give me a verified short commit receipt when GitHub exposes the commit SHA.`
+> `@GitHub Initialize my operational-memory repository for normal use. Retrieve both CURRENT.md and DECISIONS.md. Treat CURRENT.md as transient/current working state and active DECISIONS.md entries as durable decisions. If they conflict, surface and reconcile the inconsistency. Follow my Custom Instruction persistence and failure policy. Keep CURRENT.md compact, require clear authorization for new durable decisions, protect updates against stale overwrites when the integration exposes a current-version precondition, verify consequential GitHub writes by readback, and give me verified retrieval and commit receipts when GitHub exposes the underlying identifiers.`
 
 Then begin normal work.
 
@@ -165,17 +180,23 @@ After setup, the user should not need to think in Git commands or manually edit 
 
 When prior state matters, say:
 
-> `@GitHub Load my operational-memory repository. Read CURRENT.md and the relevant active decisions in DECISIONS.md before we continue.`
+> `@GitHub Load my operational-memory repository. Retrieve both CURRENT.md and DECISIONS.md before we continue.`
+
+A normal successful load should produce a compact receipt such as:
+
+`Loaded: CURRENT.md@1d8998f + DECISIONS.md@743fa79 · main · owner/repo`
+
+Those identifiers must be derived from the actual GitHub retrieval metadata. If both required files were not retrieved, ChatGPT should report **partial retrieval** rather than claiming the memory load succeeded.
 
 If automatic GitHub selection is reliable on your account/surface, you may omit `@GitHub`. If certainty matters, use it.
 
 ## During a conversation
 
-With the recommended assisted-persistence Custom Instruction, ChatGPT should watch the active conversation for clear, non-sensitive durable changes and selectively persist them.
+With the recommended assisted-persistence Custom Instruction, ChatGPT should watch the active conversation for clear, non-sensitive **current-state** changes and selectively persist them.
 
 You can always direct it explicitly:
 
-- **"Record this in operational memory."** Let ChatGPT determine the appropriate file from the semantics.
+- **"Record this in operational memory."** Let ChatGPT determine the appropriate file from the semantics, asking if durable status is ambiguous.
 - **"Update current state with this."** Use for active objectives, work, constraints, or material open questions.
 - **"Make this a durable decision."** Use when the decision should govern future conversations until superseded.
 - **"Do not persist this."** Prevent this material from being written under the routine persistence policy.
@@ -189,6 +210,8 @@ After a successful write, ChatGPT should give you a compact receipt such as:
 
 The commit prefix must come from a real GitHub commit SHA. A plausible-looking hash generated from memory or imagination is not acceptable. If the commit SHA is not available, the receipt should say **commit ID unavailable**.
 
+For a new durable decision, ChatGPT should also show the exact one-sentence `Decision` field it stored. That is your semantic check; readback alone verifies bytes, not whether the summary accurately reflects your intent.
+
 If ChatGPT says it saved something but you did not observe GitHub use/readback, ask it to verify the repository/ref/path/content before relying on the claim.
 
 ## Closing out an important session
@@ -201,14 +224,16 @@ Say:
 
 ChatGPT should:
 
-1. retrieve current `CURRENT.md` and relevant active decisions;
+1. retrieve both `CURRENT.md` and `DECISIONS.md` from the intended repository;
 2. identify material durable changes from the active conversation that have not yet been persisted;
 3. apply the persistence policy, asking where required;
 4. update only what earns persistence;
 5. compact stale current state instead of appending a transcript;
 6. reconcile `CURRENT.md` with active durable decisions;
-7. verify consequential writes by readback;
-8. briefly report what changed, any verified short commit IDs for the writes, and anything intentionally left unpersisted.
+7. protect each update against a stale target version when the integration supports it;
+8. verify consequential writes by readback;
+9. if a coupled write partially fails, report the repository as temporarily inconsistent and repair/reconcile it before claiming completion;
+10. briefly report what changed, any verified short commit IDs for the writes, and anything intentionally left unpersisted.
 
 This closeout is optional. It is most useful after a session that materially changed plans, constraints, active work, or decisions.
 
@@ -228,13 +253,28 @@ You can say:
 
 That removes or retires the active record as appropriate. It does **not** guarantee erasure from prior Git history.
 
+# Failure behavior
+
+The safe default is **fail closed, fail loud, preserve the last known good state**.
+
+That means ChatGPT should not silently substitute a plausible answer when an operational-memory action fails.
+
+- If retrieval is incomplete, say **partial retrieval** and do not claim the repository is fully loaded.
+- If a write is rejected or cannot be read back, say **not persisted** or **not verified** as appropriate.
+- If the target changed since it was read, do not overwrite it. Reload and reconcile the concurrent change.
+- If one half of a coupled `CURRENT.md`/`DECISIONS.md` update fails, say **operational memory is temporarily inconsistent** and finish reconciliation before reporting completion.
+- If a proposed durable decision is semantically ambiguous, ask before making it active.
+- If the connector is unavailable, say the conversation change was **not persisted** and use the manual fallback below.
+
+A loud recoverable stop is better than a quiet false success.
+
 # Troubleshooting GitHub access
 
 ## ChatGPT does not appear to use GitHub
 
 Invoke it explicitly:
 
-> `@GitHub Retrieve CURRENT.md from <YOUR REPOSITORY URL>. Identify the repository and path you actually retrieved.`
+> `@GitHub Retrieve CURRENT.md and DECISIONS.md from <YOUR REPOSITORY URL>. Identify the repository and paths you actually retrieved.`
 
 If `@GitHub` is not available, check **+ → More**, the Plugins directory, or your account's Apps/Plugins settings.
 
@@ -253,6 +293,16 @@ Check these in order:
 
 Then retry explicit `@GitHub` retrieval.
 
+## ChatGPT retrieved only one state file
+
+Treat that as **partial retrieval**, not a complete operational-memory load.
+
+Ask:
+
+> `@GitHub Retrieve both CURRENT.md and DECISIONS.md from exactly <YOUR REPOSITORY URL>. Report the repository, ref/branch when available, both exact paths, and retrieval identifiers actually returned by GitHub.`
+
+Do not rely on a conflict check unless both files were actually retrieved.
+
 ## ChatGPT can read the repository but cannot write
 
 Do not tell it that it has write permission and ask it to proceed anyway.
@@ -265,6 +315,20 @@ If only read/search actions are available, you may be using the read-only GitHub
 
 Return to the Plugins/Apps settings, verify the correct write-capable capability is installed and authorized, then repeat the CRUD test.
 
+## A write is rejected because the file changed
+
+That is a concurrency protection event, not a reason to force the write.
+
+Ask ChatGPT to:
+
+1. re-fetch the current target file;
+2. identify the intervening change;
+3. compare it with the intended update;
+4. ask if user intent is ambiguous;
+5. write only after reconciliation, using the newly observed current version as the precondition.
+
+Do not force-push or blindly retry a stale file update.
+
 ## ChatGPT claims a write succeeded but GitHub does not show it
 
 Treat the write as **unverified**, not successful.
@@ -275,11 +339,33 @@ If ChatGPT reports a commit ID, require that it be derived from the actual GitHu
 
 If readback does not show the intended state, retry only after identifying the wrong-target, permission, stale-read, or tool failure.
 
+## One coupled file changed and the other did not
+
+Treat the repository as temporarily inconsistent.
+
+Ask:
+
+> `@GitHub Re-read CURRENT.md and DECISIONS.md. A coupled update partially failed. Preserve valid intervening edits, reconcile the two files, verify both final states, and do not report completion until they are consistent.`
+
+## GitHub is temporarily unavailable
+
+Do not pretend the conversation was persisted.
+
+For a temporary manual fallback:
+
+1. open your private repository in GitHub's web interface;
+2. edit `CURRENT.md` for current objectives/work/constraints or `DECISIONS.md` for a clearly authorized durable decision;
+3. follow the existing file structure and keep the change compact;
+4. commit the web edit;
+5. when ChatGPT GitHub access returns, say `@GitHub Reload both CURRENT.md and DECISIONS.md and reconcile operational memory before we continue.`
+
+This fallback preserves the durable Markdown state even when the conversational writeback layer is temporarily unavailable.
+
 ## ChatGPT retrieves the wrong repository
 
 Provide the full repository URL and require target identity:
 
-> `@GitHub Use exactly <FULL REPOSITORY URL>. Before relying on its contents, identify the owner/repository and path you retrieved.`
+> `@GitHub Use exactly <FULL REPOSITORY URL>. Before relying on its contents, identify the owner/repository and both state paths you retrieved.`
 
 If the wrong account remains connected, reconnect GitHub to the intended account or adjust repository authorization.
 
@@ -345,8 +431,10 @@ Setup is complete only when all of these are true:
 - the required write-capable OpenAI GitHub capability is connected to the correct account/repository;
 - explicit GitHub invocation can retrieve the exact repository;
 - create/update/readback/delete works on the current account/surface;
-- your persistent ChatGPT instructions identify the correct repository, semantic authority rules, persistence policy, and verified commit-receipt behavior;
+- existing-file updates use a current observed version/blob precondition when the integration exposes one, or the limitation is explicitly reported if mechanical concurrency protection is unavailable;
+- your persistent ChatGPT instructions identify the correct repository, require complete two-file retrieval, semantic authority rules, durable-decision confirmation, persistence policy, fail-closed behavior, and verified commit-receipt behavior;
 - a fresh chat retrieves a repository-only nonce it has never previously seen;
 - if automatic selection is unreliable, explicit `@GitHub` retrieval works reliably and is documented as your baseline;
 - `SETUP-TEST.md` has been deleted and deletion verified;
-- you understand the basic normal-use controls: load, record, do not persist, close out, verify, and troubleshoot explicit GitHub invocation.
+- you understand the basic normal-use controls: load, record, do not persist, close out, verify, and troubleshoot explicit GitHub invocation;
+- you understand that a failed or unverified operation should be reported loudly rather than treated as successful.
