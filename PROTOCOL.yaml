@@ -52,7 +52,10 @@ activation:
   receipt_includes_repository_id: true
   ready_label: "Operational memory: READY"
   blocked_label: "Operational memory: BLOCKED"
-  explicit_future_fallback: "@GitHub Use my operational memory repository ID <repository ID>. Resolve its current owner/name, then enter through START_HERE.md."
+  normal_setup_command: "@GitHub Set up operational memory from <repository URL>."
+  configured_normal_entry: "@GitHub Use my operational memory."
+  explicit_future_fallback: "@GitHub Use operational memory from <repository URL>."
+  user_need_not_name_front_door_or_resolution_steps: true
 
 human_docs:
   readme: README.md

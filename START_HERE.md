@@ -18,15 +18,19 @@ The user's normal setup prompt does **not** need to mention `START_HERE.md`, `PR
 5. create **no** project, decision, knowledge, working-style, or current-state entry merely to mark activation;
 6. return a compact receipt beginning **`Operational memory: READY`** or **`Operational memory: BLOCKED`**, covering current owner/name, GitHub repository ID, privacy, read/write verification, protocol/status, structural health, project count, durable-state empty/non-empty, persistence-watch status, and the next useful action.
 
+The repository URL supplied during setup selects the exact working repository even when the GitHub connection can access many unrelated repositories. Do not substitute another connected repository by name similarity, search rank, or convenience. Once activation records the numeric repository ID, future bootloader routing uses that ID only.
+
 Activation is idempotent. Cloning/naming the repository alone is not activation.
 
 For future routing, prefer the GitHub repository ID over owner/name. Resolve the repository ID to its current owner/name before retrieving files. A normal repository rename therefore requires no protocol migration and no bootloader edit.
 
 If a configured repository ID does not resolve, fail closed and ask the user to restore access or identify the intended repository. Do not guess based on a similar repository name.
 
-If no persistent ChatGPT bootloader is configured, offer the repository-ID bootloader from `SETUP.md`, filled with the verified ID from the activation receipt. The reliable manual fallback is:
+If no persistent ChatGPT bootloader is configured, offer the simple URL fallback from `SETUP.md`:
 
-`@GitHub Use my operational memory repository ID <repository ID>. Resolve its current owner/name, then enter through START_HERE.md.`
+`@GitHub Use operational memory from <repository URL>.`
+
+The user should not have to name repository-ID resolution, owner/name resolution, `START_HERE.md`, or other routing mechanics in a normal command.
 
 ## Normal route
 

@@ -6,11 +6,19 @@ This document is for normal operation after setup: persistence watch, project cr
 
 ## Normal entry
 
-When prior durable state matters and the repository-ID bootloader is configured:
+When prior durable state matters and the repository-ID bootloader is configured, the user does not need to restate repository identity or routing mechanics. A minimal explicit invocation is enough:
 
-> `@GitHub Use my configured operational-memory repository ID. Resolve its current owner/name, enter through START_HERE.md, and load only the durable state relevant to this task.`
+> `@GitHub Use my operational memory.`
 
-If no persistent bootloader is configured, use the explicit repository-ID fallback from `SETUP.md` rather than relying on a remembered repository name or URL.
+For a known project, the task itself can be the command, for example:
+
+> `@GitHub where are we on Northstar?`
+
+ChatGPT should use the configured repository ID, resolve the exact repository, enter through the current front door, and load only the durable state relevant to the request. The user should not have to mention repository-ID resolution, owner/name resolution, `START_HERE.md`, or file paths.
+
+If no persistent bootloader is configured, supply only the identity ChatGPT genuinely cannot infer:
+
+> `@GitHub Use operational memory from <repository URL>.`
 
 For a known project, name it. ChatGPT should use `PROJECTS.md` to locate the project rather than asking you to remember a path.
 

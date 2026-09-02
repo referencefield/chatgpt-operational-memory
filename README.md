@@ -17,6 +17,8 @@ Already have the **GitHub plugin with repository read/write actions** authentica
 
 That is the complete normal setup command. ChatGPT should inspect the repository, discover its runtime front door, and run the activation procedure without requiring the user to name `START_HERE.md`, `PROTOCOL.yaml`, or an “activation handshake.”
 
+Having other repositories connected to GitHub does not change this. The URL selects one exact working repository; activation records that repository's numeric GitHub repository ID, and future automatic routing uses only that ID. If the selected repository cannot be resolved or accessed, ChatGPT should stop rather than choose another connected repository.
+
 ChatGPT should verify the exact repository, confirm that it is private, obtain its GitHub repository ID, check the protocol structure, prove reversible read/write access, remove its diagnostic file, and return either:
 
 **Operational memory: READY**
@@ -124,9 +126,11 @@ At runtime ChatGPT resolves that repository ID to the repository's current owner
 - `referencefield/chatgpt-operational-memory` remains the current human-readable location of that public source, not a required working-repository name;
 - if a configured working or template-source repository ID cannot be resolved, ChatGPT should fail visibly rather than guess a similarly named repository.
 
-For users who skip Custom Instructions, the rename-safe manual fallback is:
+For users who skip Custom Instructions, the simple manual fallback is:
 
-> `@GitHub Use my operational memory repository ID <YOUR REPOSITORY ID>. Resolve its current owner/name, then enter through START_HERE.md.`
+> `@GitHub Use operational memory from <YOUR REPOSITORY URL>.`
+
+The repository URL supplies the only identity ChatGPT cannot infer. Repository-ID resolution, owner/name resolution, and entry through the protocol front door are internal steps, not user commands.
 
 ## Controlled persistence
 

@@ -14,6 +14,8 @@ In ChatGPT, say:
 
 That is the complete normal setup command. ChatGPT should inspect the repository, discover the runtime front door, and run the activation procedure without requiring you to name `START_HERE.md`, `PROTOCOL.yaml`, or an “activation handshake.”
 
+Having several other repositories connected or authorized does not make setup ambiguous. The URL identifies one exact working repository. Activation captures that repository's numeric GitHub repository ID, and the optional bootloader uses only that ID in future chats. If that exact repository cannot be resolved or accessed, ChatGPT should stop rather than choose another repository.
+
 ChatGPT should verify the exact repository, confirm it is private, retrieve the protocol/front door, obtain the repository's GitHub repository ID, check the declared structure, run a reversible create/read/update/read/delete diagnostic through the write-capable GitHub plugin/app, remove the diagnostic file, and return a compact **Operational memory: READY** or **Operational memory: BLOCKED** receipt.
 
 A successful receipt should include the repository's numeric GitHub repository ID. That ID is the preferred long-lived identifier for future ChatGPT routing because the repository owner/name may later change without changing the repository itself.
@@ -22,9 +24,11 @@ Activation does not create a project or record personal state merely to mark the
 
 One thing cannot be installed by repository writeback: the optional persistent ChatGPT bootloader that helps future chats enter the repository automatically when durable context matters. After activation, ChatGPT should give you the small repository-ID bootloader below, filled with the verified ID from the activation receipt.
 
-If you skip that step, nothing in the repository breaks. Begin relevant future chats with:
+If you skip that step, nothing in the repository breaks. For a relevant future chat, paste the current private repository URL and say:
 
-> `@GitHub Use my operational memory repository ID <YOUR REPOSITORY ID>. Resolve its current owner/name, then enter through START_HERE.md.`
+> `@GitHub Use operational memory from <YOUR REPOSITORY URL>.`
+
+ChatGPT should handle repository resolution and entry through the protocol internally. You do not need to remember a repository ID, file path, or routing command.
 
 The detailed procedure below exists for users who want to inspect or independently test each setup step.
 
@@ -71,9 +75,11 @@ The action test below is the authoritative check. If create/update/delete action
 
 ## 3. Confirm repository access, identity, and write actions
 
-In ChatGPT, explicitly invoke the plugin:
+For the detailed no-write access check, say:
 
-> `@GitHub Find my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Confirm that you can retrieve that exact repository, report its GitHub repository ID, and confirm that the authenticated GitHub plugin/app can read, create, update, and delete files there. Do not make changes yet.`
+> `@GitHub Check operational-memory access to <YOUR PRIVATE REPOSITORY URL>. Don't change anything.`
+
+ChatGPT should retrieve that exact repository, report its GitHub repository ID, and determine whether the selected GitHub plugin/app exposes the repository read/create/update/delete actions needed by the later diagnostic. Those implementation checks are ChatGPT's job; the user should not have to spell them out in the command.
 
 The repository ID is the stable identifier the bootloader will use. The current owner/name remains useful for human-readable receipts but is not the durable routing key.
 
@@ -133,15 +139,15 @@ If you use a ChatGPT Project whose own instructions override global Custom Instr
 
 ## 7. Test a genuinely fresh chat
 
-If you performed the repository-only nonce test, start a completely new ordinary ChatGPT conversation.
+If you performed the repository-only nonce test and installed the bootloader, start a completely new ordinary ChatGPT conversation and say only:
 
-First try:
+> `@GitHub Read SETUP-TEST.md from my operational memory.`
 
-> `Use my operational-memory repository from my configured repository ID. Resolve its current owner/name, enter through START_HERE.md, then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
+That short request is deliberate. The test is meant to prove that the installed bootloader supplies the repository identity and that ChatGPT performs repository resolution and protocol entry without the user restating those mechanics.
 
-If ChatGPT does not invoke GitHub automatically, repeat with explicit plugin invocation:
+If you intentionally skipped the bootloader, use the repository URL instead:
 
-> `@GitHub Use my operational-memory repository ID <YOUR REPOSITORY ID>. Resolve its current owner/name, enter through START_HERE.md, then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
+> `@GitHub Read SETUP-TEST.md from <YOUR REPOSITORY URL>.`
 
 The test passes only when repository retrieval is actually evidenced and the returned content matches the repository-only nonce. Correct content alone is not proof of retrieval.
 
@@ -197,6 +203,8 @@ Setup is complete when:
 - `SETUP-TEST.md` is removed after diagnostics unless intentionally retained for the optional nonce test;
 - failed or unverified operations are reported visibly instead of treated as success.
 
-For automatic future routing, also install the small repository-ID bootloader. Without it, explicit `@GitHub Use my operational memory repository ID <YOUR REPOSITORY ID>` remains the supported manual entry path and remains valid across an ordinary repository rename.
+For automatic future routing, also install the small repository-ID bootloader. Without it, the supported manual entry path is simply:
+
+> `@GitHub Use operational memory from <YOUR REPOSITORY URL>.`
 
 For normal use after setup, start with `START_HERE.md` and consult `OPERATIONS.md` only when you need project creation, closeout, health checks, recovery, update checks, or maintenance.
