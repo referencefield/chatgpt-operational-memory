@@ -68,6 +68,89 @@ When a future release changes protocol structure or semantics:
 
 A working-repository rename by itself is not a protocol migration.
 
+## Objective pre-release acceptance gate
+
+Do not call the repository **done**, **release-ready**, or recommend stopping substantive review merely because an architecture/design sweep found no further improvements. Release readiness is established only by the evidence below against a frozen candidate.
+
+### Gate 1 — Freeze candidate
+
+Record the candidate `main` commit SHA and tree SHA. From that point until the gate completes, do not make opportunistic improvements. Any accepted repository change invalidates the candidate and starts the gate again from a new frozen SHA.
+
+### Gate 2 — Deterministic repository checks
+
+Against the frozen candidate:
+
+- run `tools/validate_protocol.py` and require `RESULT: PASS` or consciously adjudicate every `Watch` signal;
+- verify repository visibility/template status, default branch, branch set, and intended public-repository ruleset/settings;
+- verify no setup/probe files or unintended artifacts remain;
+- verify `START_HERE.md` and other declared soft budgets;
+- verify the public template-source repository ID resolves correctly.
+
+Record the exact candidate SHA used. A validator result from an earlier commit does not satisfy this gate.
+
+### Gate 3 — Zero-reading template-copy acceptance test
+
+Create a new **private** repository using GitHub **Use this template**, give it an arbitrary name, and approach it as a first-time non-expert user who has not read the repository files.
+
+Using a fresh ChatGPT conversation and the documented Fast start only:
+
+1. run activation from the private repository URL;
+2. require the correct repository ID, privacy check, reversible CRUD/readback, cleanup, and `Operational memory: READY` receipt;
+3. install the repository-ID bootloader supplied by activation;
+4. create a small piece of genuine durable project state through normal conversation;
+5. start another fresh conversation and recover that state from the repository;
+6. rename the private repository;
+7. start another fresh conversation and verify the same repository ID resolves to the renamed repository, the state is recovered, and a verified write succeeds without changing the bootloader.
+
+Failure or user confusion is release evidence. Fix the smallest root cause, freeze a new candidate, and restart the gate.
+
+### Gate 4 — Surface smoke tests
+
+On the frozen candidate:
+
+- **Codex:** verify root `AGENTS.md` enters through `PROTOCOL.yaml` / `START_HERE.md`, uses the existing memory topology, and can perform a verified repository-backed state change without creating a competing memory system.
+- **ChatGPT Work:** when the required write-capable GitHub plugin/app is available, verify it uses the same repository ID/front door and preserves the same routing, privacy, write-set, and readback rules. If the required capability is unavailable on the tested Work surface, record that limitation and qualify public compatibility wording rather than inventing a pass.
+
+### Gate 5 — Independent adversarial release audit
+
+Run the maintained final pre-release audit against **every tracked file in the frozen candidate**, with the reviewer instructed to report only and not modify the repository. The reviewer must distinguish PASS/WARN/FAIL/BLOCKED and provide evidence for each finding.
+
+Triage every finding into exactly one of:
+
+- **Blocker:** must be fixed before release;
+- **Should-fix:** cheap/material enough to fix before the first release;
+- **Deferred:** consciously accepted for a later release with the reason recorded.
+
+Do not accept or reject a finding merely because it agrees or disagrees with prior design intent. Reproduce or verify material claims against the actual candidate and current product capability.
+
+### Gate 6 — Post-fix regression gate
+
+If Gates 2–5 caused any repository change:
+
+1. freeze the new candidate SHA/tree;
+2. rerun deterministic validation against that exact candidate;
+3. rerun the portions of the zero-reading/surface tests affected by the changes;
+4. rerun the independent audit as a regression/delta audit, explicitly checking accepted fixes for newly introduced failures.
+
+The candidate passes only when there are **zero unresolved blockers**, every remaining warning is consciously classified, and no new material regression is found.
+
+### Gate 7 — Release transition
+
+Only after Gates 1–6 pass:
+
+- assign the first real protocol release identifier/status;
+- execute the controlled one-time history cleanup if still desired;
+- restore and verify the intended public-repository protection/settings;
+- rerun deterministic validation against the final release tree;
+- tag/publish the release;
+- create one final private copy using **Use this template** and repeat the activation smoke test against what GitHub actually ships.
+
+That final private-copy activation is the release artifact check. A successful test against the source repository alone is not sufficient.
+
+### Stopping rule
+
+After the gate passes, new suggestions do not automatically reopen the release. Reopen only for a reproducible blocker, material regression, security/privacy defect, false product claim, or a change that clearly exceeds the agreed diminishing-returns threshold. Other improvements become post-release candidates.
+
 ## One-time pre-release history cleanup
 
 The public repository currently uses lightweight `main` protection that blocks deletion and non-fast-forward updates. A final pre-release history reset/squash is therefore a deliberate maintenance exception, not a normal operational-memory action.
