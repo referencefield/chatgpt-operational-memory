@@ -6,9 +6,11 @@ This document is for normal operation after setup: persistence watch, project cr
 
 ## Normal entry
 
-When prior durable state matters:
+When prior durable state matters and the repository-ID bootloader is configured:
 
-> `@GitHub Enter my operational-memory repository through START_HERE.md and load only the durable state relevant to this task.`
+> `@GitHub Use my configured operational-memory repository ID. Resolve its current owner/name, enter through START_HERE.md, and load only the durable state relevant to this task.`
+
+If no persistent bootloader is configured, use the explicit repository-ID fallback from `SETUP.md` rather than relying on a remembered repository name or URL.
 
 For a known project, name it. ChatGPT should use `PROJECTS.md` to locate the project rather than asking you to remember a path.
 
@@ -130,22 +132,23 @@ This is a conversational closeout, not a transcript archive.
 
 ## Check for template/protocol updates
 
-`PROTOCOL.yaml` declares the public template source and manifest path for this working copy.
+`PROTOCOL.yaml` declares the public template source and manifest path for this working copy. The template source's GitHub repository ID is the durable update-discovery key; its owner/name is human-readable metadata that may change.
 
 When the user says **“Check for protocol updates”**, or when a repository health check can reach the template source without distracting from the user's task:
 
 1. retrieve the local `PROTOCOL.yaml`;
-2. retrieve the template source's declared manifest;
-3. compare the local and source release/status plus any materially changed protocol structure relevant to migration;
-4. report whether the working copy appears current, whether a newer released protocol is available, or whether comparison is indeterminate;
-5. if the source is newer, read `MIGRATIONS.md` from the source and describe the applicable migration before changing anything;
-6. **do not auto-migrate** and do not overwrite private state merely because the public template changed.
+2. resolve `template_source.repository_id` to the public template's current owner/name; do not substitute a similarly named repository if the ID cannot be resolved;
+3. retrieve that resolved template source's declared manifest;
+4. compare the local and source release/status plus any materially changed protocol structure relevant to migration;
+5. report whether the working copy appears current, whether a newer released protocol is available, or whether comparison is indeterminate;
+6. if the source is newer, read `MIGRATIONS.md` from the resolved source and describe the applicable migration before changing anything;
+7. **do not auto-migrate** and do not overwrite private state merely because the public template changed.
 
 During pre-release development, `protocol_version: "unreleased"` is intentionally not an ordered release identifier. If both source and working copy are unreleased, do not invent version ordering. Compare the manifest/content only when the user explicitly needs a development comparison.
 
 After a real release identifier exists, use the release metadata plus `MIGRATIONS.md` to determine whether an upgrade is applicable.
 
-If the template source cannot be reached, report update status as **not checked** rather than assuming the working copy is current.
+If the template source repository ID cannot be resolved or the resolved source cannot be reached, report update status as **not checked** rather than guessing another source or assuming the working copy is current.
 
 ## Repository health check
 
@@ -153,7 +156,7 @@ A health check has two layers.
 
 ### Deterministic structural layer
 
-Use the advisory validator declared in `PROTOCOL.yaml` when available. It checks machine-verifiable invariants such as required files, project registration/template structure, identifier uniqueness/reference integrity, and soft budget warnings.
+Use the advisory validator declared in `PROTOCOL.yaml` when available. It checks machine-verifiable invariants such as required files, project registration/template structure, identifier uniqueness/reference integrity, supersession lifecycle consistency, manifest identity fields, and soft budget warnings.
 
 The GitHub Action is advisory. It is **not** a required status check and does not block ordinary direct ChatGPT writes to `main`.
 
