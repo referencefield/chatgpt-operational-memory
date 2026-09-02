@@ -187,7 +187,13 @@ def load_manifest() -> dict:
 
 def registry_slugs(registry_path: Path) -> set[str]:
     text = read_text(registry_path)
-    return set(re.findall(r"^###\s+([a-z0-9][a-z0-9-]*)\s+—", text, re.MULTILINE))
+    return set(
+        re.findall(
+            r"^###\s+([a-z0-9][a-z0-9-]*)\s+[—–-]\s+",
+            text,
+            re.MULTILINE,
+        )
+    )
 
 
 def project_dirs(root: Path) -> set[str]:
