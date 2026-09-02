@@ -4,9 +4,13 @@ This document is installation only. Runtime behavior lives in `START_HERE.md`; o
 
 The intended user should not need a terminal or Git expertise for normal use.
 
+> **Required ChatGPT capability:** this setup uses the **`@GitHub` plugin** with repository **read/write actions**. OpenAI also documents a separate GitHub app/connection used for repository search/analysis that may be read-only. Do not treat that separate app's limitation as proof that `@GitHub` cannot write. The selected `@GitHub` plugin's exposed actions plus the reversible CRUD/readback test below determine readiness.
+>
+> **Plan/surface note:** plugin availability is not safely inferred from a plan name alone. OpenAI currently says plugin availability can vary by plan, workspace, role, region, surface, and included app capabilities. If `@GitHub` with repository create/update/delete actions is unavailable on the current account/surface, this write-backed setup cannot reach READY there.
+
 ## Fast path if write-capable GitHub access is already authenticated in ChatGPT
 
-If you already have the **GitHub plugin with repository read/write actions** installed/authenticated and you created a **private** working copy from this template, you do not need to read the rest of this file before starting.
+If you already have the **`@GitHub` plugin with repository read/write actions** installed/authenticated and you created a **private** working copy from this template, you do not need to read the rest of this file before starting.
 
 In ChatGPT, say:
 
@@ -16,7 +20,7 @@ That is the complete normal setup command. ChatGPT should inspect the repository
 
 Having several other repositories connected or authorized does not make setup ambiguous. The URL identifies one exact working repository. Activation captures that repository's numeric GitHub repository ID, and the optional bootloader uses only that ID in future chats. If that exact repository cannot be resolved or accessed, ChatGPT should stop rather than choose another repository.
 
-ChatGPT should verify the exact repository, confirm it is private, retrieve the protocol/front door, obtain the repository's GitHub repository ID, check the declared structure, run a reversible create/read/update/read/delete diagnostic through the write-capable GitHub plugin/app, remove the diagnostic file, and return a compact **Operational memory: READY** or **Operational memory: BLOCKED** receipt.
+ChatGPT should verify the exact repository, confirm it is private, retrieve the protocol/front door, obtain the repository's GitHub repository ID, check the declared structure, run a reversible create/read/update/read/delete diagnostic through the selected write-capable `@GitHub` plugin, remove the diagnostic file, and return a compact **Operational memory: READY** or **Operational memory: BLOCKED** receipt.
 
 A successful receipt should include the repository's numeric GitHub repository ID. That ID is the preferred long-lived identifier for future ChatGPT routing because the repository owner/name may later change without changing the repository itself.
 
@@ -37,7 +41,7 @@ The detailed procedure below exists for users who want to inspect or independent
 You will do five things:
 
 1. create a **private** working repository from this template; the working repository may have any name you want;
-2. install/authenticate the **GitHub plugin** in ChatGPT, connect its underlying GitHub app/connection, authorize the intended repository, and confirm that repository **write actions** are available;
+2. install/authenticate the **`@GitHub` plugin**, connect/authorize its GitHub account access for the intended repository, and confirm repository **write actions** are available;
 3. prove read/create/update/delete and readback actually work through `@GitHub`;
 4. add one small persistent ChatGPT instruction containing the working repository's GitHub repository ID;
 5. optionally run a stronger genuinely fresh-chat retrieval test using a value that exists only in GitHub.
@@ -58,20 +62,33 @@ GitHub template copies do **not** inherit this public repository's branch-protec
 
 The template also includes an advisory GitHub Actions validator. In a derived working copy it does **not** run on every direct operational-memory write; it runs for pull requests or when manually dispatched. It is not a required status check.
 
-## 2. Install and authenticate the write-capable GitHub plugin/app
+## 2. Install and authenticate the write-capable `@GitHub` plugin
 
-OpenAI currently uses both **plugin** and **app** terminology: plugins package workflow capabilities, while underlying apps/connections provide access to external data and supported actions. The normal ChatGPT path for this template is the **GitHub plugin with an underlying GitHub app/connection that exposes repository read/write actions**, invoked with `@GitHub` when explicit repository access is needed.
+OpenAI currently uses both **plugin** and **app** terminology. For this template, the distinction matters:
+
+- the normal write-backed path is the **GitHub plugin invoked as `@GitHub`**, when that plugin exposes repository read/write actions;
+- OpenAI also documents a separate GitHub app/connection for repository search and analysis that may be **read-only**;
+- the existence of that read-only app must **not** be generalized into “ChatGPT cannot write to GitHub.”
+
+The public GitHub plugin listing identifies GitHub as having **Write** capability. Actual availability still depends on the current account/surface and its authorization/action controls, so the test below remains authoritative.
 
 1. open ChatGPT's **Plugins** area, or the equivalent plugin/app surface available to your account;
-2. install/select the GitHub plugin;
-3. connect/authenticate its underlying GitHub app/connection when prompted;
+2. install/select the **GitHub plugin**;
+3. connect/authenticate the GitHub account/app access it requests;
 4. authorize the account or organization that owns your private working repository;
 5. grant access to that repository, preferably selected-repository access when available;
-6. confirm that the selected plugin/app exposes repository create/update/delete actions, not only search/read.
+6. invoke it as **`@GitHub`** in ChatGPT;
+7. confirm that the selected plugin exposes repository create/update/delete actions, not only search/read.
 
-A separate GitHub app/connection may be available on some ChatGPT surfaces with repository search/read but no write actions. That read-only connection can retrieve operational memory but **cannot persist it**. It is not sufficient for the write-backed setup documented here. Do not infer from the existence of a read-only GitHub connection that all GitHub access in ChatGPT is read-only; verify the actions exposed by the selected plugin/app on your current surface.
+If ChatGPT responds that “GitHub is read-only,” first verify that the request actually selected `@GitHub` and inspect/test the actions available to that plugin. Do not stop setup solely because the model recalls documentation for the separate read-only GitHub app.
 
-The action test below is the authoritative check. If create/update/delete actions are unavailable, activation must not claim persistence readiness.
+The action test below is the authoritative check. If create/update/delete actions are unavailable on the selected `@GitHub` plugin, activation must not claim persistence readiness.
+
+### Plan and surface availability
+
+Do not rely on a hard-coded plan list in this repository. OpenAI currently states that the Plugin Directory is visible across ChatGPT plans, while installation/use of an individual plugin depends on plan, workspace, role, region, supported surface, and the capabilities of its included apps.
+
+For this template, the practical requirement is simple: the current ChatGPT account/surface must let the user invoke **`@GitHub` with repository create/update/delete actions**. If those actions are unavailable, the repository can still be read where supported, but write-backed operational memory is unavailable on that surface.
 
 ## 3. Confirm repository access, identity, and write actions
 
@@ -79,7 +96,7 @@ For the detailed no-write access check, say:
 
 > `@GitHub Check operational-memory access to <YOUR PRIVATE REPOSITORY URL>. Don't change anything.`
 
-ChatGPT should retrieve that exact repository, report its GitHub repository ID, and determine whether the selected GitHub plugin/app exposes the repository read/create/update/delete actions needed by the later diagnostic. Those implementation checks are ChatGPT's job; the user should not have to spell them out in the command.
+ChatGPT should retrieve that exact repository, report its GitHub repository ID, and determine whether the selected `@GitHub` plugin exposes the repository read/create/update/delete actions needed by the later diagnostic. Those implementation checks are ChatGPT's job; the user should not have to spell them out in the command.
 
 The repository ID is the stable identifier the bootloader will use. The current owner/name remains useful for human-readable receipts but is not the durable routing key.
 
@@ -196,7 +213,7 @@ Branch protection is optional hardening, not a requirement for operational memor
 Setup is complete when:
 
 - the working repository is visibly private;
-- the GitHub plugin/app is authenticated and authorized for the intended repository;
+- the **`@GitHub` plugin** is authenticated and authorized for the intended repository;
 - explicit `@GitHub` invocation retrieves the intended repository and reports its repository ID;
 - create/update/readback/delete succeeds through the selected write-capable GitHub actions;
 - current blob/version preconditions are used when available or their absence is explicitly reported;

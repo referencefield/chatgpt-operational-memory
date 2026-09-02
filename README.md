@@ -6,9 +6,13 @@ The goal is not to make ChatGPT remember everything. It is to keep the smaller s
 
 > **A portable continuity layer for serious ongoing ChatGPT work.**
 
+> **Required ChatGPT capability:** use the **`@GitHub` plugin** and connect/authorize it to the private working repository. This template requires that selected plugin to expose repository **create/update/delete** actions. OpenAI also documents a separate GitHub app/connection used for repository search and analysis that may be read-only; that limitation is **not** evidence that the `@GitHub` plugin itself cannot write. Setup proves the selected path with reversible CRUD/readback before returning READY.
+>
+> **Plan/surface note:** OpenAI currently makes the Plugin Directory visible across ChatGPT plans, but individual plugin/action availability varies by plan, workspace, role, region, and product surface. Compatibility here is therefore **capability-based, not plan-name-based**. If your account/surface cannot invoke `@GitHub` with repository write actions, this template can support retrieval there but cannot provide write-backed operational memory.
+
 ## Fast start
 
-Already have the **GitHub plugin with repository read/write actions** authenticated in ChatGPT?
+Already have the **`@GitHub` plugin with repository read/write actions** authenticated in ChatGPT?
 
 1. Use this public repository as a template to create your own **private** GitHub repository. Give your working copy any name you want.
 2. In ChatGPT, say:
@@ -27,7 +31,7 @@ or
 
 **Operational memory: BLOCKED**
 
-OpenAI uses both **plugin** and **app** terminology. This template requires a GitHub plugin/app path that actually exposes repository create/update/delete actions. A separate read-only GitHub app/connection may be available on some surfaces; it can support retrieval but is insufficient for persistence. The activation CRUD test is the authority on whether the selected connection is write-capable.
+If ChatGPT says “GitHub is read-only,” do not treat that sentence alone as a setup result. Explicitly invoke `@GitHub` and use the access check in `SETUP.md`. The selected plugin's actual repository actions and CRUD/readback result determine readiness.
 
 You do not need to read the repository first. Activation should not create a fake project or personal profile merely to initialize the system.
 
@@ -163,9 +167,9 @@ The repository also includes an advisory deterministic validator for structural 
 
 ### ChatGPT Chat
 
-The primary lay-user path is ordinary ChatGPT with the authenticated **GitHub plugin and its underlying GitHub app/connection exposing repository read/write actions**, authorized for the private working repository and invoked with `@GitHub` when explicit repository access is needed.
+The primary lay-user path is ordinary ChatGPT with the authenticated **`@GitHub` plugin** and its underlying authorized GitHub connection exposing repository read/write actions for the private working repository.
 
-A read-only GitHub app/connection is a useful retrieval surface but cannot satisfy the persistence protocol. `SETUP.md` uses a reversible CRUD test rather than product naming alone to prove that the selected surface can write.
+OpenAI separately documents a GitHub app/connection used for repository search and analysis as read-only. That surface is useful for retrieval but cannot satisfy this persistence protocol. Do not generalize that read-only limitation to the `@GitHub` plugin. `SETUP.md` uses the selected plugin's actual actions plus a reversible CRUD test to prove write readiness.
 
 ### Codex
 

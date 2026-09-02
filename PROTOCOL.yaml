@@ -30,6 +30,9 @@ compatibility:
   required_chatgpt_plugin: GitHub
   plugin_invocation: "@GitHub"
   plugin_requires_repository_read_write_actions: true
+  separate_read_only_github_app_is_not_plugin_capability_authority: true
+  readiness_is_capability_based_not_plan_name_based: true
+  readiness_capability_test: reversible_crud_readback
   codex_bootloader: AGENTS.md
   chatgpt_work_uses_same_front_door: true
   other_models_require_equivalent_github_read_write_and_persistent_bootloader: true

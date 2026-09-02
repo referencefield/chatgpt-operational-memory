@@ -11,6 +11,8 @@ When the user explicitly asks to **set up**, **activate**, **initialize**, **wak
 
 The user's normal setup prompt does **not** need to mention `START_HERE.md`, `PROTOCOL.yaml`, or an “activation handshake.” Those are repository implementation details that ChatGPT should discover and apply after the user identifies the repository and asks to set up operational memory.
 
+If the user invoked the **`@GitHub` plugin**, judge GitHub capability from the actions exposed by that selected plugin. Do **not** refuse setup merely because another GitHub app/connection is documented as read-only. If the selected `@GitHub` plugin exposes repository create/update/delete actions, proceed with the diagnostic below; if it does not, return BLOCKED rather than claiming write capability.
+
 1. confirm the exact working repository, default branch, visibility, and GitHub repository ID. The working repository may have any owner/name; its name is not part of the memory schema and does not need to match the public template source;
 2. require the personal working copy to be **private** before storing personal/project state;
 3. retrieve `PROTOCOL.yaml`, this file, the declared root memory files, and `PROJECTS.md`; verify declared structure without broad-loading unrelated content;

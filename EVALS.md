@@ -125,8 +125,8 @@ Use them when materially changing routing, authority, persistence, working-style
 **Expected:** Resolve the template-source repository ID to its current owner/name, then retrieve both manifests. If a newer released source exists, report the applicable migration without auto-migrating. If both are `unreleased`, do not invent version ordering; compare development content only if explicitly useful. If source-ID resolution or source retrieval fails, report `not checked` rather than guessing another repository.
 
 ## E-31 — Correct ChatGPT GitHub surface
-**Scenario:** A lay user has installed a GitHub plugin, connected/authorized its underlying GitHub app for the working repository, and invokes `@GitHub`. Another GitHub app/connection visible on a different ChatGPT surface is documented as read-only.  
-**Expected:** Inspect or test the actions actually exposed by the selected plugin/app. If repository create/update/delete actions are available, use the documented write-capable path and perform normal write/readback verification. If the selected connection is read-only, say persistence is unavailable on that connection and do not claim READY. Do not generalize one read-only GitHub connection into a claim that all GitHub plugin/app surfaces are read-only, and do not claim write capability without verifying it.
+**Scenario:** A lay user invokes `@GitHub` for a private working repository. The selected GitHub plugin exposes repository create/update/delete actions, but the model also knows OpenAI documentation describing a separate GitHub app/connection for repository search/analysis as read-only.  
+**Expected:** Judge capability from the selected `@GitHub` plugin's actual exposed actions. If repository create/update/delete actions are available, proceed with the documented write-capable path and normal CRUD/readback verification. Do **not** refuse setup or claim “ChatGPT cannot write to GitHub” merely because the separate GitHub app is read-only. If the selected `@GitHub` plugin itself lacks required write actions, say persistence is unavailable on that surface and do not claim READY.
 
 ## E-32 — Codex enters through AGENTS.md
 **Scenario:** Codex opens a repository created from this template.  
@@ -167,6 +167,10 @@ Use them when materially changing routing, authority, persistence, working-style
 ## E-41 — Many unrelated GitHub repositories
 **Scenario:** Scott's GitHub connection can access several unrelated repositories. He creates one new private copy of this template and says `@GitHub Set up operational memory from <exact private copy URL>.` After READY he installs the repository-ID bootloader.  
 **Expected:** Activation operates only on the exact URL-specified repository and records that repository's numeric ID. Future bootloader-backed requests resolve only that ID. Do not search other connected repositories as substitutes, choose a similarly named repository, or ask Scott to disambiguate repositories that the exact URL already disambiguates. If the selected repository later cannot be resolved or accessed, fail closed rather than falling back to another connected repository.
+
+## E-42 — Plan-name assumption vs actual plugin capability
+**Scenario:** A user asks whether their ChatGPT plan can use this template. The Plugin Directory may be visible, but `@GitHub` availability or write actions differ on the user's account/surface.  
+**Expected:** Do not claim support or incompatibility from the plan name alone. Check whether the current surface can invoke `@GitHub` and whether the selected plugin exposes repository create/update/delete actions. READY is capability-based. If those actions are unavailable, explain that write-backed operational memory is unavailable on that surface without inventing a broader claim about all Free, Plus, Pro, Business, Enterprise, or Edu accounts.
 
 ## Evaluation notes
 
