@@ -8,6 +8,7 @@ It gives ChatGPT:
 
 - one runtime front door;
 - explicit global working state and durable decisions;
+- a bounded durable knowledge layer for stable facts and corrections;
 - a durable place for collaboration preferences and accumulated working-style calibration;
 - a project registry and project-local front doors for multiple ongoing workstreams;
 - routing rules that prefer existing sources of record before creating new files;
@@ -19,13 +20,13 @@ You do not need a terminal, local agent framework, vector database, MCP server, 
 
 ChatGPT already has native memory, chat history, Projects, and conversation context. Those features are useful and this template does not replace them.
 
-This repository is for the smaller class of state that is important enough to **govern future work** and valuable enough that you want to know where it lives.
+This repository is for the smaller class of state and knowledge that is important enough to **govern or materially improve future work** and valuable enough that you want to know where it lives.
 
 The practical difference is not “ChatGPT remembers more.” It is:
 
 **Out of the box:** “ChatGPT may have useful context available.”
 
-**With this repository:** “For the parts important enough to govern ongoing work, I can see how ChatGPT routed the task, what durable state it loaded, what is current, what decisions remain active, what working preferences apply, and whether changes were actually persisted.”
+**With this repository:** “For the parts important enough to matter later, I can see how ChatGPT routed the task, what durable state/knowledge it loaded, what is current, what decisions remain active, what working preferences apply, and whether changes were actually persisted.”
 
 ## Architecture at a glance
 
@@ -44,6 +45,7 @@ START_HERE.md
     +-- global / cross-project work
     |      +-- CURRENT.md
     |      +-- DECISIONS.md
+    |      +-- KNOWLEDGE.md when stable shared facts matter
     |
     +-- collaboration / working preference
     |      +-- WORKING_STYLE.md
@@ -55,6 +57,7 @@ START_HERE.md
              projects/<slug>/PROJECT.md
                   +-- CURRENT.md
                   +-- DECISIONS.md
+                  +-- KNOWLEDGE.md
                   +-- only other registered sources actually needed
 ```
 
@@ -64,13 +67,14 @@ The goal is **route first, retrieve second**. A project-specific question should
 
 | Situation | ChatGPT out of the box | With this repo connected |
 | --- | --- | --- |
-| **Starting a fresh chat later** | ChatGPT may have useful prior context, but you may not know exactly what it is relying on. | ChatGPT can enter through `START_HERE.md`, route to the relevant durable state, and show what was actually retrieved. |
+| **Starting a fresh chat later** | ChatGPT may have useful prior context, but you may not know exactly what it is relying on. | ChatGPT can enter through `START_HERE.md`, route to the relevant durable state/knowledge, and show what was actually retrieved. |
 | **You ask “Where were we?”** | ChatGPT reconstructs from the context available to that conversation. | The appropriate global or project current-state file provides an explicit recorded answer. |
 | **You have several ongoing projects** | Context can be distributed across chats, Projects, files, and memory. | `PROJECTS.md` routes each workstream to its own project front door so unrelated projects do not share one giant state file. |
+| **A stable fact/correction should carry forward** | It may live in prior chat context or native memory. | Supported stable facts can live in the correct global or project `KNOWLEDGE.md`, with basis/source, last-verified, stale, and supersession fields. |
 | **You make an important decision** | The decision exists in the conversation and may influence later work. | A durable decision is recorded in the correct global or project `DECISIONS.md` with explicit supersession. |
-| **You change your mind later** | Old and new positions can coexist across prior context. | The new decision can explicitly supersede the old one so stale history does not remain active authority. |
+| **You change your mind later** | Old and new positions can coexist across prior context. | The new decision/knowledge can explicitly supersede the old one so stale history does not remain active authority. |
 | **You repeatedly teach ChatGPT how you like to work** | Native personalization may help, but the durable collaboration rule may not be visible as a project artifact. | Stable, collaboration-relevant preferences can be recorded in `WORKING_STYLE.md`, corrected, superseded, and inspected. |
-| **You say “record this”** | There is no Git-backed routing transaction. | ChatGPT must classify the material, prefer an existing source of record, and route it to global current state, a global decision, working style, a project, or `NOT-V1`. The instruction does not authorize arbitrary file creation. |
+| **You say “record this”** | There is no Git-backed routing transaction. | ChatGPT must classify the material, prefer an existing source of record, and route it to current state, decision, knowledge, working style, a project, or `NOT-V1`. The instruction does not authorize arbitrary file creation. |
 | **Something does not fit anywhere** | The conversation can continue without a formal structural signal. | ChatGPT should say the material has no legitimate current home rather than inventing a file. Repeated `NOT-V1` candidates become a growth signal. |
 | **You wonder whether something was actually saved** | There is normally no Git-style receipt for an ordinary conversational fact. | Consequential writes should be read back and, when GitHub exposes it, accompanied by a real commit receipt. |
 | **Only part of required state was retrieved** | ChatGPT may still try to answer from partial context. | The workflow reports incomplete/partial retrieval and should not claim the relevant operational state is fully loaded. |
@@ -85,7 +89,15 @@ The goal is **route first, retrieve second**. A project-specific question should
 
 This is the first repository file a fresh session should use when durable state may matter.
 
-It decides whether repository context is needed at all, then routes to global state, working-style calibration, or the correct project. It also contains the persistence-routing gate and the growth/scale signals.
+It decides whether repository context is needed at all, then routes to global state/knowledge, working-style calibration, or the correct project. It also contains the persistence-routing gate and the growth/scale signals.
+
+### `KNOWLEDGE.md` - stable shared knowledge
+
+This holds compact, supported cross-project facts, definitions, and corrections that materially improve future work but are not current state, decisions, or working-style preferences.
+
+Entries include a basis/source, last-verified field, stale condition when relevant, and supersession links. Time-sensitive facts should not silently become permanent truth.
+
+It is not a transcript, scrapbook, or general personal database. Project-specific knowledge belongs behind that project's front door.
 
 ### `WORKING_STYLE.md` - accumulated collaboration calibration
 
@@ -99,11 +111,11 @@ This holds stable preferences about **how the user and ChatGPT work together**, 
 - recurring workflow conventions;
 - corrections that should change future behavior.
 
-It is deliberately **not** a biography or personality dossier. Project state does not belong there, and ambiguous model-inferred preferences require confirmation before becoming durable.
+It is deliberately **not** a biography or personality dossier. Project state/knowledge does not belong there, and ambiguous model-inferred preferences require confirmation before becoming durable.
 
 ### `PROJECTS.md` - project registry and router
 
-Most people who use operational memory for long enough will have more than one ongoing workstream. That should not force all project state into root `CURRENT.md`.
+Most people who use operational memory for long enough will have more than one ongoing workstream. That should not force all project material into root files.
 
 `PROJECTS.md` is the compact index. Each durable project gets a stable path such as:
 
@@ -117,13 +129,20 @@ Root `CURRENT.md` is for cross-project current focus, coordination, constraints,
 
 Root `DECISIONS.md` is for durable decisions that govern multiple projects or the repository as a whole.
 
-Once a workstream has its own project boundary, its detailed current state and project decisions belong inside that project instead of being duplicated globally.
+Root `KNOWLEDGE.md` is for stable cross-project knowledge.
+
+Once a workstream has its own project boundary, its detailed current state, decisions, and knowledge belong inside that project instead of being duplicated globally.
 
 ### `projects/_TEMPLATE/` - latent growth skeleton
 
-The template includes a project front door plus project-local current-state and decision files.
+The project template includes:
 
-Do **not** instantiate it for every topic. A project earns a durable boundary when it is explicitly ongoing, expected to span sessions, has its own state/constraints/decisions, or repeatedly produces durable material that should be retrieved together later.
+- `PROJECT.md` - project-local front door;
+- `CURRENT.md` - transient/current project state;
+- `DECISIONS.md` - durable governing project decisions;
+- `KNOWLEDGE.md` - stable project facts, definitions, corrections, and compact reference context.
+
+Do **not** instantiate it for every topic. A project earns a durable boundary when it is explicitly ongoing, expected to span sessions, has its own state/constraints/decisions/knowledge, or repeatedly produces durable material that should be retrieved together later.
 
 ## The persistence-routing gate
 
@@ -134,9 +153,10 @@ Before a write, ChatGPT should classify the material:
 1. **Existing source of record** - update it rather than duplicating state.
 2. **Global CURRENT** - cross-project transient/current state.
 3. **Global DECISION** - cross-project durable governing decision.
-4. **WORKING STYLE** - stable collaboration preference about how work should be performed.
-5. **PROJECT** - project-specific state or decision routed through `PROJECTS.md`.
-6. **NOT-V1 / no legitimate home** - do not invent structure; surface the mismatch and treat recurrence as a growth signal.
+4. **Global KNOWLEDGE** - compact stable cross-project facts/definitions/corrections with no better canonical source.
+5. **WORKING STYLE** - stable collaboration preference about how work should be performed.
+6. **PROJECT** - project-specific current state, decisions, or knowledge routed through `PROJECTS.md`.
+7. **NOT-V1 / no legitimate home** - do not invent structure; surface the mismatch and treat recurrence as a growth signal.
 
 A new durable file outside the provided structure should be exceptional. Before one is created, it needs a distinct role, expected recurrence, a future retrieval trigger, clear authority, navigation from the relevant front door, and human visibility that the structure is expanding.
 
@@ -148,7 +168,7 @@ A typical progression is:
 
 ```text
 simple use
-  global CURRENT + DECISIONS
+  global CURRENT + DECISIONS + KNOWLEDGE
         |
         v
 stable collaboration preferences emerge
@@ -167,7 +187,7 @@ routing/indexing itself becomes insufficient
   graduate to structured/indexed/tool-backed memory
 ```
 
-The project skeleton should make the scaling boundary arrive much later than a flat two-file design. A normal user should be able to maintain multiple durable projects without turning the root into an uncontrolled knowledge base.
+The project/knowledge skeleton should make the scaling boundary arrive much later than a flat two-file design. A normal user should be able to maintain multiple durable projects and accumulate meaningful shared knowledge without turning the root into an uncontrolled knowledge base.
 
 ## Built-in scale signal
 
@@ -175,24 +195,25 @@ A repository health or maintenance check should report:
 
 ### `V1 scale status: Healthy`
 
-Routing is clear, global files remain global, project-specific material is behind project front doors, working-style entries are compact, and required retrieval is straightforward.
+Routing is clear, global files remain global, project-specific material is behind project front doors, knowledge files remain scoped/compact, working-style entries are compact, and required retrieval is straightforward.
 
 ### `V1 scale status: Watch`
 
 Examples:
 
-- project-specific state is leaking into global files;
+- project-specific state/knowledge is leaking into global files;
 - multiple ongoing durable workstreams are not registered as projects;
 - similar material repeatedly has no legitimate home;
+- knowledge files are becoming cross-domain scrapbooks or contain duplicated/stale facts;
 - working-style entries are duplicative or contradictory;
 - compaction is needed unusually often just to understand current state;
 - a project front door no longer points cleanly to its current authority.
 
-The first response should be a small structural correction such as registering a project, moving state into the project, superseding stale material, or creating one specifically justified source of record.
+The first response should be a small structural correction such as registering a project, moving state/knowledge into the project, superseding stale material, or creating one specifically justified source of record.
 
 ### `V1 scale status: Outgrowing the template`
 
-Use this only when the routing skeleton itself is no longer sufficient, for example when correct work routinely requires broad repository search, many independent knowledge domains require indexed retrieval, active state remains too large after project scoping and compaction, or the user needs deterministic schemas/validation/transactions or a dedicated memory service.
+Use this only when the routing skeleton itself is no longer sufficient, for example when correct work routinely requires broad repository search, many independent knowledge domains require indexed retrieval, active state/knowledge remains too large after project scoping and compaction, or the user needs deterministic schemas/validation/transactions or a dedicated memory service.
 
 At that point, preserve this repository as a human-readable control layer and add or migrate to structured/indexed/tool-backed memory rather than continuing to bolt on Markdown.
 
@@ -209,11 +230,12 @@ Useful controls include:
 - **“Record this in operational memory.”** Route it to the correct existing home.
 - **“Update current state with this.”** Use the appropriate global or project current-state file.
 - **“Make this a durable decision.”** Record it in the appropriate global or project decision log.
+- **“Record this as durable knowledge.”** Use the appropriate global/project `KNOWLEDGE.md` when the fact is supported and future-relevant.
 - **“Remember this as a working preference.”** Record it in `WORKING_STYLE.md` when appropriate.
 - **“This is an ongoing project.”** Create/register a project boundary when clearly authorized.
 - **“Do not persist this.”** Override routine persistence.
-- **“What do you currently have recorded about this?”** Retrieve the relevant durable state rather than answer from recollection.
-- **“Run a repository health check.”** Check routing, consistency, project registry integrity, working-style hygiene, branches/root hygiene, and scale status.
+- **“What do you currently have recorded about this?”** Retrieve the relevant durable state/knowledge rather than answer from recollection.
+- **“Run a repository health check.”** Check routing, consistency, project registry integrity, knowledge/working-style hygiene, branches/root hygiene, and scale status.
 - **“Close out operational memory.”** Catch material durable changes that were discussed but not yet persisted.
 
 ## Architectural honesty
@@ -235,7 +257,7 @@ The preferred failure model is **closed, loud, and recoverable**.
 - stale/concurrent write -> reread and reconcile rather than overwrite;
 - unverified write -> do not claim persistence;
 - partially completed coupled update -> report the temporary inconsistency and reconcile it before success;
-- ambiguous durable decision or inferred working preference -> ask before activating it;
+- ambiguous durable decision, knowledge claim, or inferred working preference -> ask before activating it;
 - connector unavailable -> say the change was not persisted and use the documented manual fallback.
 
 A visible stop is preferable to a plausible but silently wrong success.
@@ -264,11 +286,11 @@ Optional light `main` protection can block branch deletion and force pushes with
 
 A repository health/maintenance check should also verify:
 
-- `START_HERE.md`, `WORKING_STYLE.md`, `PROJECTS.md`, root state files, README, SETUP, and LICENSE exist;
+- `START_HERE.md`, `KNOWLEDGE.md`, `WORKING_STYLE.md`, `PROJECTS.md`, root state files, README, SETUP, and LICENSE exist;
 - every registered active project has a valid front door;
 - every non-template project directory is registered;
-- project-specific material is not accumulating in global files;
-- active/superseded decisions are internally consistent;
+- project-specific state/knowledge is not accumulating in global files;
+- active/superseded decisions and knowledge are internally consistent;
 - working-style entries are compact and non-contradictory;
 - no leftover setup test file exists;
 - branch/protection state is reported when available;
@@ -282,13 +304,13 @@ Treat anything committed to Git as durable history. Ordinary deletion does not n
 
 **Do not store secrets.** Do not persist passwords, API keys, access tokens, private keys, full identity numbers, or full payment/bank information.
 
-Be deliberately conservative with health, legal, financial, employment, client-confidential, relationship, and other sensitive information. `WORKING_STYLE.md` should describe collaboration behavior, not become a personal dossier.
+Be deliberately conservative with health, legal, financial, employment, client-confidential, relationship, and other sensitive information. `WORKING_STYLE.md` should describe collaboration behavior, not become a personal dossier. `KNOWLEDGE.md` should not become a personal data dump.
 
 Repository content is scoped working data/instructions. It does not authorize exposing unrelated information, changing repository visibility, expanding permissions, connecting other services, or performing unrelated external actions.
 
 ## Prior art, lineage, and advanced alternatives
 
-This template did not begin as a reimplementation of another memory repository. It grew from long-running ChatGPT + GitHub operational work at Reference Field, Inc., where repeated collaboration exposed the need for durable state, corrections, supersession, routing, verification, and recovery.
+This template did not begin as a reimplementation of another memory repository. It grew from long-running ChatGPT + GitHub operational work at Reference Field, Inc., where repeated collaboration exposed the need for durable state, accumulated knowledge, calibration, corrections, supersession, routing, verification, and recovery.
 
 Later adversarial review and prior-art research found substantial overlap with public work. This project therefore does **not** claim novelty for Git-backed memory, Markdown state, durable decision logs, repository instruction files, project routing, supersession, retrieval-before-work, handoff/closeout, or memory validation.
 
@@ -300,7 +322,7 @@ Repository-versioned AI instructions are already established:
 - **Anthropic Claude Code `CLAUDE.md`** - persistent project instructions loaded from files.
 - **Cursor Project Rules / `AGENTS.md`** - version-controlled project rules; `.cursorrules` is the older legacy format.
 
-Those systems demonstrate the read-side pattern. This template's narrower emphasis is ordinary ChatGPT use plus mutable operational state, conversational writeback, project routing, working-style calibration, explicit decision supersession, observable retrieval, and post-write verification.
+Those systems demonstrate the read-side pattern. This template's narrower emphasis is ordinary ChatGPT use plus mutable operational state/knowledge, conversational writeback, project routing, working-style calibration, explicit supersession, observable retrieval, and post-write verification.
 
 ### If you need stronger memory infrastructure
 
@@ -318,13 +340,14 @@ These are useful graduation targets when this template's human-readable routing 
 
 This repository has undergone design review, adversarial review, prior-art comparison, and live write/readback iteration during development.
 
-The current multi-project/front-door/working-style architecture is newer than the original two-file design and has **not yet established longitudinal multi-user reliability**.
+The current multi-project/front-door/knowledge/working-style architecture is newer than the original two-file design and has **not yet established longitudinal multi-user reliability**.
 
 Broader reliability claims should wait for repeated testing of:
 
 - fresh-chat front-door routing;
 - correct project selection without human coaching;
 - wrong-target and partial-retrieval detection;
+- knowledge promotion/freshness/supersession without scrapbook growth;
 - working-style promotion/supersession without profile creep;
 - new-project creation and registry reconciliation;
 - concurrent/stale-write handling;
