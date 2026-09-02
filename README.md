@@ -1,10 +1,12 @@
-# ChatGPT Operational Memory
+# Operational Memory
 
 A low-infrastructure GitHub template for giving ChatGPT durable, user-owned working state across conversations: current state, decisions, durable knowledge, working preferences, routed projects, and cross-repository continuity.
 
 The goal is not to make ChatGPT remember everything. It is to keep the smaller set of information that genuinely needs to survive a conversation somewhere you can inspect, correct, version, and own.
 
 > **A portable continuity layer for serious ongoing ChatGPT work.**
+
+Operational Memory is an independent open-source project created by **Reference Field, Inc.** It is not an OpenAI or GitHub product and is not sponsored by or endorsed by either company. See [`DISCLAIMER.md`](DISCLAIMER.md) for practical boundaries and third-party independence.
 
 **Supported release baseline:** a **paid ChatGPT plan** plus the `@GitHub` plugin with repository write actions. Free ChatGPT accounts are not supported by this release. A paid plan alone does not guarantee that the required plugin/actions are available on every account, region, workspace, or surface, so setup verifies the actual capability.
 
@@ -16,7 +18,7 @@ You only need to do this once. You do **not** need Git expertise, a terminal, or
 
 ### 1. Create
 
-[**Create my private memory repository**](https://github.com/new?owner=%40me&template_owner=referencefield&template_name=chatgpt-operational-memory&visibility=private)
+[**Create my private memory repository**](https://github.com/new?owner=%40me&template_owner=referencefield&template_name=operational-memory&visibility=private)
 
 GitHub should open a new-repository form using this template with **Private** preselected. Choose any repository name, visibly confirm **Private**, and create it.
 
@@ -238,7 +240,7 @@ A private GitHub repository is private on GitHub, but content retrieved into Cha
 
 Git history is useful recovery evidence but is not an independent backup of the GitHub account/repository itself. If losing the operational-memory repository would be materially costly, keep an independent clone/archive using a backup practice you trust.
 
-See [`SECURITY.md`](SECURITY.md) for details.
+See [`SECURITY.md`](SECURITY.md) for details and [`DISCLAIMER.md`](DISCLAIMER.md) for project and third-party boundaries.
 
 ## Structural validation and behavioral evals
 
@@ -273,6 +275,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - `AGENTS.md` — Codex bootloader
 - `OPERATIONS.md` — project creation, write-sets, health, closeout, recovery, maintenance
 - `SECURITY.md` — privacy, secrets, recovery boundaries, optional Git hardening
+- `DISCLAIMER.md` — project independence, warranty/reliability boundaries, and user responsibility
 - `MIGRATIONS.md` — release/update rules and controlled release cleanup
 - `EXAMPLE.md` — fictional worked example
 - `EVALS.md` — adversarial behavioral scenarios
@@ -302,6 +305,6 @@ This is not an infallible memory system, objective source of truth, deterministi
 
 It cannot know about changes that were never recorded, guarantee automatic plugin invocation, guarantee that a generic companion will dominate stronger user-provided guidance, or guarantee future product behavior.
 
-Licensed under the MIT License. See [`LICENSE`](LICENSE).
+Licensed under the MIT License. See [`LICENSE`](LICENSE). Additional practical limitations and third-party independence are described in [`DISCLAIMER.md`](DISCLAIMER.md).
 
 Created by **Reference Field, Inc.** · https://referencefield.com · contact@referencefield.com
