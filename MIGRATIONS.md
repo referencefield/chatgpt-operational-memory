@@ -87,9 +87,9 @@ this repository is in active pre-release development. During that state:
 
 ### Entering acceptance
 
-Acceptance begins only after an explicit current instruction from the repository owner/maintainer authorizes starting the acceptance gate.
+Initial acceptance begins only after an explicit current instruction from the repository owner/maintainer authorizes starting the acceptance gate.
 
-To enter acceptance:
+To enter acceptance from ordinary development:
 
 1. finish the intended development changes that should precede testing;
 2. change `protocol_status` from `development` to `acceptance_candidate` as the deliberate lifecycle transition;
@@ -99,11 +99,11 @@ To enter acceptance:
 
 The commit that establishes `protocol_status: acceptance_candidate` is the first commit eligible to become the frozen acceptance candidate. Do not freeze an earlier development commit and then mutate the manifest afterward.
 
-If testing exposes a defect or other accepted repository change, that candidate is invalid. The corrective change must restore `protocol_status: development` as part of returning to active development. After fixes are complete, acceptance requires another explicit entry decision and a new `acceptance_candidate` transition/freeze.
+If testing exposes a defect or other accepted repository change, that candidate is invalid and the corrective change must restore `protocol_status: development`. If the owner's original authorization to run the acceptance gate remains in force and the work is corrective rather than a newly expanded design phase, fixes may re-enter `acceptance_candidate` and freeze a new SHA as part of the same authorized gate without another approval prompt. Require a new explicit entry decision only after the gate was stopped/revoked or the work returned to a new substantive development phase outside the already-authorized corrective loop.
 
 ## Objective pre-release acceptance gate
 
-This section is dormant while `protocol_status: development`. It begins only through the explicit entry procedure above.
+This section is dormant while `protocol_status: development` unless the repository is temporarily in corrective development inside an already-authorized acceptance run. Initial entry from ordinary development still requires the explicit procedure above.
 
 Do not call the repository **done**, **release-ready**, or recommend stopping substantive review merely because an architecture/design sweep found no further improvements. Release readiness is established only by the evidence below against a frozen candidate.
 
@@ -111,7 +111,7 @@ Do not call the repository **done**, **release-ready**, or recommend stopping su
 
 Verify `PROTOCOL.yaml` reports `protocol_status: acceptance_candidate`, then record the resulting canonical `main` commit SHA and tree SHA. That exact commit is the frozen candidate.
 
-From that point until the gate completes, do not make opportunistic improvements. Any accepted repository change invalidates the candidate, returns the repository to development for corrective work, and requires a later explicit re-entry with a new frozen SHA.
+From that point through Gates 2-6, do not make opportunistic improvements. Any accepted repository change before the prescribed Gate 7 release transition invalidates the candidate and returns the repository to development for corrective work. If the already-authorized acceptance run remains active, re-enter with a new `acceptance_candidate` transition and frozen SHA after those fixes; do not ask for redundant approval merely because the candidate changed.
 
 ### Gate 2 — Deterministic repository checks
 
@@ -129,7 +129,9 @@ Record the exact candidate SHA used. A validator result from an earlier commit d
 
 Create a new **private** repository using GitHub **Use this template**, give it an arbitrary name, and approach it as a first-time non-expert user who has not read the repository files.
 
-Using a fresh ChatGPT conversation and the documented Fast start only:
+Run this test on a ChatGPT account, plan, and surface representative of the **minimum public support claim**. Record the plan/surface and the GitHub plugin/app path actually used. Do not treat a maintainer-only, administrator-only, internal, development, or unusually privileged GitHub capability as proof that ordinary users at the claimed baseline can perform setup. Before calling the gate runnable, confirm the documented GitHub capability is discoverable/invokable on that surface and actually exposes the repository create/update/delete actions required by activation. If the available GitHub path is read-only, this gate is BLOCKED for that claimed baseline and the public compatibility wording must be narrowed or the required capability path must be established before release.
+
+Using a fresh ChatGPT conversation and only the documented beginner **Create → Connect → Activate** path:
 
 1. run activation from the private repository URL;
 2. require the correct repository ID, privacy check, reversible CRUD/readback, cleanup, and `Operational memory: READY` receipt;
@@ -139,7 +141,7 @@ Using a fresh ChatGPT conversation and the documented Fast start only:
 6. rename the private repository;
 7. start another fresh conversation and verify the same repository ID resolves to the renamed repository, the state is recovered, and a verified write succeeds without changing the bootloader.
 
-Failure or user confusion is release evidence. Fix the smallest root cause, return the public template to development, and re-enter acceptance later with a new frozen candidate.
+Failure or user confusion is release evidence. Fix the smallest root cause, return the public template to development, and, when the existing acceptance authorization remains in force, re-enter with a new candidate after corrective work.
 
 ### Gate 4 — Surface smoke tests
 
@@ -166,7 +168,7 @@ If Gates 2–5 identify any repository change that should be made:
 
 1. invalidate the current candidate and restore `protocol_status: development` as part of corrective work;
 2. make and verify the accepted fixes in development;
-3. explicitly authorize re-entry to acceptance and change `protocol_status` back to `acceptance_candidate`;
+3. if the existing acceptance authorization remains in force and the work stayed within the corrective loop, change `protocol_status` back to `acceptance_candidate` without a redundant approval prompt; otherwise obtain a new explicit entry decision;
 4. freeze the resulting new canonical `main` SHA/tree;
 5. rerun deterministic validation against that exact candidate;
 6. rerun the portions of the zero-reading/surface tests affected by the changes;
@@ -184,6 +186,8 @@ Only after Gates 1–6 pass:
 - rerun deterministic validation against the final release tree;
 - tag/publish the release;
 - create one final private copy using **Use this template** and repeat the activation smoke test against what GitHub actually ships.
+
+The prescribed release/version/history changes in Gate 7 are the release transition after the frozen candidate has passed; they are not an acceptance-candidate defect that sends the repository back through Gate 6. Any unrelated or opportunistic change discovered during Gate 7 still invalidates the release transition and must be handled through the normal corrective path.
 
 That final private-copy activation is the release artifact check. A successful test against the source repository alone is not sufficient.
 
