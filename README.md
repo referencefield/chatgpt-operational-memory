@@ -6,6 +6,8 @@ The goal is not to make ChatGPT remember everything. It is to keep the smaller s
 
 > **A portable continuity layer for serious ongoing ChatGPT work.**
 
+**Supported release baseline:** a **paid ChatGPT plan** plus the `@GitHub` plugin with repository write actions. Free ChatGPT accounts are not supported by this release. A paid plan alone does not guarantee that the required plugin/actions are available on every account, region, workspace, or surface, so setup verifies the actual capability.
+
 ## Get started: Create → Connect → Activate
 
 You only need to do this once. You do **not** need Git expertise, a terminal, or knowledge of the repository's internal protocol.
@@ -22,8 +24,6 @@ In ChatGPT, install/select the **`@GitHub` plugin**, sign in to GitHub, and auth
 
 **Requires:** `@GitHub` with repository write actions. Setup checks this automatically. OpenAI also documents a separate GitHub app/connection used for repository search and analysis that may be read-only; that separate limitation is not proof that the `@GitHub` plugin cannot write.
 
-Availability varies by account and ChatGPT surface, so compatibility is based on the actions actually available rather than a hard-coded plan name.
-
 ### 3. Activate
 
 Copy the URL of your new private repository and send:
@@ -38,7 +38,13 @@ Success begins:
 
 **Operational memory: READY**
 
-Then ChatGPT should give you **one completed Custom Instructions block** to copy into ChatGPT so future conversations know which repository to use. The repository's numeric ID is already embedded; you do not need to understand or type it yourself.
+Then ChatGPT should say **One final step** and give you one completed Custom Instructions block with your repository ID already embedded. It should tell you exactly where to put it:
+
+- **Web/Desktop:** Settings → Personalization → Custom Instructions.
+- **Mobile:** Settings → Customize ChatGPT → Custom Instructions.
+- Make sure customization is enabled, paste the block **at the top above any existing Custom Instructions**, keep your existing instructions, and save.
+
+The completed bootloader is intentionally tiny, about **487 characters with a current 10-digit repository ID**. You do not need to understand or type the ID yourself.
 
 For dependable repository-backed retrieval or saving, start the message with **`@GitHub`**. The bootloader supplies the repository identity and routing, so you do not repeat the URL, ID, or protocol commands.
 
@@ -57,7 +63,7 @@ Custom Instructions can tell ChatGPT when GitHub should be used, but they are no
 
 If setup cannot safely complete, ChatGPT should return **Operational memory: BLOCKED**, show one plain-language problem and one **Fix**, then ask you to say **`Retry setup.`** after fixing it. It should not dump repository IDs, blob details, or protocol jargon unless you ask.
 
-See [`SETUP.md`](SETUP.md) for advanced verification and troubleshooting.
+See [`SETUP.md`](SETUP.md) for the exact bootloader shape plus advanced verification and troubleshooting.
 
 ## Development status
 
@@ -143,9 +149,9 @@ Git history preserves evolution, but **Git history is not current authority**.
 
 ## The bootloader principle
 
-Persistent ChatGPT instructions should be tiny. Activation obtains the working repository's stable numeric GitHub repository ID and fills it into a completed Custom Instructions block for the user to copy.
+Persistent ChatGPT instructions should be tiny. Activation obtains the working repository's stable numeric GitHub repository ID, inserts it into the compact bootloader defined by `PROTOCOL.yaml`, and gives the completed block to the user.
 
-The user does not need to understand or manually manage the ID. ChatGPT uses it internally so an ordinary repository rename does **not** require editing the bootloader or migrating durable state.
+The user pastes that block **at the top of Custom Instructions without replacing existing instructions**. The user does not need to understand or manually manage the ID. ChatGPT uses it internally so an ordinary repository rename does **not** require editing the bootloader or migrating durable state.
 
 The bootloader carries two triggers: use operational memory when prior durable state may materially affect the task **or** when the conversation creates/changes clear future-governing state that should persist. On actual GitHub invocation, ChatGPT resolves the ID to the repository's current owner/name and retrieves `START_HERE.md`.
 
@@ -183,7 +189,9 @@ The repository also includes an advisory deterministic validator for structural 
 
 ### ChatGPT Chat
 
-The primary lay-user path is ordinary ChatGPT with the authenticated **`@GitHub` plugin** exposing repository read/write actions for the private working repository.
+The supported lay-user baseline for this release is a **paid ChatGPT account** with the authenticated **`@GitHub` plugin** exposing repository read/write actions for the private working repository. Free ChatGPT accounts are outside this release's supported setup.
+
+A paid account is necessary for this release's support policy but does not itself prove that `@GitHub` write actions are available on the user's current surface; activation verifies actual capability.
 
 OpenAI separately documents a GitHub app/connection used for repository search and analysis as read-only. That surface can support retrieval but cannot satisfy this persistence protocol. Do not generalize its read-only limitation to the selected `@GitHub` plugin; `SETUP.md` uses actual exposed actions plus reversible CRUD/readback to determine readiness.
 

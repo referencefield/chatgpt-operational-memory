@@ -27,11 +27,13 @@ working_repository:
 
 compatibility:
   primary_surface: chatgpt
+  supported_release_requires_paid_chatgpt_plan: true
+  free_chatgpt_plan_supported: false
   required_chatgpt_plugin: GitHub
   plugin_invocation: "@GitHub"
   plugin_requires_repository_read_write_actions: true
   separate_read_only_github_app_is_not_plugin_capability_authority: true
-  readiness_is_capability_based_not_plan_name_based: true
+  paid_plan_alone_does_not_guarantee_plugin_capability: true
   readiness_capability_test: reversible_crud_readback
   explicit_github_invocation_is_dependable_execution_path: true
   custom_instructions_alone_do_not_prove_plugin_invocation: true
@@ -75,6 +77,11 @@ activation:
   configured_normal_entry: "@GitHub Use my operational memory."
   explicit_future_fallback: "@GitHub Use operational memory from <repository URL>."
   user_need_not_name_front_door_or_resolution_steps: true
+  ready_custom_instructions_install_required: true
+  ready_custom_instructions_position: top
+  ready_custom_instructions_preserve_existing: true
+  ready_custom_instructions_web_desktop_path: "Settings > Personalization > Custom Instructions"
+  ready_custom_instructions_mobile_path: "Settings > Customize ChatGPT > Custom Instructions"
 
 human_docs:
   readme: README.md
@@ -145,14 +152,10 @@ lifecycle:
   budget_status_when_crossed: Watch
 
 custom_instruction_role: bootloader
+custom_instruction_template: >-
+  Operational Memory: I use GitHub repository ID `<ID>` for durable operational memory. When prior durable state could affect the task, or this conversation creates/changes clear future-governing state, use `@GitHub`, resolve this ID to its current repository, and follow `START_HERE.md`. Do not claim retrieval or persistence unless GitHub actions actually ran and writes were verified. If the ID cannot resolve or a write cannot be verified, say so; never guess another repository.
 custom_instruction_rule: >-
-  Persistent ChatGPT instructions identify the working repository by its GitHub repository ID. Activation fills
-  that ID into the bootloader for the user; the user is not required to understand or manually manage it. When
-  prior durable context can materially affect the task, or when the conversation creates or changes clear
-  future-governing state that should persist, the bootloader tells ChatGPT to use @GitHub, resolve the ID to the
-  repository's current owner/name, retrieve START_HERE.md, and follow the current protocol. The instruction itself
-  does not prove the plugin ran. Owner/name changes do not require a bootloader change; an unresolved ID fails
-  closed rather than guessing a replacement, and retrieval/persistence must not be claimed without actual GitHub evidence.
+  Activation substitutes the verified repository ID into custom_instruction_template and gives the completed block to the user. The user pastes it at the top of Custom Instructions without replacing existing instructions. The user is not required to understand or manually manage the ID. The instruction is a trigger and identity carrier, not proof that the plugin ran.
 
 release_rule: >-
   Keep protocol_version set to unreleased during pre-release development. Assign the first real release

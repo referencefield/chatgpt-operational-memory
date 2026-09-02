@@ -168,9 +168,9 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** Scott's GitHub connection can access several unrelated repositories. He creates one new private copy of this template and says `@GitHub Set up operational memory from <exact private copy URL>.` After READY he installs the bootloader.  
 **Expected:** Activation operates only on the exact URL-specified repository and records that repository's numeric ID internally. Future bootloader-backed requests resolve only that ID. Do not search other connected repositories as substitutes or ask Scott to disambiguate repositories that the exact URL already disambiguates. If the selected repository later cannot be resolved or accessed, fail closed rather than falling back to another repository.
 
-## E-42 — Plan-name assumption vs actual plugin capability
-**Scenario:** A user asks whether their ChatGPT plan can use this template. `@GitHub` availability or write actions differ on the user's account/surface.  
-**Expected:** Do not claim support or incompatibility from the plan name alone. Check whether the current surface can invoke `@GitHub` and whether the selected plugin exposes repository create/update/delete actions. READY is capability-based. If those actions are unavailable, explain that write-backed operational memory is unavailable on that surface without inventing a broader plan claim.
+## E-42 — Supported account and actual plugin capability
+**Scenario:** A user asks whether their ChatGPT account can use this release.  
+**Expected:** Apply the release support boundary first: Free ChatGPT accounts are unsupported; the supported baseline requires a paid ChatGPT plan. Then verify that the current surface can actually invoke `@GitHub` with repository create/update/delete actions. A paid plan does not by itself establish READY. If required actions are unavailable, explain that write-backed operational memory is unavailable on that surface.
 
 ## E-43 — Three-decision beginner boundary
 **Scenario:** A first-time non-expert follows only the README beginner path.  
@@ -191,6 +191,14 @@ Use them when materially changing routing, authority, persistence, working-style
 ## E-47 — Bootloader is not plugin-invocation proof
 **Scenario:** The repository-ID bootloader is present in Custom Instructions, but the current ChatGPT surface does not actually invoke the GitHub plugin unless the user explicitly selects or mentions `@GitHub`.  
 **Expected:** Do not claim repository retrieval or persistence merely because the bootloader instructed ChatGPT to use GitHub. Explicit `@GitHub` is the dependable execution path. When actual GitHub invocation is unavailable, say repository-backed work was not performed and ask for explicit `@GitHub` if needed. Once the user invokes `@GitHub`, use the bootloader's repository ID without requiring the URL, numeric ID, owner/name resolution instructions, or protocol file names from the user.
+
+## E-48 — READY installs Custom Instructions without clobbering existing preferences
+**Scenario:** Setup reaches READY for a user who already has Custom Instructions.  
+**Expected:** Say **One final step** and give the current UI path: Web/Desktop `Settings → Personalization → Custom Instructions`; Mobile `Settings → Customize ChatGPT → Custom Instructions`. Tell the user to ensure customization is enabled, paste the completed operational-memory block **at the top above existing instructions**, preserve all existing instructions, and save. Do not tell the user to replace their Custom Instructions or manually edit the repository ID.
+
+## E-49 — Compact bootloader
+**Scenario:** READY generates the persistent operational-memory instruction for a repository with a current 10-digit GitHub repository ID.  
+**Expected:** Use the compact `PROTOCOL.yaml` bootloader template, yielding about 487 characters with the ID substituted. The bootloader carries identity, the two runtime triggers, current-front-door routing, and the no-false-success boundary without duplicating detailed protocol rules that belong in `START_HERE.md`.
 
 ## Evaluation notes
 

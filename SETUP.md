@@ -8,6 +8,8 @@ You only need to do this once.
 
 You do **not** need to know Git, use a terminal, understand repository IDs, or edit memory files yourself.
 
+**Supported release baseline:** a **paid ChatGPT plan** plus the `@GitHub` plugin with repository write actions. Free ChatGPT accounts are not supported by this release. A paid plan alone does not guarantee that the required plugin/actions are available on every account, region, workspace, or surface, so setup still verifies the actual capability.
+
 ### 1. Create your private memory repository
 
 [**Create my private memory repository**](https://github.com/new?owner=%40me&template_owner=referencefield&template_name=chatgpt-operational-memory&visibility=private)
@@ -23,8 +25,6 @@ Do not store passwords, API keys, recovery codes, full payment/bank information,
 In ChatGPT, install/select the **`@GitHub` plugin**, sign in to GitHub when asked, and authorize the private memory repository you just created. Prefer selected-repository access when available; you do not need to authorize unrelated repositories.
 
 **Required capability:** the selected `@GitHub` plugin must expose repository read/write actions. OpenAI also documents a separate GitHub app/connection used for repository search/analysis that may be read-only. That separate limitation does **not** prove that the `@GitHub` plugin cannot write.
-
-Plugin availability varies by account, workspace, role, region, and ChatGPT surface. Setup determines compatibility from the actual `@GitHub` actions available, not from the plan name alone.
 
 ### 3. Activate it
 
@@ -51,7 +51,29 @@ It should show a compact human-facing result such as:
 - GitHub read/write verified ✓
 - operational-memory structure healthy ✓
 
-Then it should say **One final step:** and give you a completed Custom Instructions block to copy into ChatGPT. The repository's numeric GitHub ID is already embedded in that instruction; you do not need to understand, remember, or type it yourself.
+Then it should say **One final step** and tell you exactly where to install the completed Custom Instructions block.
+
+**Web/Desktop**
+
+1. Open **Settings → Personalization → Custom Instructions**.
+2. Make sure customization is enabled.
+3. Paste the block **at the very top, above any Custom Instructions you already have**.
+4. Do **not** delete or replace your existing instructions.
+5. Save the change.
+
+**iOS/Android**
+
+1. Open **Settings → Customize ChatGPT → Custom Instructions**.
+2. Make sure customization is enabled.
+3. Paste the block **at the very top, above any Custom Instructions you already have**.
+4. Do **not** delete or replace your existing instructions.
+5. Save the change.
+
+ChatGPT supplies the completed block with your repository ID already filled in. Its compact form is:
+
+> Operational Memory: I use GitHub repository ID `<ID>` for durable operational memory. When prior durable state could affect the task, or this conversation creates/changes clear future-governing state, use `@GitHub`, resolve this ID to its current repository, and follow `START_HERE.md`. Do not claim retrieval or persistence unless GitHub actions actually ran and writes were verified. If the ID cannot resolve or a write cannot be verified, say so; never guess another repository.
+
+With a current 10-digit GitHub repository ID, this is about **487 characters**. You copy the completed block as-is; you do not need to understand, remember, or type the numeric ID yourself.
 
 For dependable repository-backed retrieval or saving, start the message with **`@GitHub`**. The bootloader supplies the repository identity and routing, so you do not repeat the URL, ID, or protocol commands.
 
@@ -83,6 +105,9 @@ It should show **one problem and one next action**, not a technical diagnostic d
 > `Retry setup.`
 
 Examples:
+
+**This release is not supported on a Free ChatGPT account.**  
+**Fix:** Use a paid ChatGPT account with the `@GitHub` plugin, then tell me `Retry setup.`
 
 **I can't access your memory repository.**  
 **Fix:** Give the `@GitHub` plugin access to that repository. Then tell me `Retry setup.`
@@ -176,15 +201,9 @@ The test passes only when GitHub retrieval is evidenced and the returned content
 
 ## Bootloader specification
 
-For technical inspection, the completed Custom Instructions block generated after READY has this shape, with the verified numeric repository ID filled in automatically:
+The completed block generated after READY is the compact block shown above. The verified repository ID is already filled in.
 
-> I use GitHub repository ID `<VERIFIED ID>` as durable operational memory.
->
-> When my request can materially depend on prior durable work, **or this conversation creates or changes clear future-governing state that should persist**, use `@GitHub` to resolve that repository ID to its current owner/name, retrieve `START_HERE.md`, and follow its current retrieval and persistence protocol. Do not load the whole repository by default.
->
-> Custom Instructions are a trigger and identity carrier, not proof that the plugin ran. Do not claim repository retrieval or persistence unless `@GitHub` actually ran and the required read/write verification occurred. If the repository ID cannot be resolved or a persistence write cannot be verified, say so rather than guessing a replacement repository or claiming success.
-
-The user should copy the completed block, not manually find or substitute the numeric ID.
+The user pastes it at the top of Custom Instructions and preserves all existing instructions below it.
 
 **Why the trigger has two directions:** operational memory may be needed because existing durable state affects the task, or because a conversation that began without repository context later creates a firm decision/status/constraint that should govern future work. The second case should still wake the repository before the session ends.
 
@@ -220,6 +239,7 @@ If desired, configure lightweight protection against deleting or force-pushing t
 
 Setup is technically complete when:
 
+- the supported release baseline is satisfied;
 - the working repository is visibly private;
 - the selected `@GitHub` plugin is authenticated and authorized for that exact repository;
 - required repository create/update/delete actions are available;

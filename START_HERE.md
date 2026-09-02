@@ -11,6 +11,8 @@ Treat **set up**, **activate**, **initialize**, **wake up**, or **start using** 
 
 The user need not mention protocol files, repository IDs, CRUD, or a handshake.
 
+Supported release baseline: a **paid ChatGPT plan** plus the selected `@GitHub` plugin exposing required repository write actions. Free ChatGPT accounts are outside this release's supported setup. A paid plan alone does not prove the required plugin/actions are available.
+
 1. confirm the exact working repository, default branch, visibility, and GitHub repository ID; owner/name may be arbitrary;
 2. require the working copy to be **private** before storing personal/project state;
 3. retrieve `PROTOCOL.yaml`, this file, declared root memory files, and `PROJECTS.md`; verify structure without broad-loading unrelated content;
@@ -24,11 +26,21 @@ The setup URL selects the exact repository even when GitHub can access many othe
 
 Begin **`Operational memory: READY`**. Show only useful status such as repository, Private, GitHub read/write verified, structure healthy, and ready to use. Do not make the numeric repository ID something the user must understand or copy separately.
 
-Then say **One final step:** and provide the completed Custom Instructions bootloader from `SETUP.md` with the verified ID already filled in. The user copies it as-is.
+Then say **One final step** and tell the user exactly where to place the completed bootloader:
+
+- **Web/Desktop:** Settings → Personalization → Custom Instructions; ensure customization is enabled.
+- **Mobile:** Settings → Customize ChatGPT → Custom Instructions; ensure customization is enabled.
+- Paste the completed block **at the top, above any existing Custom Instructions**. Do not delete or replace the user's existing instructions. Save the change.
+
+Provide this compact bootloader with the verified repository ID already substituted for `<ID>`:
+
+`Operational Memory: I use GitHub repository ID <ID> for durable operational memory. When prior durable state could affect the task, or this conversation creates/changes clear future-governing state, use @GitHub, resolve this ID to its current repository, and follow START_HERE.md. Do not claim retrieval or persistence unless GitHub actions actually ran and writes were verified. If the ID cannot resolve or a write cannot be verified, say so; never guess another repository.`
+
+The user copies it as-is. Do not ask them to edit, understand, or separately record the ID.
 
 ### BLOCKED
 
-Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker in this order: exact repository access, Private visibility, required write actions, write/readback verification, diagnostic cleanup, protocol structure.
+Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker in this order: supported ChatGPT setup when known, exact repository access, Private visibility, required write actions, write/readback verification, diagnostic cleanup, protocol structure.
 
 Use plain language, give exactly one **Fix:**, and end **Then tell me `Retry setup.`** Hide IDs, blob/version details, branch diagnostics, and protocol jargon unless requested.
 
