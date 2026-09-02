@@ -154,7 +154,8 @@ release_lifecycle:
   development_status: development
   acceptance_candidate_status: acceptance_candidate
   released_status: released
-  acceptance_entry_requires_explicit_user_authorization: true
+  initial_acceptance_entry_requires_explicit_user_authorization: true
+  corrective_reentry_reuses_active_acceptance_authorization: true
   development_allows_substantive_changes: true
   development_validation_is_advisory: true
   development_has_frozen_candidate: false
@@ -205,8 +206,11 @@ custom_instruction_rule: >-
 
 release_rule: >-
   During active pre-release work keep protocol_version set to unreleased. While protocol_status is
-  development, no acceptance candidate is frozen and development validation remains advisory. Enter
-  acceptance_candidate only after explicit user authorization; the transition commit is the first SHA
-  eligible to freeze under MIGRATIONS.md. Any accepted repository change after freeze invalidates that
-  candidate and corrective work must restore protocol_status to development. After the acceptance gate
-  passes, assign the first real release identifier and set protocol_status to released.
+  development, no acceptance candidate is frozen and development validation remains advisory. Initial
+  entry into acceptance_candidate from ordinary development requires explicit user authorization; the
+  transition commit is the first SHA eligible to freeze under MIGRATIONS.md. Any accepted repository
+  change after freeze invalidates that candidate and corrective work must restore protocol_status to
+  development. Corrective re-entry may reuse an acceptance authorization that remains in force; a new
+  authorization is required only after the gate is stopped/revoked or work returns to a new substantive
+  development phase. After the acceptance gate passes, assign the first real release identifier and set
+  protocol_status to released.

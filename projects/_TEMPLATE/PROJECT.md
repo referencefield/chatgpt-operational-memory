@@ -91,7 +91,7 @@ Before persisting project material:
 2. current objective/state/constraints/open questions -> `CURRENT.md`;
 3. durable governing decision -> `DECISIONS.md`;
 4. stable supported project fact/definition/correction -> `KNOWLEDGE.md`;
-5. stable global collaboration preference -> root `WORKING_STYLE.md`, not this project;
+5. stable collaboration preference -> root `WORKING_STYLE.md`, using a project/workflow scope when the preference is not global;
 6. cross-project fact/definition/correction -> root `KNOWLEDGE.md` when no better source exists;
 7. material with no legitimate project home -> do not invent a file; surface it as a routing/growth signal.
 

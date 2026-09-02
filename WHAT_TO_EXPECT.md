@@ -4,7 +4,7 @@ This page is for the person deciding whether Operational Memory is worth install
 
 ## Short version
 
-Use this if you have a **paid ChatGPT account**, use ChatGPT for ongoing work, and regularly run into questions like:
+Use this if you have a **paid ChatGPT account where the GitHub plugin/app path exposes repository write actions**, use ChatGPT for ongoing work, and regularly run into questions like:
 
 - Where were we?
 - Which decision is actually current?
@@ -12,6 +12,8 @@ Use this if you have a **paid ChatGPT account**, use ChatGPT for ongoing work, a
 - Why am I explaining the same project again?
 - Did ChatGPT really save that change?
 - How do several projects or GitHub repositories fit together?
+
+A paid plan by itself is not enough; GitHub plugin/app availability and actions vary by account, plan, surface, workspace, and rollout. Setup verifies the actual capability before reporting READY.
 
 Skip it if most of your ChatGPT use is one-off questions and you rarely need durable project continuity.
 

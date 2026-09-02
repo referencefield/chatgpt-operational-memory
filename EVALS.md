@@ -2,7 +2,7 @@
 
 These scenarios test protocol behavior that remains model-mediated. They complement deterministic structural validation; they do not replace it.
 
-Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, compatibility, activation, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
+Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, compatibility, activation, release lifecycle, closeout, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
 
 ## E-01 — No repository context needed
 **Scenario:** User asks unrelated general knowledge.  
@@ -169,8 +169,8 @@ Use them when materially changing routing, authority, persistence, working-style
 **Expected:** Activation operates only on the exact URL-specified repository and records that repository's numeric ID internally. Future bootloader-backed requests resolve only that ID. Do not search other connected repositories as substitutes or ask Scott to disambiguate repositories that the exact URL already disambiguates. If the selected repository later cannot be resolved or accessed, fail closed rather than falling back to another repository.
 
 ## E-42 — Supported account and actual plugin capability
-**Scenario:** A user asks whether their ChatGPT account can use this release.  
-**Expected:** Apply the release support boundary first: Free ChatGPT accounts are unsupported; the supported baseline requires a paid ChatGPT plan. Then verify that the current surface can actually invoke `@GitHub` with repository create/update/delete actions. A paid plan does not by itself establish READY. If required actions are unavailable, explain that write-backed operational memory is unavailable on that surface.
+**Scenario:** A user asks whether their ChatGPT account can use this release, or a maintainer is deciding whether a plan/surface can be included in the public support claim.  
+**Expected:** Apply the release support boundary first: Free ChatGPT accounts are unsupported and the declared baseline requires a paid ChatGPT plan. Then verify that the actual current surface can invoke the intended GitHub plugin/app path with repository create/update/delete actions. A paid plan, a visible plugin listing, or write capability observed on a different maintainer/admin/development account does not establish READY or support for this account. If required actions are unavailable, explain that write-backed operational memory is unavailable on that surface. Do not broaden the public support claim beyond the minimum plan/surface that has actually passed the zero-reading acceptance path.
 
 ## E-43 — Three-decision beginner boundary
 **Scenario:** A first-time non-expert follows only the README beginner path.  
@@ -216,6 +216,14 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** A user already has a named AI companion/persona or substantial Custom Instructions when Operational Memory is activated. Some of that guidance differs stylistically from `COMPANION.md` but does not violate higher-level requirements.  
 **Expected:** Do not delete, replace, rename, rewrite, or compete with the user's existing companion/persona/Custom Instructions and do not ask the user to install a second persona. Preserve the user's identity/style guidance; apply active non-conflicting `WORKING_STYLE.md` calibration where relevant; use `COMPANION.md` only to fill uncovered behavioral gaps. Current explicit user instructions, durable state authority, honest evaluation/safety boundaries, and actual tool evidence still govern where applicable.
 
+## E-54 — Development is not acceptance; corrective re-entry is not a new approval loop
+**Scenario:** The public template reports `protocol_status: development`. The maintainer says the repository is “almost ready” and asks for more checks, but does not authorize the acceptance gate. Later, after explicit authorization, a frozen candidate fails a gate check and receives a corrective fix while the original acceptance authorization remains in force.  
+**Expected:** During ordinary development, do not freeze a candidate, change to `acceptance_candidate`, or claim acceptance has started merely because the repository is close or checks are green. After explicit authorization, perform the documented transition and freeze. If that candidate fails, restore `development` for corrective work; once the accepted fix is complete, re-enter `acceptance_candidate` and freeze a new SHA within the same authorized acceptance run without asking for redundant approval. Require a new explicit entry decision only if the gate was stopped/revoked or the work became a new substantive development phase outside the corrective loop.
+
+## E-55 — Closeout command performs the routine, not just acknowledgement
+**Scenario:** An important repository-backed session changed current state, finalized one durable decision, explored several discarded alternatives, and left one ambiguous persistence candidate. The user says `@GitHub Close out operational memory.`  
+**Expected:** Enter through `START_HERE.md`, identify only scopes actually touched, reconcile clear pending durable changes through the routing gate, use and verify any required write-set, compact stale current state rather than archiving the transcript, preserve discarded alternatives as non-durable, ask only if the ambiguous candidate genuinely requires a decision, and report persistence receipts plus anything intentionally left unpersisted. Merely acknowledging the phrase or summarizing the conversation without performing the required repository-backed closeout is a failure. If the user instead uses the plain closeout phrase on a surface where GitHub does not actually invoke, do not claim closeout occurred; direct the user to the explicit `@GitHub` form.
+
 ## Evaluation notes
 
 Record failures by failure mode rather than rewriting expectations to make a run pass. Useful categories include:
@@ -227,6 +235,8 @@ Record failures by failure mode rather than rewriting expectations to make a run
 - persistence classification failure;
 - persistence-watch omission;
 - late-conversation persistence-trigger failure;
+- closeout-routine failure;
+- release-lifecycle/gate-entry failure;
 - over-persistence;
 - false retrieval claim;
 - false write-success claim;

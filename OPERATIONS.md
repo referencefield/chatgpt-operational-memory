@@ -33,10 +33,11 @@ Useful phrases during work:
 - **“Do not persist this.”** Block persistence of the specified material.
 - **“Ask before writing anything else this session.”** Temporarily switch to ask-first behavior.
 - **“What do you currently have recorded about this?”** Retrieve the durable source instead of answering from recollection.
-- **“Run a repository health check.”** Run structural + semantic health checks and report scale status.
-- **“Check for protocol updates.”** Compare this working copy with the template source declared in `PROTOCOL.yaml`.
+- **`@GitHub Close out operational memory.`** Run the repository-backed closeout routine below.
+- **`@GitHub Run a repository health check.`** Run structural + semantic health checks and report scale status.
+- **`@GitHub Check for protocol updates.`** Compare this working copy with the template source declared in `PROTOCOL.yaml`.
 
-These are controls, not required incantations. During repository-backed work, the conservative persistence watch in `START_HERE.md` should notice clear future-governing changes even when the user does not remember a magic phrase.
+These are controls, not required incantations. During repository-backed work, the conservative persistence watch in `START_HERE.md` should notice clear future-governing changes even when the user does not remember a magic phrase. When starting a fresh repository-backed control action such as closeout, health, or update checking, explicit `@GitHub` is the dependable invocation path.
 
 ## Persistence watch
 
@@ -118,9 +119,11 @@ For a new durable decision, also show the exact stored one-sentence `Decision` f
 
 ## Closing out an important session
 
-Say:
+For dependable repository-backed execution, say:
 
-> **“Close out operational memory.”**
+> **`@GitHub Close out operational memory.`**
+
+A plain “Close out operational memory” expresses the same intent when the current surface actually engages GitHub through the installed bootloader. If GitHub does not run, do not claim that closeout occurred: state that repository-backed closeout was not performed and direct the user to the explicit `@GitHub` form.
 
 ChatGPT should:
 
@@ -276,4 +279,4 @@ See `SECURITY.md` for optional `main` protection against deletion and force push
 
 ## Behavioral evals
 
-`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, authority, update discovery, or repository-maintenance rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.
+`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, authority, update discovery, release lifecycle, closeout, or repository-maintenance rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.
