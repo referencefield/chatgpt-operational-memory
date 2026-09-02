@@ -20,7 +20,7 @@ Do not post secrets, private repository contents, credentials, or sensitive pers
 Strong proposals usually preserve these principles:
 
 - ordinary ChatGPT users should not need a terminal for normal operation;
-- the primary ChatGPT path uses the authenticated GitHub plugin with repository read/write actions and explicit `@GitHub` invocation when needed;
+- the primary ChatGPT path uses the authenticated GitHub plugin with an underlying GitHub app/connection that exposes repository read/write actions, with explicit `@GitHub` invocation when needed;
 - durable material is routed before it is written;
 - existing sources of record are preferred over new files;
 - project boundaries prevent global files from becoming junk drawers;
@@ -64,9 +64,9 @@ The validator is structural. A green result does not replace semantic review.
 
 ## Compatibility contributions
 
-The primary release target is ChatGPT using the authenticated GitHub plugin described in `SETUP.md`.
+The primary release target is ChatGPT using the **write-capable GitHub plugin/app path** described in `SETUP.md`. A read-only GitHub connection may support retrieval but cannot satisfy the persistence requirements.
 
-The repository also includes a minimal root `AGENTS.md` bootloader so OpenAI Codex can enter through the same `START_HERE.md` protocol instead of inventing a second operating model. ChatGPT Work should use the same GitHub plugin and front door.
+The repository also includes a minimal root `AGENTS.md` bootloader so OpenAI Codex can enter through the same `START_HERE.md` protocol instead of inventing a second operating model. ChatGPT Work should use the same repository and front door when equivalent GitHub write actions are available.
 
 Changes for other model providers are welcome when they preserve the same user-facing simplicity and can demonstrate equivalent repository read/write behavior, scoped retrieval, and persistent bootstrapping. Do not add provider-specific machinery to the default path merely for theoretical compatibility.
 
