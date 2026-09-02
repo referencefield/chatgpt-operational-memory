@@ -241,6 +241,38 @@ def main() -> int:
     if not version:
         error("PROTOCOL.yaml missing protocol_version")
 
+    status = str(manifest.get("protocol_status", "")).strip()
+    release_lifecycle = manifest.get("release_lifecycle", {}) or {}
+    required_statuses = {"development", "acceptance_candidate", "released"}
+    allowed_statuses = set(release_lifecycle.get("allowed_protocol_statuses", []))
+
+    if status not in required_statuses:
+        error("PROTOCOL.yaml protocol_status must be development, acceptance_candidate, or released")
+    if allowed_statuses != required_statuses:
+        error("PROTOCOL.yaml release_lifecycle.allowed_protocol_statuses must declare development, acceptance_candidate, and released")
+
+    lifecycle_expected = {
+        "development_status": "development",
+        "acceptance_candidate_status": "acceptance_candidate",
+        "released_status": "released",
+        "acceptance_entry_requires_explicit_user_authorization": True,
+        "development_allows_substantive_changes": True,
+        "development_validation_is_advisory": True,
+        "development_has_frozen_candidate": False,
+        "acceptance_transition_commit_is_first_freeze_eligible_candidate": True,
+        "candidate_mutation_invalidates_gate": True,
+        "corrective_change_requires_development_status": True,
+        "release_requires_acceptance_gate_pass": True,
+    }
+    for key, expected in lifecycle_expected.items():
+        if release_lifecycle.get(key) != expected:
+            error(f"PROTOCOL.yaml release_lifecycle.{key} must be {expected!r}")
+
+    if status in {"development", "acceptance_candidate"} and version != "unreleased":
+        error("pre-release protocol_status requires protocol_version unreleased")
+    if status == "released" and version == "unreleased":
+        error("released protocol_status requires a real protocol_version")
+
     if manifest.get("canonical_branch") != "main":
         warn("canonical_branch is not main; confirm this is intentional")
 
