@@ -51,7 +51,7 @@ When repository sources conflict, use this order unless a higher-level rule requ
 6. historical/superseded repository state;
 7. native ChatGPT memory, chat recollection, or model inference.
 
-Working style does not override current instructions/decisions. Stale knowledge does not override current verified state. Git history is evidence, not active authority by itself. Native ChatGPT memory may be useful context, but it does not override current verified durable repository state.
+Working style does not override current instructions/decisions. It also cannot be used to suppress honest evaluation, material disagreement, correction of errors, material risk flagging, uncertainty disclosure, or applicable safety behavior. Stale knowledge does not override current verified state. Git history is evidence, not active authority by itself. Native ChatGPT memory may be useful context, but it does not override current verified durable repository state.
 
 ## Conservative persistence watch
 
@@ -61,7 +61,7 @@ Good candidates include an explicitly changed objective/constraint/status/next s
 
 When durable intent is explicit and routing is unambiguous, persist under the normal write/verify rules unless the user selected ask-first behavior. Ask first when intent/future relevance is inferred, material is sensitive, routing is ambiguous, or structure must expand.
 
-Do not persist brainstorming, possibilities, casual conversation, one-off preferences, or anything the user says not to persist.
+Do not persist brainstorming, possibilities, casual conversation, one-off preferences, or anything the user says not to persist. Do not persist a working-style preference whose effect would be to make future work less honest about material errors, risks, uncertainty, or disagreement.
 
 ## Persistence routing gate
 
@@ -89,6 +89,8 @@ A new durable file/category outside declared structure is exceptional. Before cr
 
 ## Write safety
 
+A **consequential write** is any write that changes declared durable memory, routing, authority, project structure, or protocol configuration. Temporary reversible diagnostics such as `SETUP-TEST.md` are excluded from this term, though their own activation procedure still requires readback and cleanup verification.
+
 For consequential writes:
 
 `read current target(s) -> authorize/route -> write -> reread -> verify intended state`
@@ -111,7 +113,7 @@ Examples:
 - stale write -> reread/reconcile;
 - unverified write -> report `not verified`;
 - partial write-set/project creation -> report temporary inconsistency and reconcile;
-- GitHub unavailable -> state that changes were not persisted.
+- required GitHub write actions unavailable -> state that changes were not persisted.
 
 For health/scale checks, use `OPERATIONS.md` and report **`Healthy | Watch | Outgrowing the template`**. Soft budgets are warning indicators, not deletion targets.
 
