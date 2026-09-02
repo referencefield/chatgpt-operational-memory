@@ -11,20 +11,22 @@ Treat **set up**, **activate**, **initialize**, **wake up**, or **start using** 
 
 The user need not mention protocol files, IDs, CRUD, or a handshake.
 
-Supported release: **paid ChatGPT plan** plus write-capable `@GitHub`; Free is unsupported. Paid status alone does not prove the required plugin/actions exist.
+Supported release: **ChatGPT Plus (currently $20/month) or higher** plus the installed/selected and authenticated `@GitHub` plugin authorized for the exact repository and exposing repository read/write actions. **Free and ChatGPT Go are unsupported.** A supported plan alone does not prove the required plugin/actions exist.
 
-1. confirm exact repository, default branch, visibility, and GitHub repository ID;
-2. require the working copy to be **private** before storing personal/project state;
-3. retrieve `PROTOCOL.yaml`, this file, declared root memory files, and `PROJECTS.md`; verify structure without broad-loading unrelated content;
-4. using selected `@GitHub` actions, verify reversible `SETUP-TEST.md` create/read/update/read/delete plus deletion readback, using current version when available. A separate read-only GitHub app does not prove `@GitHub` is read-only; missing required write actions means BLOCKED;
-5. create no durable state merely to mark activation;
-6. return READY or BLOCKED below.
+1. require a supported ChatGPT plan: Plus or higher; Free and Go are BLOCKED;
+2. require `@GitHub` to be installed/selected, authenticated to GitHub, and authorized for the exact repository;
+3. confirm exact repository, default branch, visibility, and GitHub repository ID;
+4. require the working copy to be **private** before storing personal/project state;
+5. retrieve `PROTOCOL.yaml`, this file, declared root memory files, and `PROJECTS.md`; verify structure without broad-loading unrelated content;
+6. using selected `@GitHub` actions, verify reversible `SETUP-TEST.md` create/read/update/read/delete plus deletion readback, using current version when available. A separate read-only GitHub app does not prove `@GitHub` is read-only; missing required write actions means BLOCKED;
+7. create no durable state merely to mark activation;
+8. return READY or BLOCKED below.
 
 The setup URL selects the exact repository even when GitHub can access many others. Never substitute another repository. Future bootloader routing uses its numeric ID.
 
 ### READY
 
-Begin **`Operational memory: READY`**. Show only useful status such as repository, Private, GitHub read/write verified, structure healthy, and ready to use. Keep the numeric ID out of the user's mental model.
+Begin **`Operational memory: READY`**. Show only useful status such as supported plan, GitHub connected/authenticated, repository, Private, GitHub read/write verified, structure healthy, and ready to use. Keep the numeric ID out of the user's mental model.
 
 Then say **One final step:** and provide the completed `PROTOCOL.yaml` bootloader with the verified ID filled in. Tell the user:
 - Web/Desktop: **Settings → Personalization → Custom Instructions**.
@@ -35,7 +37,7 @@ The user copies it as-is. Do not ask them to edit, understand, or separately rec
 
 ### BLOCKED
 
-Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker: supported setup when known, repository access, Private visibility, write actions, write/readback, cleanup, then protocol structure.
+Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker: supported plan, GitHub plugin installation/selection/authentication, exact repository access, Private visibility, write actions, write/readback, cleanup, then protocol structure.
 
 Use plain language, give exactly one **Fix:**, and end **Then tell me `Retry setup.`** Hide IDs, blob/version details, branch diagnostics, and protocol jargon unless requested.
 
@@ -144,7 +146,7 @@ For health/scale checks, use `OPERATIONS.md` and report **`Healthy | Watch | Out
 
 ## Load details only when needed
 
-- `OPERATIONS.md` -> project creation, persistence detail, write-sets, closeout, health/update checks, recovery, maintenance, scale
+- `OPERATIONS.md` -> project creation, persistence detail, write-sets, health/update checks, recovery, maintenance, scale
 - `SECURITY.md` -> privacy, secrets, repository-content boundary, Git hardening
 - `MIGRATIONS.md` -> release-to-release upgrades
 - `EVALS.md` -> behavioral/adversarial scenarios
