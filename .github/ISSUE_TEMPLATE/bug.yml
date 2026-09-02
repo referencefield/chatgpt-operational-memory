@@ -53,9 +53,9 @@ body:
   - type: input
     id: protocol
     attributes:
-      label: Protocol release/status
-      description: Value from `PROTOCOL.yaml`, if known.
-      placeholder: unreleased / release identifier / not sure
+      label: Protocol version / status
+      description: Values from `PROTOCOL.yaml`, if known.
+      placeholder: unreleased + development / acceptance_candidate / released / not sure
     validations:
       required: false
 
