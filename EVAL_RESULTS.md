@@ -27,7 +27,7 @@ When a qualifying run exists, add a compact summary table such as:
 
 | Date | Model / surface | Scenarios | Pass | Fail | Material notes |
 | --- | --- | ---: | ---: | ---: | --- |
-| YYYY-MM-DD | Example | E-01–E-45 | 0 | 0 | Replace with actual observed results |
+| YYYY-MM-DD | Example | E-01–E-47 | 0 | 0 | Replace with actual observed results |
 
 Then record only the failures, ambiguities, or especially informative passes that deserve detail below the table. Do not turn this file into a transcript archive.
 

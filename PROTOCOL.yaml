@@ -33,6 +33,8 @@ compatibility:
   separate_read_only_github_app_is_not_plugin_capability_authority: true
   readiness_is_capability_based_not_plan_name_based: true
   readiness_capability_test: reversible_crud_readback
+  explicit_github_invocation_is_dependable_execution_path: true
+  custom_instructions_alone_do_not_prove_plugin_invocation: true
   codex_bootloader: AGENTS.md
   chatgpt_work_uses_same_front_door: true
   other_models_require_equivalent_github_read_write_and_persistent_bootloader: true
@@ -117,6 +119,9 @@ persistence:
   conservative_persistence_watch: true
   inferred_durable_intent_requires_confirmation: true
   sensitive_persistence_requires_confirmation: true
+  bootloader_wakes_for_prior_durable_relevance: true
+  bootloader_wakes_for_new_future_governing_state: true
+  plugin_invocation_required_before_claiming_repository_persistence: true
 
 maintenance:
   canonical_branch_only_steady_state: true
@@ -143,9 +148,11 @@ custom_instruction_role: bootloader
 custom_instruction_rule: >-
   Persistent ChatGPT instructions identify the working repository by its GitHub repository ID. Activation fills
   that ID into the bootloader for the user; the user is not required to understand or manually manage it. When
-  durable context matters, ChatGPT resolves the ID to the repository's current owner/name, retrieves START_HERE.md,
-  and follows the current protocol. Owner/name changes do not require a bootloader change; an unresolved ID fails
-  closed rather than guessing a replacement.
+  prior durable context can materially affect the task, or when the conversation creates or changes clear
+  future-governing state that should persist, the bootloader tells ChatGPT to use @GitHub, resolve the ID to the
+  repository's current owner/name, retrieve START_HERE.md, and follow the current protocol. The instruction itself
+  does not prove the plugin ran. Owner/name changes do not require a bootloader change; an unresolved ID fails
+  closed rather than guessing a replacement, and retrieval/persistence must not be claimed without actual GitHub evidence.
 
 release_rule: >-
   Keep protocol_version set to unreleased during pre-release development. Assign the first real release

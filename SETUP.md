@@ -53,16 +53,20 @@ It should show a compact human-facing result such as:
 
 Then it should say **One final step:** and give you a completed Custom Instructions block to copy into ChatGPT. The repository's numeric GitHub ID is already embedded in that instruction; you do not need to understand, remember, or type it yourself.
 
-After that, start chatting normally. For example:
+For dependable repository-backed retrieval or saving, start the message with **`@GitHub`**. The bootloader supplies the repository identity and routing, so you do not repeat the URL, ID, or protocol commands.
 
-- `Where were we on my project?`
-- `Remember that I've decided to use option B.`
-- `Update my current project status.`
-- `What do you currently have recorded about this?`
+Examples:
 
-You can explicitly invoke the repository anytime with:
+- `@GitHub where were we on my project?`
+- `@GitHub remember that I've decided to use option B.`
+- `@GitHub update my current project status.`
+- `@GitHub what do you currently have recorded about this?`
+
+A generic explicit entry is also valid:
 
 > `@GitHub Use my operational memory.`
+
+Custom Instructions can tell ChatGPT when GitHub should be used, but they are not themselves proof that the plugin actually ran. ChatGPT should claim repository retrieval or persistence only after actual `@GitHub` actions provide the required evidence.
 
 If you skip the Custom Instructions step, nothing breaks. For a later chat use:
 
@@ -103,7 +107,7 @@ After READY and the one-time Custom Instructions copy, you should not normally n
 
 The intended product experience is:
 
-**Create → Connect → Activate → talk normally.**
+**Create → Connect → Activate → use `@GitHub` naturally when repository-backed continuity or persistence matters.**
 
 Before READY, the user should make at most three meaningful setup decisions:
 
@@ -176,11 +180,15 @@ For technical inspection, the completed Custom Instructions block generated afte
 
 > I use GitHub repository ID `<VERIFIED ID>` as durable operational memory.
 >
-> When my request can materially depend on prior durable work, use `@GitHub` to resolve that repository ID to its current owner/name, then retrieve `START_HERE.md` from that repository before relying on remembered context. `START_HERE.md` defines the repository's current routing and persistence protocol; follow it rather than relying on an older copy of the protocol in chat or memory. Do not load the whole repository by default.
+> When my request can materially depend on prior durable work, **or this conversation creates or changes clear future-governing state that should persist**, use `@GitHub` to resolve that repository ID to its current owner/name, retrieve `START_HERE.md`, and follow its current retrieval and persistence protocol. Do not load the whole repository by default.
 >
-> If the repository ID cannot be resolved, routing cannot be established, or a persistence write cannot be verified, say so rather than guessing a replacement repository or claiming operational memory was loaded or persisted.
+> Custom Instructions are a trigger and identity carrier, not proof that the plugin ran. Do not claim repository retrieval or persistence unless `@GitHub` actually ran and the required read/write verification occurred. If the repository ID cannot be resolved or a persistence write cannot be verified, say so rather than guessing a replacement repository or claiming success.
 
 The user should copy the completed block, not manually find or substitute the numeric ID.
+
+**Why the trigger has two directions:** operational memory may be needed because existing durable state affects the task, or because a conversation that began without repository context later creates a firm decision/status/constraint that should govern future work. The second case should still wake the repository before the session ends.
+
+**Why explicit `@GitHub` remains the dependable path:** persistent instructions can tell ChatGPT when the plugin should be used, but product surfaces may differ in whether they automatically engage a plugin. Explicit `@GitHub` removes that ambiguity and does not require the user to restate repository identity.
 
 **Why an ID is used internally:** GitHub owner/name can change; the repository's numeric ID remains stable across an ordinary rename. Renaming therefore requires no bootloader edit or memory migration.
 

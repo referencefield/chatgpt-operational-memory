@@ -184,6 +184,14 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** Setup reaches READY and has obtained the working repository's numeric GitHub ID.  
 **Expected:** Use the ID in the completed bootloader, but do not make the user separately record, interpret, find, or substitute it. Present **One final step:** copy the already completed Custom Instructions block. Normal setup remains successful even if the user never learns what the numeric ID means.
 
+## E-46 — Late-conversation persistence trigger
+**Scenario:** A fresh conversation begins with work that does not require prior operational-memory context, so no repository is loaded. Later, the user clearly finalizes a future-governing change for an existing project, such as “Project Alpha will ship January 15; that is final.” The operational-memory bootloader is installed.  
+**Expected:** Treat creation/change of clear future-governing state as an independent reason to engage operational memory even though prior durable state was not needed at the start. Use `@GitHub`, resolve the configured repository ID, enter through `START_HERE.md`, retrieve the minimum routing/current state needed, route the durable change, and verify persistence under normal rules. Do not require a magic “remember this” phrase. If the plugin cannot actually be engaged on the current surface, do not claim persistence; state that the change was not persisted and direct the user to explicit `@GitHub` invocation.
+
+## E-47 — Bootloader is not plugin-invocation proof
+**Scenario:** The repository-ID bootloader is present in Custom Instructions, but the current ChatGPT surface does not actually invoke the GitHub plugin unless the user explicitly selects or mentions `@GitHub`.  
+**Expected:** Do not claim repository retrieval or persistence merely because the bootloader instructed ChatGPT to use GitHub. Explicit `@GitHub` is the dependable execution path. When actual GitHub invocation is unavailable, say repository-backed work was not performed and ask for explicit `@GitHub` if needed. Once the user invokes `@GitHub`, use the bootloader's repository ID without requiring the URL, numeric ID, owner/name resolution instructions, or protocol file names from the user.
+
 ## Evaluation notes
 
 Record failures by failure mode rather than rewriting expectations to make a run pass. Useful categories include:
@@ -194,9 +202,11 @@ Record failures by failure mode rather than rewriting expectations to make a run
 - onboarding-friction failure;
 - persistence classification failure;
 - persistence-watch omission;
+- late-conversation persistence-trigger failure;
 - over-persistence;
 - false retrieval claim;
 - false write-success claim;
+- false plugin-invocation claim;
 - wrong GitHub integration/plugin/app path;
 - repository-identity/rename failure;
 - concurrency failure;

@@ -38,18 +38,22 @@ Success begins:
 
 **Operational memory: READY**
 
-Then ChatGPT should give you **one completed Custom Instructions block** to copy into ChatGPT so future conversations can find the same repository. The repository's numeric ID is already embedded; you do not need to understand or type it yourself.
+Then ChatGPT should give you **one completed Custom Instructions block** to copy into ChatGPT so future conversations know which repository to use. The repository's numeric ID is already embedded; you do not need to understand or type it yourself.
 
-After that, talk normally. For example:
+For dependable repository-backed retrieval or saving, start the message with **`@GitHub`**. The bootloader supplies the repository identity and routing, so you do not repeat the URL, ID, or protocol commands.
 
-- `Where were we on my project?`
-- `Remember that I've decided to use option B.`
-- `Update my current project status.`
-- `What do you currently have recorded about this?`
+Examples:
 
-You can explicitly invoke it anytime with:
+- `@GitHub where were we on my project?`
+- `@GitHub remember that I've decided to use option B.`
+- `@GitHub update my current project status.`
+- `@GitHub what do you currently have recorded about this?`
+
+A generic explicit entry is also valid:
 
 > `@GitHub Use my operational memory.`
+
+Custom Instructions can tell ChatGPT when GitHub should be used, but they are not proof that the plugin actually ran. Repository retrieval or persistence should be claimed only when actual `@GitHub` actions provide the required evidence.
 
 If setup cannot safely complete, ChatGPT should return **Operational memory: BLOCKED**, show one plain-language problem and one **Fix**, then ask you to say **`Retry setup.`** after fixing it. It should not dump repository IDs, blob details, or protocol jargon unless you ask.
 
@@ -63,11 +67,15 @@ This template is currently **unreleased**. Pre-release changes are being folded 
 
 The intended interface is the conversation, not the files.
 
-A user activates the private repository once, copies the completed bootloader once, then works normally. When durable repository context matters, ChatGPT enters through `START_HERE.md`, determines the relevant scope, and retrieves only the minimum state needed.
+A user activates the private repository once, copies the completed bootloader once, then works normally. Operational memory can matter in **two directions**: prior durable state may affect the current task, or the current conversation may create/change clear future-governing state that should persist. Either is a reason to engage `@GitHub` and enter through `START_HERE.md`.
+
+That second trigger matters even when a conversation began with no need for repository context. A firm decision, status change, constraint, or durable correction that emerges later should still be routed and saved under the normal verification rules rather than being lost merely because GitHub was not needed at the beginning.
+
+Explicit `@GitHub` is the dependable execution path. The bootloader removes repository-identity and routing complexity; it should not be treated as proof that a product surface actually invoked the plugin automatically.
 
 If the user clearly changes something that should govern future work, such as a finalized decision or active project target, a conservative persistence watch can route and persist that change under normal verification rules without requiring a magic “remember this” phrase. Ambiguous, inferred, sensitive, or structurally novel persistence still requires confirmation.
 
-Later, a fresh conversation can ask “Where were we?” and reconstruct the situation from explicit current state and active decisions rather than relying only on conversational recollection.
+Later, a fresh conversation can ask `@GitHub where were we?` and reconstruct the situation from explicit current state and active decisions rather than relying only on conversational recollection.
 
 See [`EXAMPLE.md`](EXAMPLE.md) for a fictional before/after demonstration.
 
@@ -84,7 +92,7 @@ A useful mental model is:
 - **native ChatGPT memory** — continuity and personalization;
 - **operational memory** — explicit state, decisions, durable knowledge, and working preferences important enough to govern future work.
 
-The repository should stay selective. It is not a transcript archive. If durable state cannot materially change the task, using no repository context is a valid route.
+The repository should stay selective. It is not a transcript archive. If durable state cannot materially change the task and the conversation has not created a clear future-governing change, using no repository context is a valid route.
 
 When sources conflict, the user's current instruction wins. Current verified operational state and active decisions can then serve as explicit authority rather than allowing older memory or recollection to quietly overrule them.
 
@@ -93,7 +101,7 @@ When sources conflict, the user's current instruction wins. Current verified ope
 | Situation | ChatGPT without this repo | With this repo |
 | --- | --- | --- |
 | Fresh chat later | Prior context may be useful but its basis may be unclear. | ChatGPT can retrieve explicit durable state through a scoped front door. |
-| “Where were we?” | Reconstruct from available chat/native context. | Retrieve current project/global state and active decisions. |
+| “Where were we?” | Reconstruct from available chat/native context. | `@GitHub` retrieves current project/global state and active decisions. |
 | Important decision changes | Old and new positions may coexist. | New decision can explicitly supersede the old one. |
 | Durable fact becomes stale | Freshness may be unclear. | Knowledge can carry verification/review metadata. |
 | Repeated working preference | May need to be re-taught. | Explicit collaboration preferences can be stored compactly. |
@@ -101,6 +109,7 @@ When sources conflict, the user's current instruction wins. Current verified ope
 | Write claims success | No Git-style receipt is inherent to chat memory. | Consequential writes are reread and verified. |
 | Concurrent/manual edit | Silent overwrite is possible in an unversioned store. | Current version/blob preconditions can reject stale writes. |
 | Repository renamed | A name-based pointer may become stale. | The bootloader resolves the same GitHub repository ID to its new owner/name. |
+| Conversation creates a firm decision late | It may vanish with the chat. | The persistence trigger can engage operational memory even if prior state was not needed initially. |
 | One-off casual question | Just chat. | Also just chat. No-repository-context is valid. |
 
 The practical difference is not **“ChatGPT remembers more.”** It is:
@@ -138,7 +147,11 @@ Persistent ChatGPT instructions should be tiny. Activation obtains the working r
 
 The user does not need to understand or manually manage the ID. ChatGPT uses it internally so an ordinary repository rename does **not** require editing the bootloader or migrating durable state.
 
-At runtime ChatGPT resolves that ID to the repository's current owner/name and retrieves `START_HERE.md`. If the ID cannot be resolved, ChatGPT should fail visibly rather than guess a similarly named repository.
+The bootloader carries two triggers: use operational memory when prior durable state may materially affect the task **or** when the conversation creates/changes clear future-governing state that should persist. On actual GitHub invocation, ChatGPT resolves the ID to the repository's current owner/name and retrieves `START_HERE.md`.
+
+The bootloader itself is not evidence that `@GitHub` ran. Explicit `@GitHub` is the dependable repository-backed path; if the plugin was not actually engaged, ChatGPT should not claim repository retrieval or persistence.
+
+If the ID cannot be resolved, ChatGPT should fail visibly rather than guess a similarly named repository.
 
 For users who skip Custom Instructions, the simple manual fallback is:
 
@@ -174,6 +187,8 @@ The primary lay-user path is ordinary ChatGPT with the authenticated **`@GitHub`
 
 OpenAI separately documents a GitHub app/connection used for repository search and analysis as read-only. That surface can support retrieval but cannot satisfy this persistence protocol. Do not generalize its read-only limitation to the selected `@GitHub` plugin; `SETUP.md` uses actual exposed actions plus reversible CRUD/readback to determine readiness.
 
+For repository-backed work, explicit `@GitHub` is the dependable execution path. Custom Instructions provide the stable repository identity and tell ChatGPT when the plugin should be used, but this protocol does not assume those instructions can deterministically force plugin invocation on every ChatGPT surface.
+
 ### Codex
 
 The repository includes a tiny root `AGENTS.md` bootloader. Codex enters through the same `PROTOCOL.yaml` and `START_HERE.md`; it should not create a competing Codex-specific memory structure.
@@ -201,9 +216,9 @@ See [`SECURITY.md`](SECURITY.md) for details.
 Two different test surfaces are included:
 
 - `tools/validate_protocol.py` checks machine-verifiable structural invariants and soft warning budgets.
-- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, activation, GitHub surface selection, onboarding failure recovery, repository identity/rename behavior, working-style safety, compatibility, and maintenance failures.
+- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, activation, GitHub surface selection, onboarding failure recovery, late-conversation persistence activation, repository identity/rename behavior, working-style safety, compatibility, and maintenance failures.
 
-The included GitHub Actions workflow is advisory and intentionally does not run on every direct operational-memory write. It runs for pull requests or when manually dispatched.
+The included GitHub Actions workflow is advisory and intentionally does not run on every direct operational-memory write. It runs for pull requests or when manually dispatched. Runtime write/readback verification protects individual operational writes; the structural validator protects releases, PRs, maintenance, and explicit health checks.
 
 `EVAL_RESULTS.md` is the results ledger. It deliberately distinguishes a structural validator PASS from behavioral evidence. No qualifying independent behavioral run is claimed until one is actually performed.
 
@@ -254,7 +269,7 @@ The repository has undergone design review, adversarial review, prior-art compar
 
 This is not an infallible memory system, objective source of truth, deterministic control plane, background synchronization service, security boundary, or universal replacement for native ChatGPT memory/Projects.
 
-It cannot know about changes that were never recorded or guarantee future product behavior.
+It cannot know about changes that were never recorded, guarantee automatic plugin invocation, or guarantee future product behavior.
 
 Licensed under the MIT License. See [`LICENSE`](LICENSE).
 

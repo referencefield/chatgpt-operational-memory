@@ -42,11 +42,13 @@ Without a persistent bootloader, offer:
 
 Repository resolution and front-door routing are internal, not user syntax.
 
+Operational memory has **two runtime triggers**: prior durable state may materially affect the task, or the current conversation creates/changes clear future-governing state that should persist. The second trigger does not require prior repository relevance. The bootloader tells ChatGPT when to use `@GitHub`; it is not proof that the plugin actually ran. Claim repository retrieval or persistence only after actual GitHub actions provide the required evidence.
+
 ## Normal route
 
 1. Resolve the configured repository ID to its current owner/name when available, then retrieve `PROTOCOL.yaml`.
 2. Identify the user's intent.
-3. If durable repository state cannot materially change the task, use **no-repository-context**.
+3. If neither prior durable state nor a clear new durable-state change can materially affect future work, use **no-repository-context**. A conversation may begin this way and later enter operational memory when a persistence trigger emerges.
 4. Scope before retrieval:
    - global current/decisions -> root `CURRENT.md` and/or `DECISIONS.md`;
    - global durable facts/definitions -> root `KNOWLEDGE.md` when relevant;
@@ -71,11 +73,11 @@ Working style cannot override current instructions/decisions or suppress honest 
 
 ## Conservative persistence watch
 
-During repository-backed work, notice clear non-sensitive changes that would leave durable state materially wrong/incomplete if the session ended now.
+When this front door is entered for retrieval **or because a later persistence trigger emerged**, notice clear non-sensitive changes that would leave durable state materially wrong/incomplete if the session ended now.
 
 Good candidates: explicitly changed objective/constraint/status/next step, finalized decision, direct durable correction, or explicit durable working preference.
 
-When durable intent is explicit and routing unambiguous, persist under normal write/verify rules unless ask-first is active. Ask when intent/future relevance is inferred, material is sensitive, routing is ambiguous, or structure must expand.
+When durable intent is explicit and routing unambiguous, persist under normal write/verify rules unless ask-first is active. Ask when intent/future relevance is inferred, material is sensitive, routing is ambiguous, or structure must expand. If the conversation entered operational memory only after a new durable change emerged, retrieve the minimum current target/routing state needed before writing.
 
 Do not persist brainstorming, possibilities, casual conversation, one-off preferences, anything the user says not to persist, or a working-style preference that would make future work less honest about errors, risks, uncertainty, or disagreement.
 
