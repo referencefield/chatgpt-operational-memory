@@ -8,7 +8,7 @@ The goal is not to make ChatGPT remember everything. It is to keep the smaller s
 
 ## Fast start
 
-Already have the GitHub plugin authenticated in ChatGPT?
+Already have the **GitHub plugin with repository read/write actions** authenticated in ChatGPT?
 
 1. Use this public repository as a template to create your own **private** GitHub repository. Give your working copy any name you want.
 2. In ChatGPT, say:
@@ -22,6 +22,8 @@ ChatGPT should verify the exact repository, confirm that it is private, obtain i
 or
 
 **Operational memory: BLOCKED**
+
+OpenAI uses both **plugin** and **app** terminology. This template requires a GitHub plugin/app path that actually exposes repository create/update/delete actions. A separate read-only GitHub app/connection may be available on some surfaces; it can support retrieval but is insufficient for persistence. The activation CRUD test is the authority on whether the selected connection is write-capable.
 
 You do not need to read the repository first. Activation should not create a fake project or personal profile merely to initialize the system.
 
@@ -130,7 +132,7 @@ Before writing durable material, the protocol routes it to an existing source of
 
 The system should not automatically persist brainstorming, discarded alternatives, casual conversation, one-off preferences, or sensitive material merely because it could be useful later.
 
-Working style is for collaboration preferences, not biography or psychological profiling.
+Working style is for collaboration preferences, not biography or psychological profiling, and it may not be used to suppress honest evaluation, correction, or material risk flagging.
 
 ## Verification and failure posture
 
@@ -147,7 +149,7 @@ The preferred failure behavior is **closed, loud, and recoverable**:
 - stale write -> reread and reconcile, never force blindly;
 - unverified write -> report `not verified`;
 - partial multi-file change -> report temporary inconsistency and reconcile;
-- GitHub unavailable -> say that the change was not persisted.
+- required GitHub write actions unavailable -> say that the change was not persisted.
 
 The repository also includes an advisory deterministic validator for structural invariants. It does not pretend to validate semantic truth, correct routing, prompt-injection safety, or model behavior.
 
@@ -155,7 +157,9 @@ The repository also includes an advisory deterministic validator for structural 
 
 ### ChatGPT Chat
 
-The primary lay-user path is ordinary ChatGPT with the authenticated **GitHub plugin**, authorized for the private working repository and invoked with `@GitHub` when repository access is needed.
+The primary lay-user path is ordinary ChatGPT with the authenticated **GitHub plugin and its underlying GitHub app/connection exposing repository read/write actions**, authorized for the private working repository and invoked with `@GitHub` when explicit repository access is needed.
+
+A read-only GitHub app/connection is a useful retrieval surface but cannot satisfy the persistence protocol. `SETUP.md` uses a reversible CRUD test rather than product naming alone to prove that the selected surface can write.
 
 ### Codex
 
@@ -163,7 +167,7 @@ The repository includes a tiny root `AGENTS.md` bootloader. Codex enters through
 
 ### ChatGPT Work
 
-When the same GitHub plugin is available in Work, the same repository and front door apply. Longer multi-step execution does not weaken persistence authorization, routing, privacy, write-set, or readback rules.
+When the same write-capable GitHub plugin/app is available in Work, the same repository and front door apply. Longer multi-step execution does not weaken persistence authorization, routing, privacy, write-set, or readback rules.
 
 ### Other models
 
@@ -184,7 +188,9 @@ See [`SECURITY.md`](SECURITY.md) for details.
 Two different test surfaces are included:
 
 - `tools/validate_protocol.py` checks machine-verifiable structural invariants and soft warning budgets.
-- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, stale writes, activation, plugin selection, working/upstream repository rename identity, Codex/Work compatibility, and maintenance failures.
+- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, stale writes, activation, GitHub surface selection, working/upstream repository rename identity, working-style safety boundaries, Codex/Work compatibility, and maintenance failures.
+
+The included GitHub Actions workflow is advisory and intentionally does not run on every direct operational-memory write. It runs for pull requests or when manually dispatched.
 
 `EVAL_RESULTS.md` is the results ledger. It deliberately distinguishes a structural validator PASS from behavioral evidence. No qualifying independent behavioral run is claimed until one is actually performed.
 
@@ -216,6 +222,8 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - `CURRENT.md`, `DECISIONS.md`, `KNOWLEDGE.md`, `WORKING_STYLE.md` — global durable state
 - `PROJECTS.md` — project registry/router
 - `projects/_TEMPLATE/` — project skeleton
+- `tools/` — advisory structural validator
+- `.github/` — contribution forms and advisory validation workflow
 
 ## Prior art and positioning
 
