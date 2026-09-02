@@ -14,7 +14,8 @@ For any task involving this repository's operational-memory behavior or state:
 For changes to the public template itself:
 
 - do not add user-specific memory;
-- keep `protocol_version: "unreleased"` until a release is deliberately frozen;
+- keep `protocol_version: "unreleased"` while `protocol_status` is `development` or `acceptance_candidate`; assign the first real protocol identifier only after the acceptance gate passes during the release transition;
+- do not enter `acceptance_candidate` from ordinary development without the explicit authorization required by `MIGRATIONS.md`;
 - update `PROTOCOL.yaml` if required topology changes;
 - update `EVALS.md` when model-mediated behavior changes;
 - update `tools/validate_protocol.py` when a new deterministic structural invariant is justified;
