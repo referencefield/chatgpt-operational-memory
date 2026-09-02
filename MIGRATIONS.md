@@ -19,6 +19,36 @@ Do not infer version from repository age, README wording, or the current public 
 - Never claim a private working copy has upgraded merely because the public template changed.
 - Protocol migration is separate from Git history rewriting.
 
+## 1.0.1 — Squash-safe fail-closed branch cleanup
+
+This patch changes repository-maintenance behavior without changing the durable-memory topology.
+
+Why it exists: commit-ahead/behind and ancestry comparisons can be misleading after squash merges or rebases. A source branch can still appear “ahead of `main`” even though its intended content was incorporated under different commit identities. A cleanup routine that treats ancestry alone as deletion proof can therefore produce false alarms or unsafe decisions.
+
+Changes:
+
+- branch cleanup must not use `ahead_by == 0`, `behind_by`, or commit ancestry alone as proof that work is incorporated;
+- for a PR-backed branch, verify that the PR is merged, identify the resulting commit on `main`, and verify the intended resulting content before deletion;
+- for a branch without a merged PR, inspect unique commits and content/diff against `main`, preserving anything uncertain;
+- validation and deletion must be one fail-closed execution path so a failed validation prevents destructive commands from running or being represented as safe;
+- the canonical/default branch must be explicitly excluded from deletion targets;
+- after cleanup, verify the expected `main` head, protection state when configured, and remaining branch set;
+- lightweight `main` protection remains a backstop against deleting or force-rewriting `main`, but does not establish that temporary branches are safe to delete.
+
+Behavioral coverage is added in `EVALS.md` for squash-merge ancestry and interactive-shell continuation after a failed validation.
+
+### Migrating from 1.0
+
+No user state transformation is required.
+
+1. preserve all existing durable state and project files;
+2. update `OPERATIONS.md`, `SECURITY.md`, `EVALS.md`, and `PROTOCOL.yaml` to the 1.0.1 versions;
+3. run the structural validator and a repository health check;
+4. verify the branch-cleanup policy is fail-closed and does not treat ancestry alone as incorporation proof;
+5. verify `PROTOCOL.yaml` reports `protocol_version: "1.0.1"` only after the complete patch is present.
+
+If only part of this patch is applied, report **protocol migration is temporarily inconsistent** until the complete maintenance rule and manifest version agree.
+
 ## 1.0 — First versioned protocol release
 
 This is the first release with an explicit machine-readable version.

@@ -1,4 +1,4 @@
-protocol_version: "1.0"
+protocol_version: "1.0.1"
 protocol_status: active
 canonical_branch: main
 front_door: START_HERE.md
@@ -40,6 +40,12 @@ persistence:
   unindexed_durable_files_allowed: false
   multi_file_changes_use_write_set: true
   verify_postcondition_after_write_set: true
+
+maintenance:
+  canonical_branch_only_steady_state: true
+  branch_cleanup_fail_closed: true
+  commit_ancestry_alone_proves_incorporation: false
+  verify_canonical_head_after_cleanup: true
 
 soft_budgets:
   # Warning indicators only. Crossing one means inspect structure, not delete content.

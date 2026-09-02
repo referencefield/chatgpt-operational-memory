@@ -205,14 +205,31 @@ If GitHub is temporarily unavailable, a human may make the appropriate edit dire
 
 The desired normal Git branch model is one canonical `main` branch.
 
-Routine operational-memory writes go directly to `main`.
+Routine operational-memory writes go directly to `main`. Temporary implementation branches are acceptable when needed, but they should be removed after their work is safely incorporated or deliberately abandoned.
 
-If another branch exists:
+### Branch-cleanup safety rule
 
-1. compare it with `main`;
-2. preserve unique work;
-3. verify the resulting canonical state;
-4. delete the branch only after its unique work is incorporated or deliberately abandoned.
+A branch is **not** safe to delete merely because an ahead/behind or commit-ancestry comparison looks a certain way.
+
+In particular, squash merges and rebases can leave a source branch reporting commits “ahead of `main`” even when the branch's intended content has already been incorporated into `main` under different commit identities. Conversely, a branch may contain unique work that a superficial comparison misses.
+
+Before deleting any non-`main` branch:
+
+1. identify why the branch exists and whether it belongs to a pull request;
+2. explicitly exclude the canonical/default branch from the deletion target set;
+3. if the branch belongs to a pull request, verify that the PR is merged and identify the resulting merge/squash/rebase commit on `main`;
+4. verify that the intended resulting content is present on `main` using the merged PR record, changed-file/content comparison, tree/content verification, or another method appropriate to the merge strategy;
+5. do **not** use `ahead_by == 0`, `behind_by`, commit ancestry, or branch-name similarity alone as proof that work is incorporated;
+6. if there is no associated merged PR, inspect the branch's unique commits and content/diff against `main`; preserve anything not clearly incorporated or deliberately abandoned;
+7. if incorporation remains uncertain, stop and keep the branch;
+8. execute validation and deletion as one fail-closed operation: a failed validation must prevent the deletion phase from running or being represented as safe;
+9. after deletion, verify the canonical `main` head is the expected commit, `main` remains protected when protection is configured, and only the intended branches were removed.
+
+For interactive terminal cleanup, do not rely on a prior `throw`, failed command, or warning to prevent a later separately pasted deletion block. The deletion commands themselves must be conditional on a successful validation result.
+
+### Protection is a backstop, not deletion proof
+
+Recommended `main` protection blocks deletion and non-fast-forward/force-push changes to the canonical branch. It does not protect ordinary temporary branches unless separate rules target them, and it does not establish that those branches are safe to delete.
 
 Do not use force pushes, hard resets, or history rewrites as routine cleanup.
 
@@ -220,4 +237,4 @@ See `SECURITY.md` for optional `main` protection against deletion and force push
 
 ## Behavioral evals
 
-`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, or authority rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.
+`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, authority, or repository-maintenance rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.
