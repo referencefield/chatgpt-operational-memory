@@ -6,9 +6,18 @@ front_door: START_HERE.md
 template_source:
   repository: referencefield/chatgpt-operational-memory
   manifest: PROTOCOL.yaml
+  role: public_update_source_only
   check_on_request: true
   include_in_health_check_when_reachable: true
   auto_migrate: false
+
+working_repository:
+  identity: runtime_resolved
+  owner_name_may_differ_from_template: true
+  repository_name_part_of_protocol: false
+  rename_supported: true
+  rename_requires_internal_migration: false
+  external_bootloader_reference_may_need_refresh: true
 
 compatibility:
   primary_surface: chatgpt
@@ -103,8 +112,9 @@ lifecycle:
 
 custom_instruction_role: bootloader
 custom_instruction_rule: >-
-  Persistent ChatGPT instructions identify the repository, require retrieval of START_HERE.md
+  Persistent ChatGPT instructions identify the working repository, require retrieval of START_HERE.md
   when durable context matters, and require visible failure. Runtime protocol details live in the repository.
+  The working repository may have any owner/name; template_source identifies only the public update source.
 
 release_rule: >-
   Keep protocol_version set to unreleased during pre-release development. Assign the first real release

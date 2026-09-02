@@ -10,6 +10,8 @@ Create your personal working copy as a **private GitHub repository** and visibly
 
 The public template contains no user-specific memory.
 
+The working repository may have any owner/name. Its GitHub name is not part of the memory schema and does not need to match the public template repository. Renaming the working repository does not invalidate its internal state; only external references such as a saved ChatGPT bootloader URL may need to be refreshed if they no longer resolve.
+
 ## Do not store secrets
 
 Do not commit:
@@ -61,6 +63,12 @@ The setup CRUD/readback test exists to verify that the plugin is authenticated t
 
 A private GitHub repository is private on GitHub. Once ChatGPT retrieves repository content, that content enters the ChatGPT processing path according to the applicable product settings and terms.
 
+## Repository loss and backup boundary
+
+Git history is useful recovery evidence for edits, superseded state, and many accidental content changes. It is **not** an independent backup of the GitHub repository or account that contains it.
+
+Branch protection also does not protect against every whole-repository or account-level loss scenario. If losing the operational-memory repository would be materially costly, keep an independent clone/archive or other backup using a practice you already trust. This template does not require or automate a particular backup system.
+
 ## Reporting a security or privacy concern
 
 Do **not** open a public Issue or Discussion containing credentials, private repository contents, or sensitive personal information.
@@ -95,6 +103,8 @@ Recommended lightweight ruleset when available:
 The goal is for normal ChatGPT commits to continue writing directly to `main` while destructive history operations are rejected.
 
 `main` protection is a backstop, not proof that another branch is safe to delete. Unless separate rules target temporary branches, they remain deletable. Branch cleanup must therefore use the squash/rebase-safe fail-closed procedure in `OPERATIONS.md` rather than relying on protection or commit-ahead counts.
+
+The one-time pre-release history reset described in `MIGRATIONS.md` is an explicit maintenance exception. If that rewrite is performed, suspend only the protection needed for the controlled rewrite window, restore protection immediately afterward, and verify the final tree and ruleset before release.
 
 ## Structural validator security role
 

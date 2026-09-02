@@ -4,6 +4,14 @@
 
 This repository is still **pre-release**. Pre-release development changes are folded into the eventual baseline release rather than preserved as fake release-to-release migrations.
 
+## Public template source vs. working repository
+
+The `template_source` entry in `PROTOCOL.yaml` identifies the public upstream used only for update discovery and migration guidance. It is **not** the required name of a user's working repository.
+
+A private working copy may have any GitHub owner/name. Renaming a working repository does not change its internal protocol or durable state and does not require a protocol migration. If an external reference such as a ChatGPT Custom Instructions URL stops resolving after a rename, refresh that reference to the working repository's current URL and continue using the existing state.
+
+Do not rewrite `template_source.repository` to the private working repository. Doing so would confuse the upstream update source with the user's runtime repository.
+
 ## Current pre-release rule
 
 While `PROTOCOL.yaml` reports:
@@ -49,6 +57,23 @@ When a future release changes protocol structure or semantics:
 - separate protocol migration from Git history rewriting;
 - if migration partially succeeds, report **protocol migration is temporarily inconsistent** until the full postcondition holds.
 
+## One-time pre-release history cleanup
+
+The public repository currently uses lightweight `main` protection that blocks deletion and non-fast-forward updates. A final pre-release history reset/squash is therefore a deliberate maintenance exception, not a normal operational-memory action.
+
+When the release candidate is ready for its one-time clean baseline:
+
+1. freeze and validate the complete intended release tree, including the real release identifier/status;
+2. record the pre-rewrite `main` commit SHA and tree SHA, and keep an independent local clone/archive if recovery from the development history would be costly;
+3. verify that no non-`main` branch contains work that must survive into the release tree;
+4. temporarily suspend only the protection necessary to permit the planned non-fast-forward rewrite; if the ruleset cannot be narrowed, disable it only for the controlled rewrite window;
+5. create/repoint `main` to the clean release-baseline commit whose tree matches the frozen intended release tree;
+6. immediately restore the normal `main` protection before any unrelated repository work;
+7. verify the expected `main` commit/tree, protection rules, branch set, repository visibility/settings, and structural validator result;
+8. create the public release/tag only after those postconditions hold.
+
+Do not treat this as a requirement to erase every GitHub development artifact. Pull-request records, workflow metadata, and other ordinary public-development traces may remain. The release objective is a clean canonical release history and verified release tree, not a claim that development never happened.
+
 ## Final-release checklist
 
 When the first public release is actually cut:
@@ -60,7 +85,8 @@ When the first public release is actually cut:
 5. run deterministic structural validation and the semantic repository health check;
 6. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, and failure handling;
 7. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
-8. only then treat the public template as the migration source for user-created copies.
+8. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
+9. only then treat the public template as the migration source for user-created copies.
 
 ## Future release entries
 
