@@ -28,7 +28,7 @@ jobs:
       - name: Validate protocol structure
         run: python tools/validate_protocol.py
 
-# This workflow is intentionally advisory at protocol V1.
+# This workflow is intentionally advisory.
 # PROTOCOL.yaml declares blocking_required_check: false, and the recommended
 # main-branch ruleset does not require this status check. A failure should be
 # investigated, but it does not prevent ordinary direct ChatGPT writes to main.

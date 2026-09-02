@@ -81,4 +81,4 @@ If entries become numerous, consolidate overlapping items and prefer a smaller n
 
 Soft budgets are declared in `PROTOCOL.yaml`. Crossing the active-entry warning budget is a `Watch` signal requiring review, not permission to delete valid preferences.
 
-If correct behavior begins requiring many narrowly triggered working-style entries, report `V1 scale status: Watch` and consider whether the relevant preferences belong inside specific project front doors instead.
+If correct behavior begins requiring many narrowly triggered working-style entries, report `Scale status: Watch` and consider whether the relevant preferences belong inside specific project front doors instead.

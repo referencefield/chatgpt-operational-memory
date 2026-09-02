@@ -1,109 +1,73 @@
 # Protocol Migrations
 
-`PROTOCOL.yaml` gives each working copy an explicit operational-memory protocol version.
+`PROTOCOL.yaml` gives each working copy an explicit protocol release/status and identifies the public template source.
 
-This file records changes that require a user-created private repository to update structure or operating behavior. Ordinary wording/documentation improvements that do not change required structure or semantics do not require a migration entry.
+This repository is still **pre-release**. Pre-release development changes are folded into the eventual baseline release rather than preserved as fake release-to-release migrations.
 
-## How to check your version
+## Current pre-release rule
 
-Retrieve `PROTOCOL.yaml` from your working repository and read `protocol_version`.
+While `PROTOCOL.yaml` reports:
 
-Do not infer version from repository age, README wording, or the current public template.
+`protocol_version: "unreleased"`
 
-## Migration principles
+there is no ordered public protocol version to compare against another unreleased copy.
 
-- Migrations must preserve valid user state rather than overwrite it with blank template content.
-- Route/reconcile existing content before introducing a new required home.
-- Treat a migration affecting multiple files as a write-set with explicit postconditions.
-- Reread and verify the complete migrated structure before reporting completion.
-- Never claim a private working copy has upgraded merely because the public template changed.
-- Protocol migration is separate from Git history rewriting.
+During this phase:
 
-## 1.0.1 — Squash-safe fail-closed branch cleanup
+- do not infer chronology from commit count, repository age, or prior draft version labels;
+- do not preserve temporary development version numbers in user-facing docs;
+- compare the local and template manifests/content only when an explicit development comparison is needed;
+- preserve private working state if a development copy is being refreshed;
+- do not auto-migrate merely because the public template changed.
 
-This patch changes repository-maintenance behavior without changing the durable-memory topology.
+The first real protocol identifier should be assigned only when the release candidate is frozen.
 
-Why it exists: commit-ahead/behind and ancestry comparisons can be misleading after squash merges or rebases. A source branch can still appear “ahead of `main`” even though its intended content was incorporated under different commit identities. A cleanup routine that treats ancestry alone as deletion proof can therefore produce false alarms or unsafe decisions.
+## Update discovery
 
-Changes:
+The template source is declared in `PROTOCOL.yaml`.
 
-- branch cleanup must not use `ahead_by == 0`, `behind_by`, or commit ancestry alone as proof that work is incorporated;
-- for a PR-backed branch, verify that the PR is merged, identify the resulting commit on `main`, and verify the intended resulting content before deletion;
-- for a branch without a merged PR, inspect unique commits and content/diff against `main`, preserving anything uncertain;
-- validation and deletion must be one fail-closed execution path so a failed validation prevents destructive commands from running or being represented as safe;
-- the canonical/default branch must be explicitly excluded from deletion targets;
-- after cleanup, verify the expected `main` head, protection state when configured, and remaining branch set;
-- lightweight `main` protection remains a backstop against deleting or force-rewriting `main`, but does not establish that temporary branches are safe to delete.
+When checking for updates:
 
-Behavioral coverage is added in `EVALS.md` for squash-merge ancestry and interactive-shell continuation after a failed validation.
+1. retrieve the working copy's `PROTOCOL.yaml`;
+2. retrieve the template source's declared manifest;
+3. compare release/status and relevant structural fields;
+4. if both are `unreleased`, report that ordered version comparison is unavailable and compare content only when explicitly needed;
+5. after real releases exist, use their release identifiers plus this file to determine the applicable migration path;
+6. never overwrite populated private state with blank template state;
+7. never claim an upgrade merely because the public template changed.
 
-### Migrating from 1.0
+If the template source cannot be reached, report update status as **not checked**.
 
-No user state transformation is required.
+## Migration principles after release
 
-1. preserve all existing durable state and project files;
-2. update `OPERATIONS.md`, `SECURITY.md`, `EVALS.md`, and `PROTOCOL.yaml` to the 1.0.1 versions;
-3. run the structural validator and a repository health check;
-4. verify the branch-cleanup policy is fail-closed and does not treat ancestry alone as incorporation proof;
-5. verify `PROTOCOL.yaml` reports `protocol_version: "1.0.1"` only after the complete patch is present.
+When a future release changes protocol structure or semantics:
 
-If only part of this patch is applied, report **protocol migration is temporarily inconsistent** until the complete maintenance rule and manifest version agree.
+- preserve valid user state rather than replacing it with template examples;
+- route/reconcile existing content before introducing a new required home;
+- treat a migration affecting multiple files as a write-set with explicit postconditions;
+- reread and verify the complete migrated structure before reporting completion;
+- separate protocol migration from Git history rewriting;
+- if migration partially succeeds, report **protocol migration is temporarily inconsistent** until the full postcondition holds.
 
-## 1.0 — First versioned protocol release
+## Final-release checklist
 
-This is the first release with an explicit machine-readable version.
+When the first public release is actually cut:
 
-Required global protocol structure:
+1. freeze the release-candidate structure and behavior;
+2. replace `protocol_version: "unreleased"` with the chosen first real release identifier;
+3. set an appropriate released status in `PROTOCOL.yaml`;
+4. remove any remaining pre-release-only wording that would confuse a working copy created from the release;
+5. run deterministic structural validation and the semantic repository health check;
+6. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, and failure handling;
+7. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
+8. only then treat the public template as the migration source for user-created copies.
 
-- `PROTOCOL.yaml`
-- `START_HERE.md`
-- `CURRENT.md`
-- `DECISIONS.md`
-- `KNOWLEDGE.md`
-- `WORKING_STYLE.md`
-- `PROJECTS.md`
-- `projects/_TEMPLATE/PROJECT.md`
-- `projects/_TEMPLATE/CURRENT.md`
-- `projects/_TEMPLATE/DECISIONS.md`
-- `projects/_TEMPLATE/KNOWLEDGE.md`
+## Future release entries
 
-Human documentation is separated by role:
+For each post-release protocol change that requires working copies to update, add a migration entry containing:
 
-- `SETUP.md` — installation only;
-- `START_HERE.md` — runtime routing/persistence protocol;
-- `OPERATIONS.md` — maintenance, health, recovery, project creation, write-sets;
-- `SECURITY.md` — privacy and hardening;
-- `MIGRATIONS.md` — protocol upgrades;
-- `EVALS.md` — behavioral/adversarial test scenarios.
-
-The recommended persistent ChatGPT instruction is now a **bootloader** that points to `START_HERE.md` rather than duplicating the full runtime protocol.
-
-Coupled multi-file changes now use an explicit write-set model: intent, expected writes, current preconditions, required postcondition, full readback verification.
-
-Knowledge and working-style entries may include `Review after:` lifecycle metadata. Soft budgets are declared in `PROTOCOL.yaml` as warning indicators.
-
-An advisory structural validator is available at `tools/validate_protocol.py` and can run through `.github/workflows/protocol-validation.yml`. It is not a required status check in this protocol.
-
-### Migrating an older unversioned working copy
-
-If your repository was created before `PROTOCOL.yaml` existed:
-
-1. retrieve the current public template's migration documentation and your private repository's existing front door/state files;
-2. preserve all valid private state;
-3. add the missing protocol/documentation/validator files without replacing populated state files with blank examples;
-4. update the persistent ChatGPT instruction to the small bootloader shown in current `SETUP.md`;
-5. reconcile any project-specific information that still lives in global files;
-6. add `Review after:` only where useful; do not invent dates merely to populate the field;
-7. run the structural validator and a semantic repository health check;
-8. verify `PROTOCOL.yaml` reports `protocol_version: "1.0"` only after the complete required structure and routing behavior are present.
-
-If migration partially succeeds, report **protocol migration is temporarily inconsistent** and reconcile before claiming the version upgrade complete.
-
-## Future releases
-
-For each future protocol version, record:
-
-- prior version(s) supported for migration;
+- source release(s);
+- target release;
 - required structural additions/removals/renames;
 - semantic authority/routing changes;
 - state transformations required;
@@ -111,4 +75,4 @@ For each future protocol version, record:
 - rollback/recovery considerations;
 - the postcondition that proves migration complete.
 
-Do not create migrations solely to keep version numbers moving. Version changes should correspond to meaningful protocol changes.
+Do not create release numbers solely to record wording cleanup. Version changes should correspond to meaningful public protocol changes.

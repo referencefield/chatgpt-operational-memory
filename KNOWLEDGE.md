@@ -75,4 +75,4 @@ If support is ambiguous or the proposed durable fact is model-inferred rather th
 
 Soft budgets are declared in `PROTOCOL.yaml`. Crossing one is a `Watch` signal requiring structural review, not a command to delete valid knowledge.
 
-If this file starts becoming a large cross-domain encyclopedia, report `V1 scale status: Watch` and route knowledge into project scopes or a justified indexed/structured layer instead of continuing flat growth.
+If this file starts becoming a large cross-domain encyclopedia, report `Scale status: Watch` and route knowledge into project scopes or a justified indexed/structured layer instead of continuing flat growth.

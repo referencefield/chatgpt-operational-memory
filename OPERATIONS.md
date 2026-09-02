@@ -1,6 +1,6 @@
 # Operations
 
-This document is for normal operation after setup: project creation, durable persistence, write-sets, closeout, health checks, recovery, scale management, and repository maintenance.
+This document is for normal operation after setup: persistence watch, project creation, durable persistence, write-sets, closeout, health checks, update discovery, recovery, scale management, and repository maintenance.
 
 `START_HERE.md` remains the runtime routing authority. Use this document when the task needs operational detail.
 
@@ -24,6 +24,21 @@ Useful phrases during work:
 - **“Ask before writing anything else this session.”** Temporarily switch to ask-first behavior.
 - **“What do you currently have recorded about this?”** Retrieve the durable source instead of answering from recollection.
 - **“Run a repository health check.”** Run structural + semantic health checks and report scale status.
+- **“Check for protocol updates.”** Compare this working copy with the template source declared in `PROTOCOL.yaml`.
+
+These are controls, not required incantations. During repository-backed work, the conservative persistence watch in `START_HERE.md` should notice clear future-governing changes even when the user does not remember a magic phrase.
+
+## Persistence watch
+
+The purpose of the persistence watch is to keep loaded durable state from quietly becoming wrong while avoiding transcript-like over-persistence.
+
+When the user explicitly establishes a clear, non-sensitive change that will materially govern future work, ChatGPT may route and persist it under the normal authorization, write, and verification rules without requiring a separate “remember this” phrase. Examples include a finalized decision, a changed active objective/constraint, a direct durable correction, or an explicit durable working preference.
+
+Ask before writing when durable intent or future relevance is inferred rather than explicit, when the material is sensitive, when routing is ambiguous, when a new structural home would be required, or when the user has selected ask-first behavior.
+
+Do not persist brainstorming, alternatives under consideration, casual facts, transient preferences, or conversational detail merely because they might be useful later.
+
+At closeout, reconcile any persistence-watch candidates still pending and report anything intentionally left unpersisted.
 
 ## Project creation
 
@@ -101,7 +116,7 @@ ChatGPT should:
 
 1. enter through `START_HERE.md`;
 2. identify the global/project scopes actually touched;
-3. identify material durable changes not yet persisted;
+3. identify material durable changes not yet persisted, including persistence-watch candidates;
 4. apply the persistence-routing gate;
 5. establish any required write-set before writing;
 6. update only what earns persistence;
@@ -112,6 +127,25 @@ ChatGPT should:
 11. surface a `Watch` condition if the session exposed routing/sprawl problems.
 
 This is a conversational closeout, not a transcript archive.
+
+## Check for template/protocol updates
+
+`PROTOCOL.yaml` declares the public template source and manifest path for this working copy.
+
+When the user says **“Check for protocol updates”**, or when a repository health check can reach the template source without distracting from the user's task:
+
+1. retrieve the local `PROTOCOL.yaml`;
+2. retrieve the template source's declared manifest;
+3. compare the local and source release/status plus any materially changed protocol structure relevant to migration;
+4. report whether the working copy appears current, whether a newer released protocol is available, or whether comparison is indeterminate;
+5. if the source is newer, read `MIGRATIONS.md` from the source and describe the applicable migration before changing anything;
+6. **do not auto-migrate** and do not overwrite private state merely because the public template changed.
+
+During pre-release development, `protocol_version: "unreleased"` is intentionally not an ordered release identifier. If both source and working copy are unreleased, do not invent version ordering. Compare the manifest/content only when the user explicitly needs a development comparison.
+
+After a real release identifier exists, use the release metadata plus `MIGRATIONS.md` to determine whether an upgrade is applicable.
+
+If the template source cannot be reached, report update status as **not checked** rather than assuming the working copy is current.
 
 ## Repository health check
 
@@ -132,11 +166,13 @@ ChatGPT should additionally inspect what deterministic tooling cannot reliably d
 - whether knowledge appears stale despite missing/weak lifecycle metadata;
 - whether two project entries are really duplicate workstreams;
 - whether a working-style entry is overbroad, contradictory, or drifting into personal profiling;
-- whether the minimum useful retrieval path is still obvious.
+- whether the minimum useful retrieval path is still obvious;
+- whether persistence-watch behavior is missing obvious durable changes or producing noisy/overbroad writes.
 
 A compact health result should include:
 
-- protocol version / manifest readable;
+- protocol release/status / manifest readable;
+- template update status when checked;
 - front door present and readable;
 - global current/decision consistency;
 - global knowledge freshness/supersession;
@@ -146,9 +182,9 @@ A compact health result should include:
 - project-specific state/knowledge not leaking into global files;
 - working-style hygiene;
 - recent consequential writes relevant to the check observable;
-- no leftover `SETUP-TEST.md`;
+- no leftover `SETUP-TEST.md` or other temporary setup/probe files;
 - canonical branch/protection state when available;
-- **`V1 scale status: Healthy | Watch | Outgrowing the template`**.
+- **`Scale status: Healthy | Watch | Outgrowing the template`**.
 
 ## Soft budgets and lifecycle pressure
 
@@ -156,15 +192,7 @@ Soft budgets live in `PROTOCOL.yaml`. They are warning indicators, not hard limi
 
 Crossing a soft budget means ask **why the supposedly compact active state is getting large**. Do not delete material merely to get under a number.
 
-Typical corrections include:
-
-- move project-specific material out of global files;
-- create/register a project boundary that has clearly been earned;
-- compact stale current state;
-- supersede inactive decisions;
-- consolidate duplicate knowledge or working-style entries;
-- move stable project knowledge to the correct project scope;
-- add one justified routed source of record when the promotion gate is satisfied.
+Typical corrections include moving project-specific material out of global files, creating/registering an earned project boundary, compacting stale current state, superseding inactive decisions, consolidating duplicate knowledge or working-style entries, moving project knowledge to the correct scope, or adding one justified routed source of record when the promotion gate is satisfied.
 
 Knowledge and working-style entries may use `Review after:` to prompt future scrutiny without requiring background automation.
 
@@ -176,7 +204,7 @@ Routing is clear, front doors remain useful, and the minimum required context is
 
 ### Watch
 
-Structural pressure is appearing but the existing architecture can still correct it. Examples include soft-budget warnings, state leakage, repeated NOT-V1 material, unregistered workstreams, duplicate/stale knowledge, or too many narrow working-style rules.
+Structural pressure is appearing but the existing architecture can still correct it. Examples include soft-budget warnings, state leakage, repeated UNROUTED material, unregistered workstreams, duplicate/stale knowledge, or too many narrow working-style rules.
 
 Apply the smallest structural correction first.
 
@@ -191,7 +219,7 @@ At that point, preserve this repo as a human-readable control layer and migrate 
 Default to fail closed, fail loud, preserve the last known good state, and offer a recovery path.
 
 - Missing required retrieval -> report incomplete/partial retrieval.
-- No legitimate persistence destination -> report `NOT-V1 / no legitimate home`.
+- No legitimate persistence destination -> report `UNROUTED / no legitimate home`.
 - Unsupported/ambiguous durable fact -> ask rather than activate it.
 - Stale write -> reload and reconcile, never force/blind retry.
 - Unverified write -> report `not verified`.
@@ -237,4 +265,4 @@ See `SECURITY.md` for optional `main` protection against deletion and force push
 
 ## Behavioral evals
 
-`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, authority, or repository-maintenance rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.
+`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, authority, update discovery, or repository-maintenance rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.

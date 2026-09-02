@@ -1,7 +1,14 @@
-protocol_version: "1.0.1"
-protocol_status: active
+protocol_version: "unreleased"
+protocol_status: development
 canonical_branch: main
 front_door: START_HERE.md
+
+template_source:
+  repository: referencefield/chatgpt-operational-memory
+  manifest: PROTOCOL.yaml
+  check_on_request: true
+  include_in_health_check_when_reachable: true
+  auto_migrate: false
 
 human_docs:
   readme: README.md
@@ -40,6 +47,9 @@ persistence:
   unindexed_durable_files_allowed: false
   multi_file_changes_use_write_set: true
   verify_postcondition_after_write_set: true
+  conservative_persistence_watch: true
+  inferred_durable_intent_requires_confirmation: true
+  sensitive_persistence_requires_confirmation: true
 
 maintenance:
   canonical_branch_only_steady_state: true
@@ -66,3 +76,7 @@ custom_instruction_role: bootloader
 custom_instruction_rule: >-
   Persistent ChatGPT instructions identify the repository, require retrieval of START_HERE.md
   when durable context matters, and require visible failure. Runtime protocol details live in the repository.
+
+release_rule: >-
+  Keep protocol_version set to unreleased during pre-release development. Assign the first real release
+  identifier only when the release candidate is frozen; thereafter record upgrades in MIGRATIONS.md.

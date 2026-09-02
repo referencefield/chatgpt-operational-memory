@@ -1,10 +1,14 @@
 # ChatGPT Operational Memory
 
-A low-infrastructure GitHub template for ChatGPT users who want explicit, user-owned working state with conversational GitHub writeback, scoped retrieval, and post-write verification.
+A low-infrastructure GitHub template for ChatGPT users who want explicit, user-owned working state with conversational GitHub writeback, scoped retrieval, controlled growth, and post-write verification.
 
-The goal is not to make ChatGPT “remember everything.” It is to keep the smaller set of state, decisions, knowledge, and collaboration preferences that actually need to survive a conversation somewhere you can inspect, correct, version, route, and own.
+The goal is not to make ChatGPT “remember everything.” It is to keep the smaller set of state, decisions, knowledge, and collaboration preferences that actually need to survive a conversation somewhere you can inspect, correct, route, version, and own.
 
 > **A portable continuity layer for serious ongoing ChatGPT work.**
+
+## Development status
+
+This template is currently **unreleased**. Pre-release protocol changes are being folded into the eventual baseline release rather than treated as a chain of public versions. The first real release identifier should be assigned only when the release candidate is frozen.
 
 ## What this is architecturally
 
@@ -12,7 +16,7 @@ This is a **small operational-memory protocol**, not a server-side enforcement e
 
 GitHub supplies durable files, history, and some mechanical protections such as current-version/blob write preconditions when the integration exposes them. ChatGPT performs routing, interpretation, selective persistence, reconciliation, and semantic checks by following the current protocol in this repository.
 
-Many safeguards therefore remain model-mediated. The repository adds an advisory deterministic validator for structural invariants, but it does not pretend that prose plus Markdown creates a deterministic memory service.
+Many safeguards therefore remain model-mediated. The repository includes an advisory deterministic validator for structural invariants, but it does not pretend that prose plus Markdown creates a deterministic memory service.
 
 If you need typed APIs, indexed retrieval, atomic transactions, deterministic semantic validation, automatic transcript ingestion, or a dedicated memory server, this template is probably a control layer or stepping stone rather than your final storage architecture.
 
@@ -38,14 +42,16 @@ Typical uses include:
 - **Stable knowledge and corrections:** retain supported facts/definitions/corrections while giving time-sensitive information freshness metadata.
 - **Working-style calibration:** preserve explicit or repeatedly confirmed preferences about how ChatGPT should work with you without constructing a personal dossier.
 - **Multiple workstreams:** route future chats to the correct project front door instead of broad-loading unrelated state.
+- **Conservative persistence watch:** notice clear future-governing changes during repository-backed work without requiring the user to repeat a magic “remember this” phrase every time.
 - **Recovery and auditability:** see what changed over time and verify that claimed persistence actually reached GitHub.
 
 ## What changes in practice
 
 | Situation | ChatGPT out of the box | With this repo connected |
 | --- | --- | --- |
-| **Starting a fresh chat later** | ChatGPT may have useful prior context, but you may not know exactly what it is relying on. | ChatGPT can enter through `START_HERE.md`, determine scope, and retrieve the minimum durable state that actually governs the task. |
+| **Starting a fresh chat later** | ChatGPT may have useful prior context, but you may not know exactly what it is relying on. | ChatGPT can enter through `START_HERE.md`, determine scope, and retrieve the minimum durable state that governs the task. |
 | **You ask “Where were we?”** | ChatGPT reconstructs from whatever context is available. | The relevant global/project current state and decisions are explicit and inspectable. |
+| **You clearly change an active plan but forget to say “remember this”** | The change may remain only in that conversation. | During repository-backed work, a conservative persistence watch can recognize clear non-sensitive future-governing changes and route them under the normal verification rules. Ambiguous or inferred candidates still require confirmation. |
 | **You make an important decision** | It exists in the conversation and may influence later work. | You can make it a durable decision with explicit active/superseded status. |
 | **You change your mind later** | Old and new positions can coexist across prior conversations or memory. | The newer decision explicitly supersedes the old one so only the active decision governs. |
 | **You establish a durable fact** | It may remain in chat/native memory without clear freshness or scope. | Supported durable knowledge can live globally or inside the correct project with provenance/freshness fields. |
@@ -54,7 +60,8 @@ Typical uses include:
 | **You wonder whether something was actually saved** | There is usually no Git-style transaction receipt for an ordinary conversational fact. | Consequential writes use readback verification and real commit receipts when GitHub exposes a commit SHA. |
 | **Two sessions/manual edits collide** | Native conversational memory does not expose this as a versioned write problem. | Existing-file updates can use current blob/version preconditions so stale writes are rejected and reconciled. |
 | **One intent changes several files** | There is no separate state transaction to inspect. | The protocol establishes a write-set and verifies the complete postcondition, not merely individual API successes. |
-| **Something does not fit the existing memory structure** | A user/model may create another note/file ad hoc. | The routing gate reports `NOT-V1 / no legitimate home` unless a new durable home passes an explicit promotion test. |
+| **Something does not fit the existing structure** | A user/model may create another note/file ad hoc. | The routing gate reports `UNROUTED / no legitimate home` unless a new durable home passes an explicit promotion test. |
+| **Your private copy may be behind the template** | There is no template-specific migration mechanism. | `PROTOCOL.yaml` identifies the template source; ChatGPT can check for a newer released protocol and read migration guidance without auto-upgrading private state. |
 | **The repository starts getting too complicated** | There is no built-in architectural growth signal. | Health checks report `Healthy`, `Watch`, or `Outgrowing the template`, informed by routing quality and soft budgets. |
 | **One-off casual conversation** | Just chat. | Also just chat. No-repository-context is a valid route. |
 
@@ -91,7 +98,7 @@ START_HERE.md
 
 Git history preserves evolution, but **Git history is not current authority**.
 
-`PROTOCOL.yaml` provides the machine-readable protocol version, canonical topology, required project files, validator paths, and soft warning budgets.
+`PROTOCOL.yaml` provides machine-readable release/status, template source, canonical topology, required project files, validator paths, persistence controls, maintenance controls, and soft warning budgets.
 
 ## The front-door principle
 
@@ -103,6 +110,14 @@ That means protocol improvements can be made in the repository without asking ev
 
 **Persistent instructions point to the operating system; they do not contain the operating system.**
 
+## Controlled persistence, not transcript collection
+
+During repository-backed work, `START_HERE.md` maintains a conservative persistence watch for clear non-sensitive changes that would make loaded durable state materially wrong or incomplete if the session ended.
+
+Explicit future-governing changes may be routed and persisted under normal write/verify rules without a separate magic phrase. Inferred intent, sensitive material, ambiguous routing, or structural expansion still requires confirmation.
+
+Brainstorming, possibilities, casual conversation, and one-off preferences are not automatically persisted.
+
 ## Controlled growth instead of a junk drawer
 
 Before durable material is written, it is routed to:
@@ -113,11 +128,11 @@ Before durable material is written, it is routed to:
 - global durable knowledge;
 - working-style calibration;
 - a registered project;
-- or `NOT-V1 / no legitimate home`.
+- or `UNROUTED / no legitimate home`.
 
 Project-specific material should not keep accumulating in global files after a project boundary has been earned.
 
-A new durable file/category outside the declared structure is exceptional. It must have a distinct role, expected recurrence, retrieval trigger, clear authority, navigation path, and human visibility. If it becomes required protocol structure, the manifest and migration record change with it.
+A new durable file/category outside the declared structure is exceptional. It must have a distinct role, expected recurrence, retrieval trigger, clear authority, navigation path, and human visibility. If it becomes required protocol structure, the manifest and migration guidance change with it.
 
 ## Verification and write-sets
 
@@ -138,9 +153,9 @@ Success means the complete postcondition is verified after rereading all affecte
 The repository includes two complementary test surfaces:
 
 - `tools/validate_protocol.py` checks deterministic structural invariants and soft budget warnings.
-- `EVALS.md` defines behavioral/adversarial scenarios for model-mediated routing, authority, persistence, failure, privacy boundaries, and lifecycle behavior.
+- `EVALS.md` defines behavioral/adversarial scenarios for model-mediated routing, authority, persistence, persistence-watch behavior, failure, privacy boundaries, update discovery, lifecycle behavior, and branch cleanup.
 
-The GitHub workflow is intentionally **advisory at protocol 1.0**. It is not a required status check and does not block ordinary direct ChatGPT writes to `main`.
+The GitHub workflow is **currently advisory**. It is not a required status check and does not block ordinary direct ChatGPT writes to `main`.
 
 Structural validation cannot determine whether a fact belongs in the right project or whether a current-state sentence semantically contradicts a decision. Those remain part of the semantic health check in `OPERATIONS.md`.
 
@@ -149,10 +164,10 @@ Structural validation cannot determine whether a fact belongs in the right proje
 - **`README.md`** — what the system is, who it is for, and why it differs from ordinary ChatGPT context.
 - **`SETUP.md`** — one-time installation and fresh-chat test only.
 - **`START_HERE.md`** — runtime routing/persistence authority.
-- **`PROTOCOL.yaml`** — machine-readable version/topology/budgets.
-- **`OPERATIONS.md`** — project creation, write-sets, closeout, health, recovery, maintenance.
+- **`PROTOCOL.yaml`** — machine-readable release/status/topology/template source/budgets.
+- **`OPERATIONS.md`** — persistence watch, project creation, write-sets, update checks, closeout, health, recovery, maintenance.
 - **`SECURITY.md`** — privacy, secrets, repository-content boundary, optional branch hardening.
-- **`MIGRATIONS.md`** — upgrading older private working copies.
+- **`MIGRATIONS.md`** — pre-release release rules now; release-to-release upgrade guidance after launch.
 - **`EVALS.md`** — adversarial behavioral test cases.
 - **`CURRENT.md`** — cross-project current state.
 - **`DECISIONS.md`** — cross-project durable decisions.
@@ -170,6 +185,14 @@ Normal use after setup is intentionally simple. When prior state matters, a user
 > `@GitHub Enter my operational-memory repository through START_HERE.md and load only the durable state relevant to this task.`
 
 A user should not need to think in Git commands or design repository structure during ordinary work.
+
+## Update discovery
+
+A private working copy retains a pointer to this template in `PROTOCOL.yaml`.
+
+When asked to **“Check for protocol updates,”** ChatGPT can compare the local manifest with the template source. It reports whether a newer released protocol appears available and reads `MIGRATIONS.md` before any upgrade. It does not auto-migrate or overwrite private state.
+
+While both copies are still marked `unreleased`, there is deliberately no invented version ordering.
 
 ## Failure posture
 
@@ -234,7 +257,7 @@ The repository has undergone design review, adversarial review, prior-art compar
 
 **Longitudinal multi-user reliability has not yet been established.** The project should not claim that it eliminates silent failures or that ordinary users will maintain correct state over months until demonstrated empirically.
 
-Protocol 1.0 adds deterministic structural validation and explicit behavioral evals, but many semantically important safeguards remain instructions executed by ChatGPT rather than independently enforced controls.
+The current pre-release protocol includes deterministic structural validation and explicit behavioral evals, but many semantically important safeguards remain instructions executed by ChatGPT rather than independently enforced controls.
 
 ## What this does not promise
 

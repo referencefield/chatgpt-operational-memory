@@ -31,7 +31,7 @@ _None yet._
 
 _None._
 
-Use this section only for structural warning signals such as project-specific material repeatedly leaking into global state, recurring NOT-V1 persistence candidates, or other signs that repository routing needs maintenance. Do not store the rejected material itself here merely to avoid losing it.
+Use this section only for structural warning signals such as project-specific material repeatedly leaking into global state, recurring UNROUTED persistence candidates, or other signs that repository routing needs maintenance. Do not store the rejected material itself here merely to avoid losing it.
 
 ## Reconciliation rule
 
@@ -43,4 +43,4 @@ Active durable decisions in root `DECISIONS.md` govern cross-project/global choi
 
 If this file conflicts with an active global durable decision, **do not silently prefer either file**. Treat the repository as inconsistent, surface the conflict, and reconcile the affected state before relying on it.
 
-Do not duplicate project-specific state here. If durable project material begins accumulating in this file, route it through `PROJECTS.md` and report at least `V1 scale status: Watch` until the structure is corrected.
+Do not duplicate project-specific state here. If durable project material begins accumulating in this file, route it through `PROJECTS.md` and report at least `Scale status: Watch` until the structure is corrected.
