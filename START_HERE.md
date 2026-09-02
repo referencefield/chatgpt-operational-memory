@@ -1,22 +1,22 @@
 # Runtime Front Door
 
 Status: active  
-Purpose: give a fresh ChatGPT session one small place to start, then route only to durable state that can materially affect the task.
+Purpose: small entry point for routing to durable state that can materially affect the task.
 
-This file is the **runtime protocol authority**. Do not load the whole repository. Details live in `OPERATIONS.md`; privacy/security in `SECURITY.md`; upgrades in `MIGRATIONS.md`.
+This file is the **runtime protocol authority**. Do not load the whole repository. Details: `OPERATIONS.md`; security: `SECURITY.md`; upgrades: `MIGRATIONS.md`.
 
 ## Activation
 
-Treat **set up**, **activate**, **initialize**, **wake up**, or **start using** operational memory plus an identified repository as activation intent. After a BLOCKED attempt in the same conversation, **“Retry setup.”** means rerun against that same repository; if its identity is no longer available, ask only for its URL.
+Treat **set up**, **activate**, **initialize**, **wake up**, or **start using** operational memory plus an identified repository as activation intent. After BLOCKED in the same conversation, **“Retry setup.”** reruns against that repository; if identity is unavailable, ask only for its URL.
 
-The user need not mention protocol files, repository IDs, CRUD, or a handshake.
+The user need not mention protocol files, IDs, CRUD, or a handshake.
 
-Supported release baseline: a **paid ChatGPT plan** plus the selected `@GitHub` plugin exposing required repository write actions. Free ChatGPT accounts are outside this release's supported setup. A paid plan alone does not prove the required plugin/actions are available.
+Supported release: **paid ChatGPT plan** plus write-capable `@GitHub`; Free is unsupported. Paid status alone does not prove the required plugin/actions exist.
 
-1. confirm the exact working repository, default branch, visibility, and GitHub repository ID; owner/name may be arbitrary;
+1. confirm exact repository, default branch, visibility, and GitHub repository ID;
 2. require the working copy to be **private** before storing personal/project state;
 3. retrieve `PROTOCOL.yaml`, this file, declared root memory files, and `PROJECTS.md`; verify structure without broad-loading unrelated content;
-4. using the selected `@GitHub` plugin's actual actions, verify reversible `SETUP-TEST.md` create/read/update/read/delete plus deletion readback, using the current version when available. A separate read-only GitHub app does not prove `@GitHub` is read-only; missing required write actions means BLOCKED;
+4. using selected `@GitHub` actions, verify reversible `SETUP-TEST.md` create/read/update/read/delete plus deletion readback, using current version when available. A separate read-only GitHub app does not prove `@GitHub` is read-only; missing required write actions means BLOCKED;
 5. create no durable state merely to mark activation;
 6. return READY or BLOCKED below.
 
@@ -24,49 +24,44 @@ The setup URL selects the exact repository even when GitHub can access many othe
 
 ### READY
 
-Begin **`Operational memory: READY`**. Show only useful status such as repository, Private, GitHub read/write verified, structure healthy, and ready to use. Do not make the numeric repository ID something the user must understand or copy separately.
+Begin **`Operational memory: READY`**. Show only useful status such as repository, Private, GitHub read/write verified, structure healthy, and ready to use. Keep the numeric ID out of the user's mental model.
 
-Then say **One final step** and tell the user exactly where to place the completed bootloader:
-
-- **Web/Desktop:** Settings → Personalization → Custom Instructions; ensure customization is enabled.
-- **Mobile:** Settings → Customize ChatGPT → Custom Instructions; ensure customization is enabled.
-- Paste the completed block **at the top, above any existing Custom Instructions**. Do not delete or replace the user's existing instructions. Save the change.
-
-Provide this compact bootloader with the verified repository ID already substituted for `<ID>`:
-
-`Operational Memory: I use GitHub repository ID <ID> for durable operational memory. When prior durable state could affect the task, or this conversation creates/changes clear future-governing state, use @GitHub, resolve this ID to its current repository, and follow START_HERE.md. Do not claim retrieval or persistence unless GitHub actions actually ran and writes were verified. If the ID cannot resolve or a write cannot be verified, say so; never guess another repository.`
+Then say **One final step:** and provide the completed `PROTOCOL.yaml` bootloader with the verified ID filled in. Tell the user:
+- Web/Desktop: **Settings → Personalization → Custom Instructions**.
+- Mobile: **Settings → Customize ChatGPT → Custom Instructions**.
+- enable customization; paste **at the top above existing instructions**; keep existing instructions; save.
 
 The user copies it as-is. Do not ask them to edit, understand, or separately record the ID.
 
 ### BLOCKED
 
-Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker in this order: supported ChatGPT setup when known, exact repository access, Private visibility, required write actions, write/readback verification, diagnostic cleanup, protocol structure.
+Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker: supported setup when known, repository access, Private visibility, write actions, write/readback, cleanup, then protocol structure.
 
 Use plain language, give exactly one **Fix:**, and end **Then tell me `Retry setup.`** Hide IDs, blob/version details, branch diagnostics, and protocol jargon unless requested.
 
 Activation is idempotent. Cloning/naming alone is not activation.
 
-For future routing, prefer repository ID over owner/name. Resolve it before retrieval. A normal rename requires no migration or bootloader edit. If the ID does not resolve, fail closed rather than guessing by name.
+For future routing, prefer repository ID over owner/name. Resolve it before retrieval. Rename requires no migration or bootloader edit. If the ID does not resolve, fail closed rather than guessing by name.
 
 Without a persistent bootloader, offer:
 
 `@GitHub Use operational memory from <repository URL>.`
 
-Repository resolution and front-door routing are internal, not user syntax.
+Repository resolution/front-door routing are internal, not user syntax.
 
-Operational memory has **two runtime triggers**: prior durable state may materially affect the task, or the current conversation creates/changes clear future-governing state that should persist. The second trigger does not require prior repository relevance. The bootloader tells ChatGPT when to use `@GitHub`; it is not proof that the plugin actually ran. Claim repository retrieval or persistence only after actual GitHub actions provide the required evidence.
+Operational memory has **two runtime triggers**: prior durable state may materially affect the task, or the conversation creates/changes clear future-governing state that should persist. The second does not require prior repository relevance. The bootloader tells ChatGPT when to use `@GitHub`; it is not proof the plugin ran. Claim retrieval/persistence only after actual GitHub evidence.
 
 ## Normal route
 
-1. Resolve the configured repository ID to its current owner/name when available, then retrieve `PROTOCOL.yaml`.
-2. Identify the user's intent.
-3. If neither prior durable state nor a clear new durable-state change can materially affect future work, use **no-repository-context**. A conversation may begin this way and later enter operational memory when a persistence trigger emerges.
+1. Resolve configured repository ID to current owner/name when available, then retrieve `PROTOCOL.yaml`.
+2. Identify user intent.
+3. If neither prior durable state nor a clear new durable change can materially affect future work, use **no-repository-context**. A conversation may enter operational memory later when a persistence trigger emerges.
 4. Scope before retrieval:
    - global current/decisions -> root `CURRENT.md` and/or `DECISIONS.md`;
    - global durable facts/definitions -> root `KNOWLEDGE.md` when relevant;
-   - project-specific -> `PROJECTS.md`, then the matching `PROJECT.md` and only files it routes to;
+   - project-specific -> `PROJECTS.md`, then matching `PROJECT.md` and only files it routes to;
    - working style -> `WORKING_STYLE.md` only when materially relevant.
-5. Do not scan every project/file. If a named project is not found, check `PROJECTS.md` before free-form search. A search miss is not proof of absence.
+5. Do not scan every project/file. If a named project is not found, check `PROJECTS.md` before free-form search. Search miss is not proof of absence.
 6. Stop expanding context once the task can be handled correctly.
 
 ## Authority
@@ -85,13 +80,13 @@ Working style cannot override current instructions/decisions or suppress honest 
 
 ## Conservative persistence watch
 
-When this front door is entered for retrieval **or because a later persistence trigger emerged**, notice clear non-sensitive changes that would leave durable state materially wrong/incomplete if the session ended now.
+When entered for retrieval **or because a later persistence trigger emerged**, notice clear non-sensitive changes that would leave durable state materially wrong/incomplete if the session ended now.
 
-Good candidates: explicitly changed objective/constraint/status/next step, finalized decision, direct durable correction, or explicit durable working preference.
+Good candidates: changed objective/constraint/status/next step, finalized decision, direct durable correction, or explicit durable working preference.
 
-When durable intent is explicit and routing unambiguous, persist under normal write/verify rules unless ask-first is active. Ask when intent/future relevance is inferred, material is sensitive, routing is ambiguous, or structure must expand. If the conversation entered operational memory only after a new durable change emerged, retrieve the minimum current target/routing state needed before writing.
+When durable intent is explicit and routing unambiguous, persist under normal write/verify rules unless ask-first is active. Ask when intent/future relevance is inferred, material is sensitive, routing is ambiguous, or structure must expand. If entry happened only after a new durable change emerged, retrieve minimum current target/routing state before writing.
 
-Do not persist brainstorming, possibilities, casual conversation, one-off preferences, anything the user says not to persist, or a working-style preference that would make future work less honest about errors, risks, uncertainty, or disagreement.
+Do not persist brainstorming, possibilities, casual conversation, one-off preferences, anything the user says not to persist, or working style that would make future work less honest about errors, risks, uncertainty, or disagreement.
 
 ## Persistence routing gate
 
@@ -111,23 +106,23 @@ Global files are cross-project. Project-specific material belongs behind a proje
 
 ## Project and structure triggers
 
-Do not create a project for a one-off question. A project is justified when the user clearly identifies ongoing work, it spans sessions with its own state/decisions/knowledge, project material would otherwise leak globally, or the topic repeatedly needs its own retrieval boundary. Ask when ambiguous.
+Do not create a project for a one-off question. A project is justified when the user identifies ongoing work, it spans sessions with its own state/decisions/knowledge, project material would otherwise leak globally, or the topic repeatedly needs its own retrieval boundary. Ask when ambiguous.
 
 For creation procedure, use `OPERATIONS.md`. No durable project folder may exist without a `PROJECTS.md` registry entry.
 
-A new durable file/category is exceptional. Require a distinct role, recurrence, retrieval trigger, defined authority, navigation from an existing front door/index, human visibility, and any required manifest/migration update. Otherwise use an existing home or report `UNROUTED`.
+A new durable file/category is exceptional. Require a distinct role, recurrence, retrieval trigger, authority, navigation from an existing front door/index, human visibility, and any required manifest/migration update. Otherwise use an existing home or report `UNROUTED`.
 
 ## Write safety
 
-A **consequential write** changes declared durable memory, routing, authority, project structure, or protocol configuration. Temporary reversible diagnostics such as `SETUP-TEST.md` are excluded, though activation still requires their readback and cleanup verification.
+A **consequential write** changes declared durable memory, routing, authority, project structure, or protocol configuration. Temporary reversible diagnostics such as `SETUP-TEST.md` are excluded, though activation still requires readback and cleanup verification.
 
 For consequential writes:
 
 `read current target(s) -> authorize/route -> write -> reread -> verify intended state`
 
-Use the current blob/version as update precondition when available. On stale/conflicting writes, reread and reconcile; never force or blindly retry.
+Use current blob/version as update precondition when available. On stale/conflicting writes, reread and reconcile; never force or blindly retry.
 
-If one intent changes multiple durable files, use a **write-set** and verify the cross-file postcondition before success. Detailed procedure lives in `OPERATIONS.md`.
+If one intent changes multiple durable files, use a **write-set** and verify the cross-file postcondition before success. Details live in `OPERATIONS.md`.
 
 Tool acknowledgement is not persistence proof. Readback is required. Never invent a commit ID.
 
