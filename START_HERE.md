@@ -9,49 +9,44 @@ This file is the **runtime protocol authority**. Do not load the whole repositor
 
 Treat **set up**, **activate**, **initialize**, **wake up**, or **start using** operational memory plus an identified repository as activation intent. After BLOCKED in the same conversation, **“Retry setup.”** reruns against that repository; if identity is unavailable, ask only for its URL.
 
-The user need not mention protocol files, IDs, CRUD, or a handshake.
+Supported release: **ChatGPT Plus (currently $20/month) or higher** with authenticated `@GitHub` authorized for the exact repository and exposing read/write actions. **Free and ChatGPT Go are unsupported.**
 
-Supported release: **ChatGPT Plus (currently $20/month) or higher** plus the installed/selected and authenticated `@GitHub` plugin authorized for the exact repository and exposing repository read/write actions. **Free and ChatGPT Go are unsupported.** A supported plan alone does not prove the required plugin/actions exist.
+1. require Plus or higher and require `@GitHub` installed/selected, authenticated, and authorized for the exact repository;
+2. confirm exact repository, default branch, visibility, and GitHub repository ID;
+3. require the working copy to be **private** before storing personal/project state;
+4. retrieve `PROTOCOL.yaml`, this file, declared root memory files, and `PROJECTS.md`; verify structure without broad-loading unrelated content;
+5. using selected `@GitHub` actions, verify reversible `SETUP-TEST.md` create/read/update/read/delete plus deletion readback, using current version when available. Missing required write actions means BLOCKED;
+6. create no durable state merely to mark activation;
+7. return READY or BLOCKED below.
 
-1. require a supported ChatGPT plan: Plus or higher; Free and Go are BLOCKED;
-2. require `@GitHub` to be installed/selected, authenticated to GitHub, and authorized for the exact repository;
-3. confirm exact repository, default branch, visibility, and GitHub repository ID;
-4. require the working copy to be **private** before storing personal/project state;
-5. retrieve `PROTOCOL.yaml`, this file, declared root memory files, and `PROJECTS.md`; verify structure without broad-loading unrelated content;
-6. using selected `@GitHub` actions, verify reversible `SETUP-TEST.md` create/read/update/read/delete plus deletion readback, using current version when available. A separate read-only GitHub app does not prove `@GitHub` is read-only; missing required write actions means BLOCKED;
-7. create no durable state merely to mark activation;
-8. return READY or BLOCKED below.
-
-The setup URL selects the exact repository even when GitHub can access many others. Never substitute another repository. Future bootloader routing uses its numeric ID.
+The setup URL identifies the repository. Never substitute another repository. Future bootloader routing uses its numeric ID.
 
 ### READY
 
-Begin **`Operational memory: READY`**. Show only useful status such as supported plan, GitHub connected/authenticated, repository, Private, GitHub read/write verified, structure healthy, and ready to use. Keep the numeric ID out of the user's mental model.
+Begin **`Operational memory: READY`**. Show compact status: supported plan, GitHub authenticated, repository Private, read/write verified, structure healthy. Keep the numeric ID out of the user's mental model.
 
 Then say **One final step:** and provide the completed `PROTOCOL.yaml` bootloader with the verified ID filled in. Tell the user:
 - Web/Desktop: **Settings → Personalization → Custom Instructions**.
 - Mobile: **Settings → Customize ChatGPT → Custom Instructions**.
 - enable customization; paste **at the top above existing instructions**; keep existing instructions; save.
 
-The user copies it as-is. Do not ask them to edit, understand, or separately record the ID.
+Do not ask the user to edit, understand, or separately record the ID.
 
 ### BLOCKED
 
 Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker: supported plan, GitHub plugin installation/selection/authentication, exact repository access, Private visibility, write actions, write/readback, cleanup, then protocol structure.
 
-Use plain language, give exactly one **Fix:**, and end **Then tell me `Retry setup.`** Hide IDs, blob/version details, branch diagnostics, and protocol jargon unless requested.
+Use plain language, give exactly one **Fix:**, and end **Then tell me `Retry setup.`** Hide technical diagnostics unless requested.
 
 Activation is idempotent. Cloning/naming alone is not activation.
 
-For future routing, prefer repository ID over owner/name. Resolve it before retrieval. Rename requires no migration or bootloader edit. If the ID does not resolve, fail closed rather than guessing by name.
+For future routing, resolve repository ID to current owner/name. Rename requires no migration or bootloader edit. If the ID does not resolve, fail closed rather than guessing by name.
 
 Without a persistent bootloader, offer:
 
 `@GitHub Use operational memory from <repository URL>.`
 
-Repository resolution/front-door routing are internal, not user syntax.
-
-Operational memory has **two runtime triggers**: prior durable state may materially affect the task, or the conversation creates/changes clear future-governing state that should persist. The second does not require prior repository relevance. The bootloader tells ChatGPT when to use `@GitHub`; it is not proof the plugin ran. Claim retrieval/persistence only after actual GitHub evidence.
+Operational memory has **two runtime triggers**: prior durable state may materially affect the task, or the conversation creates/changes clear future-governing state that should persist. The bootloader is not proof the plugin ran. Claim retrieval/persistence only after actual GitHub evidence.
 
 ## Normal route
 
@@ -78,7 +73,7 @@ When repository sources conflict, use this order unless a higher-level rule requ
 6. historical/superseded repository state;
 7. native ChatGPT memory, chat recollection, or model inference.
 
-Working style cannot override current instructions/decisions or suppress honest evaluation, material disagreement, correction, material risk flagging, uncertainty disclosure, or applicable safety behavior. Stale knowledge does not override current verified state. Git history is evidence, not active authority. Native memory may help but does not override verified durable state.
+Working style cannot suppress honest evaluation, correction, material risk flagging, uncertainty disclosure, or safety behavior. Stale knowledge does not override current verified state. Git history is evidence, not active authority. Native memory does not override verified durable state.
 
 ## Conservative persistence watch
 
