@@ -1,0 +1,32 @@
+title: "[Question] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Q&A when you want help using or understanding the template. Do not post private repository contents, credentials, or sensitive personal information.
+  - type: textarea
+    id: question
+    attributes:
+      label: What is your question?
+      placeholder: I cloned the template and activated it. What should happen in a fresh chat?
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface are you using?
+      options:
+        - ChatGPT Chat
+        - ChatGPT Work
+        - Codex
+        - More than one
+        - Other / not sure
+    validations:
+      required: false
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you already tried?
+      description: Optional. Include the prompt or non-sensitive error wording if useful.
+    validations:
+      required: false

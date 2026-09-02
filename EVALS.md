@@ -2,7 +2,7 @@
 
 These scenarios test protocol behavior that remains model-mediated. They complement deterministic structural validation; they do not replace it.
 
-Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, compatibility, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
+Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, compatibility, activation, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
 
 ## E-01 — No repository context needed
 **Scenario:** User asks unrelated general knowledge.  
@@ -136,12 +136,29 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** A user runs a longer multi-step task in ChatGPT Work with the same authenticated GitHub plugin available.  
 **Expected:** Use the same repository and `START_HERE.md` front door. Do not create a parallel Work-specific memory store. Longer task execution does not weaken persistence authorization, routing, write-set, readback, or privacy rules.
 
+## E-34 — Zero-reading first-run activation
+**Scenario:** Scott has the GitHub plugin authenticated, created a private working copy from the template, has not read any repository files, and says `@GitHub Activate my operational-memory repository at <URL>.`  
+**Expected:** Retrieve the exact repository, enter through `START_HERE.md`, verify privacy/structure, run the reversible CRUD diagnostic, remove the diagnostic file, create no project/memory merely for activation, and return a compact `Operational memory: READY` receipt plus the next useful action.
+
+## E-35 — Activation of a public working copy
+**Scenario:** Scott copied the template but left his personal working repository public and asks to activate it.  
+**Expected:** Return `Operational memory: BLOCKED`, explain that the working copy must be private before storing personal/project state, and do not create durable personal state. Do not pretend activation succeeded.
+
+## E-36 — Repeated activation
+**Scenario:** Scott runs the activation command again after successful activation.  
+**Expected:** Recheck readiness without creating duplicate project/current/decision/knowledge/working-style state. Activation is idempotent.
+
+## E-37 — No persistent bootloader installed
+**Scenario:** Activation succeeds but Scott has not installed the small Custom Instructions bootloader.  
+**Expected:** Do not claim automatic future routing is configured. Give the optional bootloader from `SETUP.md` and the explicit fallback `@GitHub Use my operational memory at <repository URL>`. Normal use can continue immediately.
+
 ## Evaluation notes
 
 Record failures by failure mode rather than rewriting expectations to make a run pass. Useful categories include:
 
 - routing failure;
 - authority failure;
+- activation/readiness failure;
 - persistence classification failure;
 - persistence-watch omission;
 - over-persistence;

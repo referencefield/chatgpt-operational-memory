@@ -19,6 +19,23 @@ compatibility:
   chatgpt_work_uses_same_front_door: true
   other_models_require_equivalent_github_read_write_and_persistent_bootloader: true
 
+activation:
+  trigger_intents:
+    - activate operational memory
+    - initialize operational memory
+    - wake up operational memory
+    - start using operational memory
+  requires_exact_repository: true
+  require_private_working_copy: true
+  reversible_crud_diagnostic: true
+  diagnostic_file: SETUP-TEST.md
+  create_durable_state_on_activation: false
+  idempotent: true
+  activation_receipt_required: true
+  ready_label: "Operational memory: READY"
+  blocked_label: "Operational memory: BLOCKED"
+  explicit_future_fallback: "@GitHub Use my operational memory at <repository URL>"
+
 human_docs:
   readme: README.md
   setup: SETUP.md
@@ -69,7 +86,7 @@ maintenance:
 
 soft_budgets:
   # Warning indicators only. Crossing one means inspect structure, not delete content.
-  START_HERE.md_bytes: 14000
+  START_HERE.md_bytes: 15000
   CURRENT.md_bytes: 7000
   PROJECT.md_bytes: 9000
   project_CURRENT.md_bytes: 7000

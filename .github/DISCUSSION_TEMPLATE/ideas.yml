@@ -1,0 +1,46 @@
+title: "[Idea] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use Ideas for improvements that are still being explored. If you already have a concrete patch, a Pull Request is welcome without opening an Issue first.
+        Keep proposals aligned with the project's low-infrastructure, lay-user design.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem or opportunity did you notice?
+      description: Describe the user experience or failure mode before proposing machinery.
+      placeholder: A user has to remember too much during setup...
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What improvement do you propose?
+      description: Describe the smallest useful change.
+      placeholder: Add a one-command activation handshake...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area does this affect most?
+      options:
+        - Activation / onboarding
+        - Routing / retrieval
+        - Persistence / writeback
+        - Projects / scaling
+        - Knowledge / working style
+        - Reliability / security
+        - ChatGPT / Work / Codex compatibility
+        - Documentation / community
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What makes you think this would help?
+      description: Optional examples, testing, or observed behavior are useful.
+    validations:
+      required: false

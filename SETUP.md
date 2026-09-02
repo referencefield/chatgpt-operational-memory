@@ -4,6 +4,24 @@ This document is installation only. Runtime behavior lives in `START_HERE.md`; o
 
 The intended user should not need a terminal or Git expertise for normal use.
 
+## Fast path if GitHub is already authenticated in ChatGPT
+
+If you already have the GitHub plugin installed/authenticated and you created a **private** working copy from this template, you do not need to read the rest of this file before starting.
+
+In ChatGPT, say:
+
+> `@GitHub Activate my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Use START_HERE.md and run the activation handshake.`
+
+ChatGPT should then verify the exact repository, confirm it is private, retrieve the protocol/front door, check the declared structure, run a reversible create/read/update/read/delete diagnostic through the GitHub plugin, remove the diagnostic file, and return a compact **Operational memory: READY** or **Operational memory: BLOCKED** receipt.
+
+Activation does not create a project or record personal state merely to mark the repository initialized.
+
+One thing cannot be installed by repository writeback: the optional persistent ChatGPT bootloader that helps future chats enter the repository automatically when durable context matters. After activation, ChatGPT should give you that small block if you have not already installed it. If you skip that step, nothing in the repository breaks; begin relevant future chats with:
+
+> `@GitHub Use my operational memory at <YOUR FULL PRIVATE REPOSITORY URL>`
+
+The detailed procedure below exists for users who want to inspect or independently test each setup step.
+
 ## Setup at a glance
 
 You will do five things:
@@ -12,7 +30,7 @@ You will do five things:
 2. install and authenticate the **GitHub plugin** in ChatGPT and authorize it for that repository;
 3. prove read/create/update/delete and readback actually work through `@GitHub`;
 4. add one small persistent ChatGPT instruction that points future sessions to `START_HERE.md`;
-5. run one genuinely fresh-chat retrieval test using a value that exists only in GitHub.
+5. optionally run a stronger genuinely fresh-chat retrieval test using a value that exists only in GitHub.
 
 After that, ordinary use should remain conversational.
 
@@ -62,9 +80,11 @@ A write acknowledgement is not enough. The test passes only when ChatGPT rereads
 
 If a deliberately stale update is rejected, that is a concurrency-safety success. ChatGPT should reread/reconcile rather than force or blindly retry.
 
-Do **not** delete `SETUP-TEST.md` yet.
+Do **not** delete `SETUP-TEST.md` yet if you intend to run the stronger fresh-chat nonce test below. Otherwise, delete it and verify deletion after the CRUD diagnostic passes.
 
-## 5. Put a repository-only nonce into GitHub outside ChatGPT
+## 5. Optional stronger repository-only nonce test
+
+This step is not required for the fast activation path. It independently tests fresh-chat retrieval using information ChatGPT has never seen.
 
 Open `SETUP-TEST.md` yourself in GitHub's web interface. Replace its contents with a random phrase/nonce ChatGPT has never seen and commit it directly in GitHub.
 
@@ -94,7 +114,7 @@ If you use a ChatGPT Project whose own instructions override global Custom Instr
 
 ## 7. Test a genuinely fresh chat
 
-Start a completely new ordinary ChatGPT conversation.
+If you performed the repository-only nonce test, start a completely new ordinary ChatGPT conversation.
 
 First try:
 
@@ -114,9 +134,9 @@ After the fresh-chat test passes, ask ChatGPT to delete `SETUP-TEST.md` and veri
 
 ## 9. Initialize normal use
 
-Say:
+The fast path's activation handshake already performs this initialization check. Otherwise say:
 
-> `@GitHub Enter my operational-memory repository through START_HERE.md. Verify PROTOCOL.yaml and the declared root structure, confirm there are no real projects yet unless PROJECTS.md says otherwise, and report the current scale/health status. Do not create project state just to initialize the repository.`
+> `@GitHub Activate my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Use START_HERE.md and run the activation handshake.`
 
 Then begin ordinary work.
 
@@ -147,9 +167,9 @@ Setup is complete when:
 - explicit `@GitHub` invocation retrieves the intended repository;
 - create/update/readback/delete succeeds through the plugin;
 - current blob/version preconditions are used when available or their absence is explicitly reported;
-- persistent instructions point fresh sessions to `START_HERE.md` without duplicating the full protocol;
-- a fresh chat retrieves the repository-only nonce it has never seen;
-- `SETUP-TEST.md` is deleted and deletion verified;
+- `SETUP-TEST.md` is removed after diagnostics unless intentionally retained for the optional nonce test;
 - failed or unverified operations are reported visibly instead of treated as success.
+
+For automatic future routing, also install the small persistent bootloader. Without it, explicit `@GitHub Use my operational memory at <repository URL>` remains the supported manual entry path.
 
 For normal use after setup, start with `START_HERE.md` and consult `OPERATIONS.md` only when you need project creation, closeout, health checks, recovery, update checks, or maintenance.

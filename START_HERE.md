@@ -7,6 +7,24 @@ This file is the **runtime protocol authority** for this repository. Persistent 
 
 Do not begin by loading the whole repository.
 
+## Activation handshake
+
+When the user explicitly asks to **activate**, **initialize**, **wake up**, or **start using** a newly created operational-memory repository and identifies the repository, treat that as a request for a first-run activation handshake.
+
+1. Confirm the exact repository, default branch, and repository visibility before writing anything.
+2. The personal working copy should be **private**. If it is public, report `Activation blocked: working repository is public` and do not begin storing personal/project state.
+3. Retrieve `PROTOCOL.yaml`, this file, the declared root memory files, and `PROJECTS.md`. Verify the declared structure without broad-loading unrelated content.
+4. Verify GitHub read/write operation with a reversible diagnostic using `SETUP-TEST.md`: create benign temporary content, reread it, update it using the current blob/version when available, reread it, delete it, and verify deletion. Skip this diagnostic only if the user explicitly says not to write or the same capability was already verified in the current activation session.
+5. Do **not** create a project, decision, knowledge entry, working-style entry, or current-state entry merely to mark activation.
+6. Activation is idempotent. Repeating it rechecks readiness; it must not create duplicate durable state.
+7. Finish with a compact activation receipt containing: repository, privacy, GitHub read/write verification, protocol status, structural health, registered project count, whether durable state is empty/non-empty, persistence-watch status, and the next useful action.
+
+A successful first-run receipt should begin with **`Operational memory: READY`**. A failed prerequisite should begin with **`Operational memory: BLOCKED`** and name the smallest fix.
+
+Do not claim the repository is activated merely because it was named or cloned. Activation is established by verified retrieval plus the activation checks above.
+
+If no persistent ChatGPT bootloader has been established, tell the user that one optional manual step remains for automatic future routing. Give the small bootloader from `SETUP.md`. If the user skips it, the reliable manual fallback is to begin a relevant future chat with `@GitHub Use my operational memory at <repository URL>`.
+
 ## Boot sequence
 
 1. Retrieve `PROTOCOL.yaml` and confirm the protocol release/status, canonical branch, front door, declared structure, and template source.
@@ -157,7 +175,7 @@ Examples:
 - stale write -> reread and reconcile, never force;
 - unverified write -> report not verified;
 - partial write-set -> report temporary inconsistency and reconcile;
-- connector unavailable -> state that repository changes were not persisted.
+- GitHub plugin unavailable or no longer authorized -> state that repository changes were not persisted.
 
 Visible uncertainty is preferable to invented structure or plausible-looking success.
 
