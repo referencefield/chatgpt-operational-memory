@@ -120,7 +120,9 @@ Do not infer support from a ChatGPT plan name alone. This workflow is supported 
 
 ## Setup
 
-Follow [`SETUP.md`](SETUP.md). Setup covers the first-time GitHub connection, repository authorization, Custom Instructions, write/readback testing, fresh-chat recovery testing, and troubleshooting.
+Follow [`SETUP.md`](SETUP.md). Setup covers the first-time GitHub connection, repository authorization, Custom Instructions, write/readback testing, fresh-chat recovery testing, troubleshooting, and lightweight repository maintenance.
+
+For normal use, **`main` is the canonical branch and a one-branch repository is the desired steady state**. Ordinary ChatGPT memory writes go directly to `main`; users do not need a branching workflow. If a temporary branch is ever created, compare it with `main`, preserve any unique work, and delete it only after it is merged or deliberately abandoned. See **Repository maintenance** in `SETUP.md`.
 
 It verifies:
 
