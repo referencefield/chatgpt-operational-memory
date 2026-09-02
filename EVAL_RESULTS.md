@@ -19,6 +19,12 @@ A behavioral run should be recorded here only when the evaluation is meaningfull
 
 A same-session self-review in which the model has already read the expected answers is useful for development but is **not** a publishable independent behavioral result.
 
+## Frozen-candidate handling
+
+During the Gates 1–6 acceptance freeze, qualifying behavioral evidence is recorded outside the frozen candidate tree so the act of recording results does not itself mutate and invalidate the candidate. `MIGRATIONS.md` Gate 2B defines the required qualification and evidence fields.
+
+After the frozen candidate passes Gates 1–6, Gate 7 publishes the compact qualifying summary into this file as part of the prescribed release transition. If Gate 7's lifecycle/release changes materially affect an evaluated behavior, rerun the affected scenarios and publish the updated result rather than carrying forward stale evidence.
+
 ## Published runs
 
 _None yet._
