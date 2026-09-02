@@ -4,7 +4,7 @@ Status: **No qualifying behavioral run has been published yet.**
 
 This file is the results location for the adversarial scenarios in `EVALS.md`. It exists to prevent a structural-validator PASS from being mistaken for evidence that model-mediated behavior also passed.
 
-The repository's deterministic validator and advisory GitHub Action test structural invariants only. They do not prove correct routing, retrieval claims, persistence classification, write verification, authority handling, repository-identity resolution, working-style safety boundaries, companion precedence, cross-repository behavior, release-lifecycle behavior, closeout execution, or over-persistence behavior.
+The repository's deterministic validator and advisory GitHub Action test structural invariants only. They do not prove correct routing, retrieval claims, persistence classification, write verification, authority handling, repository-identity resolution, working-style safety boundaries, companion precedence, cross-repository behavior, release-lifecycle behavior, plan/plugin readiness behavior, or over-persistence behavior.
 
 ## What counts as a publishable run
 
