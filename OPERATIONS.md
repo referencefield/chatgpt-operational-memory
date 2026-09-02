@@ -144,7 +144,7 @@ A health check has two layers.
 
 Use the advisory validator declared in `PROTOCOL.yaml` when available. It checks machine-verifiable invariants such as required files, project registration/template structure, identifier uniqueness/reference integrity, supersession lifecycle consistency, manifest identity fields, and soft budget warnings.
 
-The included GitHub Action is advisory and intentionally does **not** run on every direct operational-memory write. It runs for pull requests or when manually dispatched. It is **not** a required status check and does not block ordinary direct ChatGPT writes to `main`.
+The included GitHub Action remains advisory, but now runs for pull requests, every push to canonical `main` including normal operational-memory writes, or manual dispatch. A main-push run is an independent post-write repository-integrity check; it does not replace the immediate write/readback verification required before claiming persistence. It is **not** a required status check and does not block ordinary direct ChatGPT writes to `main`.
 
 ### Semantic layer
 
