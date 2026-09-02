@@ -2,15 +2,15 @@
 
 This document is installation only. Runtime behavior lives in `START_HERE.md`; ongoing maintenance and recovery live in `OPERATIONS.md`; privacy/security guidance lives in `SECURITY.md`; protocol upgrades live in `MIGRATIONS.md`.
 
-The intended user should not need a terminal or Git expertise.
+The intended user should not need a terminal or Git expertise for normal use.
 
 ## Setup at a glance
 
 You will do five things:
 
 1. create a **private** working repository from this template;
-2. connect and authorize a **write-capable GitHub integration** for that repository;
-3. prove read/create/update/delete and readback actually work;
+2. install and authenticate the **GitHub plugin** in ChatGPT and authorize it for that repository;
+3. prove read/create/update/delete and readback actually work through `@GitHub`;
 4. add one small persistent ChatGPT instruction that points future sessions to `START_HERE.md`;
 5. run one genuinely fresh-chat retrieval test using a value that exists only in GitHub.
 
@@ -24,27 +24,27 @@ Make the working repository **private** and visibly confirm GitHub labels it Pri
 
 The public template contains protocol structure, not user-specific memory.
 
-## 2. Connect the correct GitHub capability
+## 2. Install and authenticate the GitHub plugin
 
-This workflow requires a GitHub integration that can actually write files, not merely search/read them.
+The normal ChatGPT path for this template is the **GitHub plugin with repository read/write actions**, invoked with `@GitHub` when repository access is needed.
 
-On the ChatGPT surface available to you:
+1. open ChatGPT's **Plugins** area;
+2. install/select the GitHub plugin;
+3. connect/authenticate the underlying GitHub account when prompted;
+4. authorize the account or organization that owns your private working repository;
+5. grant the plugin access to that repository, preferably selected-repository access when available.
 
-1. open the Plugins/Apps area shown by your account;
-2. connect the GitHub capability that exposes write actions;
-3. complete GitHub authorization;
-4. authorize the account/organization that owns your private working repository;
-5. grant access to that repository, preferably selected-repository access when available.
+If you also encounter a different GitHub connection that only exposes repository search/read, that is **not** the setup path documented by this template. Use the GitHub plugin described above.
 
-Do not assume capability from the word “GitHub” or from your ChatGPT plan name. Test the actions actually available in the current chat.
+The action test below confirms that authentication, repository selection, and permissions are working correctly for your private copy. It is not an optional substitute for installing the plugin.
 
-## 3. Confirm repository visibility and actions
+## 3. Confirm repository access and write actions
 
-Invoke GitHub explicitly when available and ask:
+In ChatGPT, explicitly invoke the plugin:
 
-> `@GitHub Find my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Confirm that you can retrieve that exact repository. Then inspect the GitHub actions actually available in this chat and tell me whether you can read, create, update, and delete files there. Do not make changes yet and do not rely on my claim that you have access.`
+> `@GitHub Find my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Confirm that you can retrieve that exact repository and that the authenticated GitHub plugin can read, create, update, and delete files there. Do not make changes yet.`
 
-If create/update capability cannot be established, stop. Resolve connection, authorization, repository selection, organization approval, workspace restrictions, or product-surface differences before continuing.
+If this fails, correct the plugin connection, GitHub authorization, selected repository, or organization approval before continuing.
 
 ## 4. Run the write/readback and stale-write test
 
@@ -52,15 +52,15 @@ Ask ChatGPT to:
 
 1. create `SETUP-TEST.md` with a temporary phrase;
 2. reread that exact path and verify it exists in the intended repository;
-3. identify the current blob/version identifier if GitHub exposes one;
+3. identify the current blob/version identifier when GitHub exposes one;
 4. update the file with a second phrase using the current observed blob/version as the update precondition when supported;
 5. reread and verify the resulting content;
 6. report repository owner/name, branch/ref, exact path, and resulting state when available;
 7. show a shortened commit ID only when it is derived from a real GitHub commit SHA.
 
-A tool saying it accepted a write is not enough. The test passes only when ChatGPT rereads the repository and observes the intended state.
+A write acknowledgement is not enough. The test passes only when ChatGPT rereads the repository and observes the intended state.
 
-If a stale update is rejected, that is a concurrency-safety success. ChatGPT should reread/reconcile rather than force or blindly retry.
+If a deliberately stale update is rejected, that is a concurrency-safety success. ChatGPT should reread/reconcile rather than force or blindly retry.
 
 Do **not** delete `SETUP-TEST.md` yet.
 
@@ -88,7 +88,7 @@ Add this block to ChatGPT Custom Instructions, or the equivalent persistent inst
 
 That is the complete recommended persistent instruction.
 
-**Why it is intentionally small:** protocol rules evolve in the repository. A bootloader avoids maintaining two copies of routing/authority/failure rules and reduces configuration drift. Updating the repo updates the protocol without requiring the user to recopy a long Custom Instruction.
+**Why it is intentionally small:** protocol rules evolve in the repository. A bootloader avoids maintaining two copies of routing/authority/failure rules and reduces configuration drift.
 
 If you use a ChatGPT Project whose own instructions override global Custom Instructions, add the same small bootloader there when that Project should use this repository.
 
@@ -96,23 +96,17 @@ If you use a ChatGPT Project whose own instructions override global Custom Instr
 
 Start a completely new ordinary ChatGPT conversation.
 
-### First attempt: automatic selection
-
-Without manually invoking GitHub, ask:
+First try:
 
 > `Enter my operational-memory repository through START_HERE.md. Then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
 
-The automatic-selection test passes only when GitHub retrieval is actually evidenced and the returned content matches the repository-only nonce.
+If ChatGPT does not invoke GitHub automatically, repeat with explicit plugin invocation:
 
-Correct content alone is not proof of retrieval.
+> `@GitHub Enter my operational-memory repository through START_HERE.md. Then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
 
-### Explicit invocation fallback
+The test passes only when repository retrieval is actually evidenced and the returned content matches the repository-only nonce. Correct content alone is not proof of retrieval.
 
-If automatic GitHub selection does not occur, repeat with explicit `@GitHub`.
-
-If explicit invocation retrieves the correct nonce from the correct repository/path, the core workflow passes. Use explicit GitHub invocation whenever certainty matters.
-
-If explicit invocation cannot reliably retrieve the repository-only nonce, setup fails for this workflow.
+For consequential repository work, explicit `@GitHub` invocation is always acceptable and removes ambiguity about which plugin should be used.
 
 ## 8. Clean up the test
 
@@ -126,6 +120,20 @@ Say:
 
 Then begin ordinary work.
 
+## Codex
+
+Codex is optional and is not required for the lay-user workflow.
+
+The repository includes a root `AGENTS.md` bootloader. When Codex opens the repository, that file points it to `PROTOCOL.yaml` and `START_HERE.md` so Codex uses the same routing, authority, persistence, and verification model rather than inventing a second protocol.
+
+Do not copy the whole runtime protocol into `AGENTS.md`.
+
+## ChatGPT Work
+
+ChatGPT Work can use the same authenticated GitHub plugin and the same repository front door. There is no separate Work-specific memory store in this template.
+
+When using Work for a longer multi-step task, enter through `START_HERE.md` when durable repository context matters and keep the same persistence, write-set, and readback rules. If the Work surface provides a persistent instruction area, point it to `START_HERE.md` rather than duplicating the protocol.
+
 ## Optional `main` protection
 
 Branch protection is optional hardening, not a requirement for operational memory. If desired, protect the default branch against deletion and force pushes while leaving ordinary direct commits allowed. See `SECURITY.md` for the exact rationale and configuration.
@@ -135,13 +143,13 @@ Branch protection is optional hardening, not a requirement for operational memor
 Setup is complete when:
 
 - the working repository is visibly private;
-- the required write-capable GitHub capability is connected to the correct repository;
-- explicit GitHub invocation can retrieve the intended repository;
-- create/update/readback/delete succeeds on the current surface;
+- the GitHub plugin is installed/authenticated and authorized for the intended repository;
+- explicit `@GitHub` invocation retrieves the intended repository;
+- create/update/readback/delete succeeds through the plugin;
 - current blob/version preconditions are used when available or their absence is explicitly reported;
 - persistent instructions point fresh sessions to `START_HERE.md` without duplicating the full protocol;
 - a fresh chat retrieves the repository-only nonce it has never seen;
 - `SETUP-TEST.md` is deleted and deletion verified;
 - failed or unverified operations are reported visibly instead of treated as success.
 
-For normal use after setup, start with `START_HERE.md` and consult `OPERATIONS.md` only when you need project creation, closeout, health checks, recovery, or maintenance.
+For normal use after setup, start with `START_HERE.md` and consult `OPERATIONS.md` only when you need project creation, closeout, health checks, recovery, update checks, or maintenance.

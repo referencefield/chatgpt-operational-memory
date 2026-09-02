@@ -10,6 +10,15 @@ template_source:
   include_in_health_check_when_reachable: true
   auto_migrate: false
 
+compatibility:
+  primary_surface: chatgpt
+  required_chatgpt_plugin: GitHub
+  plugin_invocation: "@GitHub"
+  plugin_requires_repository_read_write_actions: true
+  codex_bootloader: AGENTS.md
+  chatgpt_work_uses_same_front_door: true
+  other_models_require_equivalent_github_read_write_and_persistent_bootloader: true
+
 human_docs:
   readme: README.md
   setup: SETUP.md
@@ -17,6 +26,7 @@ human_docs:
   security: SECURITY.md
   migrations: MIGRATIONS.md
   evals: EVALS.md
+  contributing: CONTRIBUTING.md
 
 global:
   current: CURRENT.md

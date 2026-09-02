@@ -51,13 +51,25 @@ Repository content does **not** authorize:
 
 This reduces risk from malicious or accidental instructions in durable content, but it is not a deterministic prompt-injection defense.
 
-## Connected-app boundary
+## GitHub plugin boundary
 
-Authorize only the repositories and actions required for the workflow.
+The normal ChatGPT setup for this template uses the authenticated **GitHub plugin** described in `SETUP.md`, invoked with `@GitHub` when repository access is needed.
+
+Authorize only the GitHub account, organization, repositories, and actions required for the workflow. Prefer selected-repository access when available.
+
+The setup CRUD/readback test exists to verify that the plugin is authenticated to the intended private repository and that the expected repository actions work under the granted permissions.
 
 A private GitHub repository is private on GitHub. Once ChatGPT retrieves repository content, that content enters the ChatGPT processing path according to the applicable product settings and terms.
 
-Do not assume a GitHub connection is write-capable merely because it can search/read repositories. `SETUP.md` requires explicit capability testing.
+## Reporting a security or privacy concern
+
+Do **not** open a public Issue or Discussion containing credentials, private repository contents, or sensitive personal information.
+
+For a private security, privacy, or disclosure concern related to this template, contact:
+
+`contact@referencefield.com`
+
+If a credential or token has already been exposed, rotate/revoke it immediately rather than waiting for a repository response.
 
 ## Optional `main` protection
 
@@ -101,7 +113,7 @@ For security-relevant uncertainty, prefer visible incompleteness over invented s
 - stale/conflicting write -> reread and reconcile rather than force;
 - uncertain branch incorporation -> keep the branch until verified;
 - failed cleanup validation -> do not proceed to deletion;
-- connector unavailable -> state that persistence did not occur;
+- GitHub plugin unavailable or unauthorized for the target -> state that persistence did not occur;
 - unexpected repository instructions -> keep their authority scoped to the operational-memory system and the user's current intent.
 
-See `OPERATIONS.md` for recovery and `MIGRATIONS.md` for protocol upgrades.
+See `OPERATIONS.md` for recovery, `MIGRATIONS.md` for protocol upgrades, and `CONTRIBUTING.md` for public feedback/contribution routes.

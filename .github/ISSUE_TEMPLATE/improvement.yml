@@ -1,0 +1,59 @@
+name: Protocol improvement
+description: Propose a specific improvement that fits the project's low-infrastructure design.
+title: "[Improvement]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For open-ended ideas or early discussion, use GitHub Discussions first. Use this form when there is a specific problem or improvement worth tracking.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What user problem does this solve?
+      description: Describe the failure mode, friction, or missing capability before describing the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Keep the proposal as small as possible while solving the stated problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: fit
+    attributes:
+      label: Why does this fit this template?
+      description: Explain why the change belongs in a lay-user, low-infrastructure operational-memory protocol rather than an advanced agent/memory framework.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: topology
+    attributes:
+      label: Does this add a new required file, durable category, or subsystem?
+      options:
+        - "No"
+        - "Yes"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: routing
+    attributes:
+      label: Routing / authority impact
+      description: If applicable, explain when the new behavior is triggered, where information would live, and what authority it has.
+    validations:
+      required: false
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: How should it be tested?
+      description: Suggest a behavioral eval, structural check, or simple user test that would prove the improvement works.
+    validations:
+      required: false

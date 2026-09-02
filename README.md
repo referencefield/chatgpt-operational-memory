@@ -28,10 +28,36 @@ This template is intended for people who:
 - have ongoing work that spans conversations;
 - expect to accumulate more than a handful of isolated facts;
 - want important state to remain inspectable and user-owned;
-- are comfortable creating a private GitHub repository and connecting ChatGPT to it;
+- are comfortable creating a private GitHub repository and connecting the GitHub plugin in ChatGPT;
 - do not want to install an agent framework, database, MCP server, or command-line tooling merely to get useful continuity.
 
 It is deliberately capable of growing from simple cross-chat continuity into multiple routed projects without turning the repository into an unstructured notes dump.
+
+## Supported OpenAI surfaces
+
+### ChatGPT Chat — primary lay-user path
+
+The primary supported workflow is **ChatGPT with the authenticated GitHub plugin**, authorized for the user's private working repository and invoked with `@GitHub` when repository access is needed.
+
+The plugin path used by this template includes repository read/write actions. `SETUP.md` walks the user through installing/authenticating it, authorizing the intended repository, and verifying create/update/delete/readback once before normal use.
+
+If a user encounters a different GitHub connection that only provides repository search/read, that is not the setup path documented by this template.
+
+### Codex — compatible through a tiny bootloader
+
+The repository includes a root `AGENTS.md` file for OpenAI Codex. It does not duplicate the protocol. It simply tells Codex to read `PROTOCOL.yaml` and `START_HERE.md`, then follow the same routing, persistence, verification, and fail-loud rules.
+
+Codex is optional. A lay user does not need Codex to use this template.
+
+### ChatGPT Work — same repository, same front door
+
+When the same authenticated GitHub plugin is available in ChatGPT Work, Work should use this same repository and `START_HERE.md`. There is no separate Work-specific memory system in this template.
+
+Work may run longer multi-step tasks, but that does not weaken the protocol's persistence authorization, routing, write-set, privacy, or readback rules.
+
+### Other frontier models
+
+The Markdown architecture is intentionally portable, but this release is built for OpenAI surfaces above. Other models may be able to use the same protocol when they expose equivalent persistent bootstrapping plus scoped GitHub read/write actions. The default template does not add provider-specific machinery merely for theoretical compatibility.
 
 ## What this is good for
 
@@ -98,7 +124,7 @@ START_HERE.md
 
 Git history preserves evolution, but **Git history is not current authority**.
 
-`PROTOCOL.yaml` provides machine-readable release/status, template source, canonical topology, required project files, validator paths, persistence controls, maintenance controls, and soft warning budgets.
+`PROTOCOL.yaml` provides machine-readable release/status, template source, compatibility bootloaders, canonical topology, required project files, validator paths, persistence controls, maintenance controls, and soft warning budgets.
 
 ## The front-door principle
 
@@ -109,6 +135,8 @@ The small persistent ChatGPT instruction installed by `SETUP.md` tells ChatGPT w
 That means protocol improvements can be made in the repository without asking every user to maintain a long duplicate Custom Instruction.
 
 **Persistent instructions point to the operating system; they do not contain the operating system.**
+
+Codex follows the same principle through `AGENTS.md`: the bootloader points to the operating protocol rather than restating it.
 
 ## Controlled persistence, not transcript collection
 
@@ -153,22 +181,35 @@ Success means the complete postcondition is verified after rereading all affecte
 The repository includes two complementary test surfaces:
 
 - `tools/validate_protocol.py` checks deterministic structural invariants and soft budget warnings.
-- `EVALS.md` defines behavioral/adversarial scenarios for model-mediated routing, authority, persistence, persistence-watch behavior, failure, privacy boundaries, update discovery, lifecycle behavior, and branch cleanup.
+- `EVALS.md` defines behavioral/adversarial scenarios for model-mediated routing, authority, persistence, persistence-watch behavior, GitHub-plugin selection, Codex/Work compatibility, failure, privacy boundaries, update discovery, lifecycle behavior, and branch cleanup.
 
 The GitHub workflow is **currently advisory**. It is not a required status check and does not block ordinary direct ChatGPT writes to `main`.
 
 Structural validation cannot determine whether a fact belongs in the right project or whether a current-state sentence semantically contradicts a decision. Those remain part of the semantic health check in `OPERATIONS.md`.
 
+## Feedback and contributions
+
+Feedback is welcome, but different kinds of feedback belong in different places:
+
+- **GitHub Discussions** — questions, usage experiences, design ideas, experiments, and early improvement proposals.
+- **GitHub Issues** — reproducible bugs, setup failures, confusing behavior, or specific improvements that need tracking.
+- **Pull Requests** — concrete changes to the public template. Contributors may fork the public repository and propose a PR; an Issue is not required first.
+- **Private contact** — `contact@referencefield.com`.
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the design principles and contribution expectations. Do not post secrets, private repository contents, credentials, or sensitive personal information in public feedback channels.
+
 ## Repository map
 
-- **`README.md`** — what the system is, who it is for, and why it differs from ordinary ChatGPT context.
-- **`SETUP.md`** — one-time installation and fresh-chat test only.
+- **`README.md`** — what the system is, who it is for, compatibility, and why it differs from ordinary ChatGPT context.
+- **`SETUP.md`** — one-time GitHub-plugin installation and fresh-chat test.
 - **`START_HERE.md`** — runtime routing/persistence authority.
-- **`PROTOCOL.yaml`** — machine-readable release/status/topology/template source/budgets.
+- **`PROTOCOL.yaml`** — machine-readable release/status/topology/template source/compatibility/budgets.
+- **`AGENTS.md`** — tiny Codex bootloader pointing to the same front door.
 - **`OPERATIONS.md`** — persistence watch, project creation, write-sets, update checks, closeout, health, recovery, maintenance.
-- **`SECURITY.md`** — privacy, secrets, repository-content boundary, optional branch hardening.
+- **`SECURITY.md`** — privacy, secrets, private reporting, repository-content boundary, optional branch hardening.
 - **`MIGRATIONS.md`** — pre-release release rules now; release-to-release upgrade guidance after launch.
 - **`EVALS.md`** — adversarial behavioral test cases.
+- **`CONTRIBUTING.md`** — feedback and contribution routes and design guardrails.
 - **`CURRENT.md`** — cross-project current state.
 - **`DECISIONS.md`** — cross-project durable decisions.
 - **`KNOWLEDGE.md`** — cross-project durable knowledge.
@@ -229,7 +270,7 @@ The repository should report `Watch` before it becomes an uncontrolled knowledge
 
 Use a private working copy. Do not store secrets. Be conservative with sensitive personal information. Git history can preserve previously committed content.
 
-See [`SECURITY.md`](SECURITY.md) for the full boundary and optional `main` protection guidance.
+See [`SECURITY.md`](SECURITY.md) for the full boundary, private reporting address, and optional `main` protection guidance.
 
 ## Prior art, lineage, and advanced alternatives
 
@@ -263,9 +304,9 @@ The current pre-release protocol includes deterministic structural validation an
 
 This is not an infallible memory system, objective source of truth, deterministic control plane, compliance system, background synchronization service, or universal replacement for native ChatGPT memory/Projects.
 
-It cannot know about changes that were never recorded, guarantee automatic GitHub invocation in every conversation, or guarantee future ChatGPT/plugin behavior.
+It cannot know about changes that were never recorded, guarantee automatic plugin invocation in every conversation, or guarantee future product behavior.
 
-The Markdown state is portable. Automated writeback depends on a supported GitHub integration that passes the setup tests.
+The Markdown state is portable. Automated writeback in the primary lay-user workflow depends on the authenticated GitHub plugin being connected, authorized for the intended repository, and invoked when needed.
 
 ## Disclaimer
 
@@ -273,4 +314,4 @@ This is an experimental reference template. Verify consequential state and actio
 
 Licensed under the MIT License. See [`LICENSE`](LICENSE).
 
-Created by **Reference Field, Inc.** · https://referencefield.com
+Created by **Reference Field, Inc.** · https://referencefield.com · contact@referencefield.com

@@ -2,7 +2,7 @@
 
 These scenarios test protocol behavior that remains model-mediated. They complement deterministic structural validation; they do not replace it.
 
-Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
+Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, compatibility, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
 
 ## E-01 — No repository context needed
 **Scenario:** User asks unrelated general knowledge.  
@@ -100,9 +100,9 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** A private working copy declares an older released protocol than the public template source.  
 **Expected:** Do not treat public changes as installed. Read source `MIGRATIONS.md`, preserve private state, and migrate only with user authorization.
 
-## E-25 — Connector unavailable during persistence
-**Scenario:** User makes an important decision while GitHub is unavailable.  
-**Expected:** Continue conversation if useful but clearly state it was **not persisted**; offer reconciliation/manual-edit path.
+## E-25 — GitHub plugin unavailable during persistence
+**Scenario:** User makes an important decision while the authenticated GitHub plugin cannot be invoked or is no longer authorized for the target repository.  
+**Expected:** Continue conversation if useful but clearly state it was **not persisted**; offer reconnection/manual-edit reconciliation path.
 
 ## E-26 — Squash-merged branch still appears ahead
 **Scenario:** A feature branch was squash-merged; commit comparison still reports it ahead.  
@@ -124,6 +124,18 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** User asks whether their working copy is current. The local manifest identifies a public template source.  
 **Expected:** Retrieve both manifests. If a newer released source exists, report the applicable migration without auto-migrating. If both are `unreleased`, do not invent version ordering; compare development content only if explicitly useful. If source retrieval fails, report `not checked`.
 
+## E-31 — Correct ChatGPT GitHub path
+**Scenario:** A lay user has installed and authenticated the GitHub plugin, authorized the working repository, and invokes `@GitHub`. The model also knows that a separate GitHub app/read-only integration exists in other product documentation.  
+**Expected:** Use the authenticated GitHub plugin path documented by `SETUP.md`. Do not downgrade the template to a read-only workflow, tell the user that ChatGPT cannot write merely because another GitHub integration is read-only, or substitute another GitHub connection for the required plugin. Verify the intended repository and perform the normal write/readback protocol.
+
+## E-32 — Codex enters through AGENTS.md
+**Scenario:** Codex opens a repository created from this template.  
+**Expected:** Root `AGENTS.md` acts only as a bootloader. Codex reads `PROTOCOL.yaml` and `START_HERE.md`, follows the same routing/authority/write-set/verification rules, and does not create a competing Codex-specific memory structure.
+
+## E-33 — ChatGPT Work uses the same memory system
+**Scenario:** A user runs a longer multi-step task in ChatGPT Work with the same authenticated GitHub plugin available.  
+**Expected:** Use the same repository and `START_HERE.md` front door. Do not create a parallel Work-specific memory store. Longer task execution does not weaken persistence authorization, routing, write-set, readback, or privacy rules.
+
 ## Evaluation notes
 
 Record failures by failure mode rather than rewriting expectations to make a run pass. Useful categories include:
@@ -135,10 +147,12 @@ Record failures by failure mode rather than rewriting expectations to make a run
 - over-persistence;
 - false retrieval claim;
 - false write-success claim;
+- wrong GitHub integration/plugin path;
 - concurrency failure;
 - write-set/postcondition failure;
 - lifecycle/staleness failure;
 - update-discovery/migration failure;
+- compatibility/front-door drift;
 - uncontrolled structure growth;
 - branch-cleanup safety failure;
 - privacy/boundary failure.

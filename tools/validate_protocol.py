@@ -116,7 +116,6 @@ def load_manifest() -> dict:
 
 def registry_slugs(registry_path: Path) -> set[str]:
     text = read_text(registry_path)
-    # Registry headings use: ### project-slug — Project name
     return set(re.findall(r"^###\s+([a-z0-9][a-z0-9-]*)\s+—", text, re.MULTILINE))
 
 
@@ -156,6 +155,17 @@ def main() -> int:
 
     for key, path in (manifest.get("human_docs", {}) or {}).items():
         require_file(str(path), f"human_docs.{key}")
+
+    compatibility = manifest.get("compatibility", {}) or {}
+    if compatibility.get("required_chatgpt_plugin") != "GitHub":
+        error("PROTOCOL.yaml compatibility.required_chatgpt_plugin must be GitHub")
+    if compatibility.get("plugin_invocation") != "@GitHub":
+        error("PROTOCOL.yaml compatibility.plugin_invocation must be @GitHub")
+    codex_bootloader = compatibility.get("codex_bootloader")
+    if not codex_bootloader:
+        error("PROTOCOL.yaml compatibility.codex_bootloader is missing")
+    else:
+        require_file(str(codex_bootloader), "Codex bootloader")
 
     projects_cfg = manifest.get("projects", {}) or {}
     projects_root_rel = str(projects_cfg.get("root", "projects"))

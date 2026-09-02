@@ -1,0 +1,68 @@
+name: Bug or setup problem
+description: Report a reproducible failure, setup problem, or confusing behavior.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Do not include secrets, private repository contents, credentials, or sensitive personal information.
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: OpenAI surface
+      options:
+        - ChatGPT Chat
+        - ChatGPT Work
+        - Codex
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: github-plugin
+    attributes:
+      label: GitHub plugin
+      options:
+        - label: I installed/authenticated the GitHub plugin and invoked `@GitHub` when the workflow required repository access.
+          required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the failure or confusing behavior in sanitized terms.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the smallest reproducible sequence. Do not paste private memory contents.
+    validations:
+      required: false
+
+  - type: input
+    id: protocol
+    attributes:
+      label: Protocol release/status
+      description: Value from `PROTOCOL.yaml`, if known.
+      placeholder: unreleased / release identifier / not sure
+    validations:
+      required: false
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Relevant error text, receipts, paths, or screenshots with private information removed.
+    validations:
+      required: false
