@@ -116,8 +116,9 @@ At runtime ChatGPT resolves that repository ID to the repository's current owner
 
 - the user may give the private working repository any name;
 - an ordinary rename does not require editing Custom Instructions;
-- the public `referencefield/chatgpt-operational-memory` identity remains only the upstream template/update source;
-- if the configured repository ID cannot be resolved, ChatGPT should fail visibly rather than guess a similarly named repository.
+- the public template/update source is also identified in `PROTOCOL.yaml` by its immutable GitHub repository ID, so update discovery does not depend on the upstream's current owner/name;
+- `referencefield/chatgpt-operational-memory` remains the current human-readable location of that public source, not a required working-repository name;
+- if a configured working or template-source repository ID cannot be resolved, ChatGPT should fail visibly rather than guess a similarly named repository.
 
 For users who skip Custom Instructions, the rename-safe manual fallback is:
 
@@ -183,7 +184,7 @@ See [`SECURITY.md`](SECURITY.md) for details.
 Two different test surfaces are included:
 
 - `tools/validate_protocol.py` checks machine-verifiable structural invariants and soft warning budgets.
-- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, stale writes, activation, plugin selection, repository rename identity, Codex/Work compatibility, and maintenance failures.
+- `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, stale writes, activation, plugin selection, working/upstream repository rename identity, Codex/Work compatibility, and maintenance failures.
 
 `EVAL_RESULTS.md` is the results ledger. It deliberately distinguishes a structural validator PASS from behavioral evidence. No qualifying independent behavioral run is claimed until one is actually performed.
 
