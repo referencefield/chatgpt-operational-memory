@@ -2,6 +2,9 @@ name: Operational-memory protocol validation
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -26,7 +29,10 @@ jobs:
       - name: Validate protocol structure
         run: python tools/validate_protocol.py
 
-# This workflow is intentionally advisory and does not run on every direct
-# operational-memory write. It runs for pull requests or when manually
-# dispatched. PROTOCOL.yaml declares blocking_required_check: false, and the
-# recommended main-branch ruleset does not require this status check.
+# This workflow is intentionally advisory. It runs for pull requests, every
+# push to canonical main (including normal operational-memory writes), or when
+# manually dispatched. Main-push validation is a post-write repository-integrity
+# check; immediate persistence claims still depend on write readback/verification,
+# not on waiting for this workflow. PROTOCOL.yaml declares
+# blocking_required_check: false, and the recommended main-branch ruleset does
+# not require this status check.
