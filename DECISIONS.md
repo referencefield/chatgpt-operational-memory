@@ -32,6 +32,9 @@ _None yet._
 - `CURRENT.md` governs transient/current working state.
 - If `CURRENT.md` conflicts with an active durable decision, do **not** silently choose one. Surface the inconsistency and reconcile the affected state.
 - Git history is historical evidence, not active authority by itself.
+- Do not promote an ambiguous conversational inference into an active durable decision. If the user did not clearly authorize the decision or its durable status, ask before activating it.
+- If the user explicitly says **"make this a durable decision"**, **"record this decision"**, or otherwise clearly states a final decision in a context that authorizes persistence, no additional confirmation is required.
+- When a new durable decision is recorded, report the exact one-sentence `Decision` field to the user so semantic intent can be checked, along with the verified write/commit receipt when available.
 
 When a later durable decision replaces an earlier one:
 
