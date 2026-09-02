@@ -10,7 +10,11 @@ Create your personal working copy as a **private GitHub repository** and visibly
 
 The public template contains no user-specific memory.
 
-The working repository may have any owner/name. Its GitHub name is not part of the memory schema and does not need to match the public template repository. Renaming the working repository does not invalidate its internal state; only external references such as a saved ChatGPT bootloader URL may need to be refreshed if they no longer resolve.
+The working repository may have any owner/name. Its GitHub name is not part of the memory schema and does not need to match the public template repository.
+
+For durable ChatGPT routing, use the repository's GitHub repository ID rather than its owner/name. A normal repository rename does not change that ID, does not invalidate internal state, and does not require changing the repository-ID bootloader. Future sessions should resolve the ID to the repository's current owner/name before retrieval.
+
+If the configured repository ID cannot be resolved, stop rather than guessing another repository. If an ownership/organization change causes the GitHub plugin to lose access, reauthorize access as needed; that is an authorization issue, not a memory migration.
 
 ## Do not store secrets
 
@@ -60,6 +64,8 @@ The normal ChatGPT setup for this template uses the authenticated **GitHub plugi
 Authorize only the GitHub account, organization, repositories, and actions required for the workflow. Prefer selected-repository access when available.
 
 The setup CRUD/readback test exists to verify that the plugin is authenticated to the intended private repository and that the expected repository actions work under the granted permissions.
+
+The setup process also obtains the repository's numeric GitHub repository ID. That ID is used for future routing; the current owner/name is resolved at runtime for actual file operations and receipts.
 
 A private GitHub repository is private on GitHub. Once ChatGPT retrieves repository content, that content enters the ChatGPT processing path according to the applicable product settings and terms.
 
@@ -119,6 +125,7 @@ Do not treat a green validation run as a security attestation.
 For security-relevant uncertainty, prefer visible incompleteness over invented success:
 
 - uncertain target -> do not write;
+- configured repository ID cannot be resolved -> stop rather than switching to a similarly named repository;
 - ambiguous authority-changing change -> ask;
 - stale/conflicting write -> reread and reconcile rather than force;
 - uncertain branch incorporation -> keep the branch until verified;

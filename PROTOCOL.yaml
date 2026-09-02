@@ -12,12 +12,14 @@ template_source:
   auto_migrate: false
 
 working_repository:
-  identity: runtime_resolved
-  owner_name_may_differ_from_template: true
+  identity: github_repository_id
+  owner_name_runtime_resolved: true
   repository_name_part_of_protocol: false
   rename_supported: true
   rename_requires_internal_migration: false
-  external_bootloader_reference_may_need_refresh: true
+  bootloader_uses_repository_id: true
+  rename_requires_bootloader_refresh: false
+  unresolved_repository_id_fails_closed: true
 
 compatibility:
   primary_surface: chatgpt
@@ -35,15 +37,17 @@ activation:
     - wake up operational memory
     - start using operational memory
   requires_exact_repository: true
+  resolve_repository_id: true
   require_private_working_copy: true
   reversible_crud_diagnostic: true
   diagnostic_file: SETUP-TEST.md
   create_durable_state_on_activation: false
   idempotent: true
   activation_receipt_required: true
+  receipt_includes_repository_id: true
   ready_label: "Operational memory: READY"
   blocked_label: "Operational memory: BLOCKED"
-  explicit_future_fallback: "@GitHub Use my operational memory at <repository URL>"
+  explicit_future_fallback: "@GitHub Use my operational memory repository ID <repository ID>. Resolve its current owner/name, then enter through START_HERE.md."
 
 human_docs:
   readme: README.md
@@ -112,9 +116,10 @@ lifecycle:
 
 custom_instruction_role: bootloader
 custom_instruction_rule: >-
-  Persistent ChatGPT instructions identify the working repository, require retrieval of START_HERE.md
-  when durable context matters, and require visible failure. Runtime protocol details live in the repository.
-  The working repository may have any owner/name; template_source identifies only the public update source.
+  Persistent ChatGPT instructions identify the working repository by its GitHub repository ID. When durable
+  context matters, ChatGPT resolves that ID to the repository's current owner/name, retrieves START_HERE.md,
+  and follows the current protocol. Runtime protocol details live in the repository. Owner/name changes do not
+  require a bootloader change; an unresolved repository ID must fail closed rather than guess a replacement.
 
 release_rule: >-
   Keep protocol_version set to unreleased during pre-release development. Assign the first real release

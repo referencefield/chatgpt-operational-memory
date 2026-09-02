@@ -12,13 +12,17 @@ In ChatGPT, say:
 
 > `@GitHub Activate my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Use START_HERE.md and run the activation handshake.`
 
-ChatGPT should then verify the exact repository, confirm it is private, retrieve the protocol/front door, check the declared structure, run a reversible create/read/update/read/delete diagnostic through the GitHub plugin, remove the diagnostic file, and return a compact **Operational memory: READY** or **Operational memory: BLOCKED** receipt.
+ChatGPT should verify the exact repository, confirm it is private, retrieve the protocol/front door, obtain the repository's GitHub repository ID, check the declared structure, run a reversible create/read/update/read/delete diagnostic through the GitHub plugin, remove the diagnostic file, and return a compact **Operational memory: READY** or **Operational memory: BLOCKED** receipt.
+
+A successful receipt should include the repository's numeric GitHub repository ID. That ID is the preferred long-lived identifier for future ChatGPT routing because the repository owner/name may later change without changing the repository itself.
 
 Activation does not create a project or record personal state merely to mark the repository initialized.
 
-One thing cannot be installed by repository writeback: the optional persistent ChatGPT bootloader that helps future chats enter the repository automatically when durable context matters. After activation, ChatGPT should give you that small block if you have not already installed it. If you skip that step, nothing in the repository breaks; begin relevant future chats with:
+One thing cannot be installed by repository writeback: the optional persistent ChatGPT bootloader that helps future chats enter the repository automatically when durable context matters. After activation, ChatGPT should give you the small repository-ID bootloader below, filled with the verified ID from the activation receipt.
 
-> `@GitHub Use my operational memory at <YOUR FULL PRIVATE REPOSITORY URL>`
+If you skip that step, nothing in the repository breaks. Begin relevant future chats with:
+
+> `@GitHub Use my operational memory repository ID <YOUR REPOSITORY ID>. Resolve its current owner/name, then enter through START_HERE.md.`
 
 The detailed procedure below exists for users who want to inspect or independently test each setup step.
 
@@ -26,10 +30,10 @@ The detailed procedure below exists for users who want to inspect or independent
 
 You will do five things:
 
-1. create a **private** working repository from this template;
+1. create a **private** working repository from this template; the working repository may have any name you want;
 2. install and authenticate the **GitHub plugin** in ChatGPT and authorize it for that repository;
 3. prove read/create/update/delete and readback actually work through `@GitHub`;
-4. add one small persistent ChatGPT instruction that points future sessions to `START_HERE.md`;
+4. add one small persistent ChatGPT instruction containing the working repository's GitHub repository ID;
 5. optionally run a stronger genuinely fresh-chat retrieval test using a value that exists only in GitHub.
 
 After that, ordinary use should remain conversational.
@@ -37,6 +41,8 @@ After that, ordinary use should remain conversational.
 ## 1. Create and verify a private working copy
 
 Use this public repository as a GitHub template to create your own working repository.
+
+Give the private working repository any owner/name you want. The name is not part of the operational-memory protocol and does not need to match this public template.
 
 Make the working repository **private** and visibly confirm GitHub labels it Private before storing personal/project state.
 
@@ -56,11 +62,13 @@ If you also encounter a different GitHub connection that only exposes repository
 
 The action test below confirms that authentication, repository selection, and permissions are working correctly for your private copy. It is not an optional substitute for installing the plugin.
 
-## 3. Confirm repository access and write actions
+## 3. Confirm repository access, identity, and write actions
 
 In ChatGPT, explicitly invoke the plugin:
 
-> `@GitHub Find my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Confirm that you can retrieve that exact repository and that the authenticated GitHub plugin can read, create, update, and delete files there. Do not make changes yet.`
+> `@GitHub Find my operational-memory repository at <YOUR FULL PRIVATE REPOSITORY URL>. Confirm that you can retrieve that exact repository, report its GitHub repository ID, and confirm that the authenticated GitHub plugin can read, create, update, and delete files there. Do not make changes yet.`
+
+The repository ID is the stable identifier the bootloader will use. The current owner/name remains useful for human-readable receipts but is not the durable routing key.
 
 If this fails, correct the plugin connection, GitHub authorization, selected repository, or organization approval before continuing.
 
@@ -73,7 +81,7 @@ Ask ChatGPT to:
 3. identify the current blob/version identifier when GitHub exposes one;
 4. update the file with a second phrase using the current observed blob/version as the update precondition when supported;
 5. reread and verify the resulting content;
-6. report repository owner/name, branch/ref, exact path, and resulting state when available;
+6. report repository ID, current owner/name, branch/ref, exact path, and resulting state when available;
 7. show a shortened commit ID only when it is derived from a real GitHub commit SHA.
 
 A write acknowledgement is not enough. The test passes only when ChatGPT rereads the repository and observes the intended state.
@@ -96,21 +104,25 @@ Do not ask ChatGPT to generate the actual nonce and do not paste the real nonce 
 
 ## 6. Add the persistent ChatGPT bootloader
 
-The persistent instruction should identify **where the current protocol lives**, not duplicate the protocol itself.
+The persistent instruction should identify the **working repository by GitHub repository ID**, then point to the current protocol. It should not duplicate the protocol itself.
 
-Add this block to ChatGPT Custom Instructions, or the equivalent persistent instruction surface available to you. Replace `<YOUR FULL PRIVATE REPOSITORY URL>` with your private working repository URL.
+Use the repository ID reported by the activation handshake or Step 3 above. Add this block to ChatGPT Custom Instructions, or the equivalent persistent instruction surface available to you. Replace `<YOUR REPOSITORY ID>` with that numeric ID.
 
-> I use this GitHub repository as durable operational memory: <YOUR FULL PRIVATE REPOSITORY URL>.
+> I use GitHub repository ID <YOUR REPOSITORY ID> as durable operational memory.
 >
-> When my request can materially depend on prior durable work, retrieve `START_HERE.md` from that repository before relying on remembered context. `START_HERE.md` defines the repository's current routing and persistence protocol; follow it rather than relying on an older copy of the protocol in chat or memory. Do not load the whole repository by default.
+> When my request can materially depend on prior durable work, use `@GitHub` to resolve that repository ID to its current owner/name, then retrieve `START_HERE.md` from that repository before relying on remembered context. `START_HERE.md` defines the repository's current routing and persistence protocol; follow it rather than relying on an older copy of the protocol in chat or memory. Do not load the whole repository by default.
 >
-> If the repository cannot be retrieved, routing cannot be established, or a persistence write cannot be verified, say so rather than claiming operational memory was loaded or persisted.
+> If the repository ID cannot be resolved, routing cannot be established, or a persistence write cannot be verified, say so rather than guessing a replacement repository or claiming operational memory was loaded or persisted.
 
 That is the complete recommended persistent instruction.
 
-**Why it is intentionally small:** protocol rules evolve in the repository. A bootloader avoids maintaining two copies of routing/authority/failure rules and reduces configuration drift.
+**Why it uses repository ID instead of URL:** GitHub owner/name is human-facing and can change. The repository ID identifies the repository independently of an ordinary rename, so renaming the working repository does not require editing this bootloader.
 
-If you use a ChatGPT Project whose own instructions override global Custom Instructions, add the same small bootloader there when that Project should use this repository.
+If ownership/organization changes cause the GitHub plugin to lose permission to the repository, reconnect or reauthorize access as needed. That is an access problem, not a memory migration; the repository ID and bootloader do not change merely because the repository was renamed.
+
+**Why the instruction is intentionally small:** protocol rules evolve in the repository. A bootloader avoids maintaining two copies of routing/authority/failure rules and reduces configuration drift.
+
+If you use a ChatGPT Project whose own instructions override global Custom Instructions, add the same small repository-ID bootloader there when that Project should use this repository.
 
 ## 7. Test a genuinely fresh chat
 
@@ -118,11 +130,11 @@ If you performed the repository-only nonce test, start a completely new ordinary
 
 First try:
 
-> `Enter my operational-memory repository through START_HERE.md. Then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
+> `Use my operational-memory repository from my configured repository ID. Resolve its current owner/name, enter through START_HERE.md, then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
 
 If ChatGPT does not invoke GitHub automatically, repeat with explicit plugin invocation:
 
-> `@GitHub Enter my operational-memory repository through START_HERE.md. Then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
+> `@GitHub Use my operational-memory repository ID <YOUR REPOSITORY ID>. Resolve its current owner/name, enter through START_HERE.md, then retrieve SETUP-TEST.md and tell me its exact contents, repository, and path.`
 
 The test passes only when repository retrieval is actually evidenced and the returned content matches the repository-only nonce. Correct content alone is not proof of retrieval.
 
@@ -140,6 +152,14 @@ The fast path's activation handshake already performs this initialization check.
 
 Then begin ordinary work.
 
+## Repository rename behavior
+
+Renaming the private working repository is supported.
+
+The repository's internal protocol and durable state do not depend on its owner/name. Future sessions should resolve the configured repository ID to the current owner/name before retrieval. A normal rename therefore requires **no** memory migration and **no** Custom Instructions/bootloader edit.
+
+If the configured repository ID stops resolving, fail closed and investigate access/deletion/authorization. Do not silently switch to another repository merely because its name looks similar.
+
 ## Codex
 
 Codex is optional and is not required for the lay-user workflow.
@@ -152,7 +172,7 @@ Do not copy the whole runtime protocol into `AGENTS.md`.
 
 ChatGPT Work can use the same authenticated GitHub plugin and the same repository front door. There is no separate Work-specific memory store in this template.
 
-When using Work for a longer multi-step task, enter through `START_HERE.md` when durable repository context matters and keep the same persistence, write-set, and readback rules. If the Work surface provides a persistent instruction area, point it to `START_HERE.md` rather than duplicating the protocol.
+When using Work for a longer multi-step task, resolve the same working repository ID and enter through `START_HERE.md` when durable repository context matters. Keep the same persistence, write-set, and readback rules. If the Work surface provides a persistent instruction area, use the same repository-ID bootloader rather than duplicating the protocol.
 
 ## Optional `main` protection
 
@@ -164,12 +184,12 @@ Setup is complete when:
 
 - the working repository is visibly private;
 - the GitHub plugin is installed/authenticated and authorized for the intended repository;
-- explicit `@GitHub` invocation retrieves the intended repository;
+- explicit `@GitHub` invocation retrieves the intended repository and reports its repository ID;
 - create/update/readback/delete succeeds through the plugin;
 - current blob/version preconditions are used when available or their absence is explicitly reported;
 - `SETUP-TEST.md` is removed after diagnostics unless intentionally retained for the optional nonce test;
 - failed or unverified operations are reported visibly instead of treated as success.
 
-For automatic future routing, also install the small persistent bootloader. Without it, explicit `@GitHub Use my operational memory at <repository URL>` remains the supported manual entry path.
+For automatic future routing, also install the small repository-ID bootloader. Without it, explicit `@GitHub Use my operational memory repository ID <YOUR REPOSITORY ID>` remains the supported manual entry path and remains valid across an ordinary repository rename.
 
 For normal use after setup, start with `START_HERE.md` and consult `OPERATIONS.md` only when you need project creation, closeout, health checks, recovery, update checks, or maintenance.

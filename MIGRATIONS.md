@@ -6,9 +6,13 @@ This repository is still **pre-release**. Pre-release development changes are fo
 
 ## Public template source vs. working repository
 
-The `template_source` entry in `PROTOCOL.yaml` identifies the public upstream used only for update discovery and migration guidance. It is **not** the required name of a user's working repository.
+The `template_source` entry in `PROTOCOL.yaml` identifies the public upstream used only for update discovery and migration guidance. It is **not** the required name or identity of a user's working repository.
 
-A private working copy may have any GitHub owner/name. Renaming a working repository does not change its internal protocol or durable state and does not require a protocol migration. If an external reference such as a ChatGPT Custom Instructions URL stops resolving after a rename, refresh that reference to the working repository's current URL and continue using the existing state.
+A private working copy may have any GitHub owner/name. Its durable ChatGPT routing identity is the repository's GitHub repository ID, resolved at runtime to the current owner/name.
+
+Renaming a working repository does not change its internal protocol or durable state, does not require a protocol migration, and does not require changing the repository-ID bootloader. If a rename changes only owner/name, future sessions resolve the same repository ID to the new current location.
+
+If repository ownership/organization changes and the GitHub plugin loses access, reauthorize the plugin. Treat that as an access problem, not a state migration. If the configured repository ID cannot be resolved, fail closed rather than guessing a similarly named repository.
 
 Do not rewrite `template_source.repository` to the private working repository. Doing so would confuse the upstream update source with the user's runtime repository.
 
@@ -26,7 +30,8 @@ During this phase:
 - do not preserve temporary development version numbers in user-facing docs;
 - compare the local and template manifests/content only when an explicit development comparison is needed;
 - preserve private working state if a development copy is being refreshed;
-- do not auto-migrate merely because the public template changed.
+- do not auto-migrate merely because the public template changed;
+- replace any pre-release URL-based ChatGPT bootloader with the repository-ID bootloader before the final release baseline is frozen.
 
 The first real protocol identifier should be assigned only when the release candidate is frozen.
 
@@ -36,13 +41,14 @@ The template source is declared in `PROTOCOL.yaml`.
 
 When checking for updates:
 
-1. retrieve the working copy's `PROTOCOL.yaml`;
-2. retrieve the template source's declared manifest;
-3. compare release/status and relevant structural fields;
-4. if both are `unreleased`, report that ordered version comparison is unavailable and compare content only when explicitly needed;
-5. after real releases exist, use their release identifiers plus this file to determine the applicable migration path;
-6. never overwrite populated private state with blank template state;
-7. never claim an upgrade merely because the public template changed.
+1. resolve the working repository by its configured repository ID;
+2. retrieve the working copy's `PROTOCOL.yaml`;
+3. retrieve the template source's declared manifest;
+4. compare release/status and relevant structural fields;
+5. if both are `unreleased`, report that ordered version comparison is unavailable and compare content only when explicitly needed;
+6. after real releases exist, use their release identifiers plus this file to determine the applicable migration path;
+7. never overwrite populated private state with blank template state;
+8. never claim an upgrade merely because the public template changed.
 
 If the template source cannot be reached, report update status as **not checked**.
 
@@ -56,6 +62,8 @@ When a future release changes protocol structure or semantics:
 - reread and verify the complete migrated structure before reporting completion;
 - separate protocol migration from Git history rewriting;
 - if migration partially succeeds, report **protocol migration is temporarily inconsistent** until the full postcondition holds.
+
+A working-repository rename by itself is not a protocol migration.
 
 ## One-time pre-release history cleanup
 
@@ -82,11 +90,12 @@ When the first public release is actually cut:
 2. replace `protocol_version: "unreleased"` with the chosen first real release identifier;
 3. set an appropriate released status in `PROTOCOL.yaml`;
 4. remove any remaining pre-release-only wording that would confuse a working copy created from the release;
-5. run deterministic structural validation and the semantic repository health check;
-6. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, and failure handling;
-7. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
-8. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
-9. only then treat the public template as the migration source for user-created copies.
+5. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;
+6. run deterministic structural validation and the semantic repository health check;
+7. run the behavioral/adversarial eval set relevant to routing, persistence, update discovery, maintenance, and failure handling;
+8. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
+9. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
+10. only then treat the public template as the migration source for user-created copies.
 
 ## Future release entries
 

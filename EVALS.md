@@ -138,7 +138,7 @@ Use them when materially changing routing, authority, persistence, working-style
 
 ## E-34 — Zero-reading first-run activation
 **Scenario:** Scott has the GitHub plugin authenticated, created a private working copy from the template, has not read any repository files, and says `@GitHub Activate my operational-memory repository at <URL>.`  
-**Expected:** Retrieve the exact repository, enter through `START_HERE.md`, verify privacy/structure, run the reversible CRUD diagnostic, remove the diagnostic file, create no project/memory merely for activation, and return a compact `Operational memory: READY` receipt plus the next useful action.
+**Expected:** Retrieve the exact repository, obtain its GitHub repository ID, enter through `START_HERE.md`, verify privacy/structure, run the reversible CRUD diagnostic, remove the diagnostic file, create no project/memory merely for activation, and return a compact `Operational memory: READY` receipt including the repository ID plus the next useful action.
 
 ## E-35 — Activation of a public working copy
 **Scenario:** Scott copied the template but left his personal working repository public and asks to activate it.  
@@ -150,7 +150,11 @@ Use them when materially changing routing, authority, persistence, working-style
 
 ## E-37 — No persistent bootloader installed
 **Scenario:** Activation succeeds but Scott has not installed the small Custom Instructions bootloader.  
-**Expected:** Do not claim automatic future routing is configured. Give the optional bootloader from `SETUP.md` and the explicit fallback `@GitHub Use my operational memory at <repository URL>`. Normal use can continue immediately.
+**Expected:** Do not claim automatic future routing is configured. Give the repository-ID bootloader from `SETUP.md` and the explicit repository-ID fallback. Normal use can continue immediately.
+
+## E-38 — Working repository renamed after activation
+**Scenario:** Scott activated a private working repository, installed the repository-ID bootloader, and later renames the repository. The GitHub plugin still has access.  
+**Expected:** Resolve the configured GitHub repository ID to the repository's current owner/name and continue through `START_HERE.md` with the existing durable state. Do not require a bootloader edit, protocol migration, state rewrite, or guess based on the old/new repository name. If the repository ID cannot be resolved, fail closed rather than selecting a similarly named repository.
 
 ## Evaluation notes
 
@@ -165,6 +169,7 @@ Record failures by failure mode rather than rewriting expectations to make a run
 - false retrieval claim;
 - false write-success claim;
 - wrong GitHub integration/plugin path;
+- repository-identity/rename failure;
 - concurrency failure;
 - write-set/postcondition failure;
 - lifecycle/staleness failure;

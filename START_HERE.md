@@ -9,22 +9,26 @@ This file is the **runtime protocol authority**. Do not begin by loading the who
 
 When the user explicitly asks to **activate**, **initialize**, **wake up**, or **start using** a newly created operational-memory repository and identifies the repository:
 
-1. confirm the exact working repository, default branch, and visibility. The working repository may have any owner/name; its name is not part of the memory schema and does not need to match the public template source;
+1. confirm the exact working repository, default branch, visibility, and GitHub repository ID. The working repository may have any owner/name; its name is not part of the memory schema and does not need to match the public template source;
 2. require the personal working copy to be **private** before storing personal/project state;
 3. retrieve `PROTOCOL.yaml`, this file, the declared root memory files, and `PROJECTS.md`; verify declared structure without broad-loading unrelated content;
 4. verify GitHub read/write with reversible `SETUP-TEST.md`: create -> reread -> update against the current blob/version when available -> reread -> delete -> verify deletion, unless the user explicitly blocks writes or the same capability was already verified in this activation session;
 5. create **no** project, decision, knowledge, working-style, or current-state entry merely to mark activation;
-6. return a compact receipt beginning **`Operational memory: READY`** or **`Operational memory: BLOCKED`**, covering repository, privacy, read/write verification, protocol/status, structural health, project count, durable-state empty/non-empty, persistence-watch status, and the next useful action.
+6. return a compact receipt beginning **`Operational memory: READY`** or **`Operational memory: BLOCKED`**, covering current owner/name, GitHub repository ID, privacy, read/write verification, protocol/status, structural health, project count, durable-state empty/non-empty, persistence-watch status, and the next useful action.
 
 Activation is idempotent. Cloning/naming the repository alone is not activation.
 
-A later working-repository rename is not a protocol migration and does not invalidate the files or durable state. Resolve and use the repository's current identity. If a previously configured external reference such as a Custom Instructions URL no longer resolves, ask for or discover the current repository URL and refresh that external reference; do not rewrite durable memory merely because the repository was renamed.
+For future routing, prefer the GitHub repository ID over owner/name. Resolve the repository ID to its current owner/name before retrieving files. A normal repository rename therefore requires no protocol migration and no bootloader edit.
 
-If no persistent ChatGPT bootloader is configured, offer the small block from `SETUP.md`. The reliable manual fallback is `@GitHub Use my operational memory at <repository URL>`.
+If a configured repository ID does not resolve, fail closed and ask the user to restore access or identify the intended repository. Do not guess based on a similar repository name.
+
+If no persistent ChatGPT bootloader is configured, offer the repository-ID bootloader from `SETUP.md`, filled with the verified ID from the activation receipt. The reliable manual fallback is:
+
+`@GitHub Use my operational memory repository ID <repository ID>. Resolve its current owner/name, then enter through START_HERE.md.`
 
 ## Normal route
 
-1. Retrieve `PROTOCOL.yaml`.
+1. Resolve the configured GitHub repository ID to the working repository's current owner/name when an ID is available, then retrieve `PROTOCOL.yaml`.
 2. Identify the user's current intent.
 3. Decide whether durable repository state can materially change the answer/action. If not, use **no-repository-context** and continue normally.
 4. Scope before retrieval:
@@ -101,6 +105,7 @@ Default to **fail closed, fail loud, preserve the last known good state, and pro
 
 Examples:
 - required retrieval missing -> report incomplete/partial retrieval;
+- configured repository ID cannot be resolved -> stop rather than guess a replacement repository;
 - no legitimate home -> `UNROUTED / no legitimate home`;
 - ambiguous durable decision/preference -> ask;
 - stale write -> reread/reconcile;
