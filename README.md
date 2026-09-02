@@ -47,6 +47,23 @@ Later, a fresh conversation can ask “Where were we?” and reconstruct the sit
 
 See [`EXAMPLE.md`](EXAMPLE.md) for a short fictional before/after demonstration.
 
+## How this fits with native ChatGPT memory
+
+This repository complements native ChatGPT memory and conversation history; it does not replace them.
+
+Native memory can continue providing useful conversational continuity. Operational Memory adds an **explicit authority layer** for the smaller subset of information where it matters to know what is current, what superseded what, where the governing state lives, and whether a consequential change actually persisted.
+
+A useful mental model is:
+
+- **conversation** — the normal working surface;
+- **tools, files, and web sources** — evidence and execution surfaces when needed;
+- **native ChatGPT memory** — useful continuity and personalization;
+- **operational memory** — the relatively small set of explicit state, decisions, durable knowledge, and working preferences important enough to govern future work.
+
+The repository should therefore stay selective. It is not a transcript archive and should not turn every useful conversation into a persistence ceremony. If durable state cannot materially change the task, using no repository context is a valid route.
+
+When sources conflict, the user's current instruction still wins. Current verified operational state and active decisions can then serve as explicit authority for ongoing work rather than allowing older native memory or conversational recollection to quietly overrule them.
+
 ## What changes in practice
 
 | Situation | ChatGPT without this repo | With this repo |
