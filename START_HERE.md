@@ -3,38 +3,43 @@
 Status: active
 Purpose: give a fresh ChatGPT session one small place to start, then route to only the durable state that can materially affect the current task.
 
-This file is the **front door** for operational memory. Do not begin by loading the whole repository.
+This file is the **runtime protocol authority** for this repository. Persistent ChatGPT instructions should point here rather than duplicate this protocol.
 
-## Fresh-session route
+Do not begin by loading the whole repository.
 
-1. Identify the user's current intent.
-2. Decide whether durable repository state can materially change the answer or action. If not, use no-repository-context and continue normally.
-3. If durable state matters, determine the scope before retrieval:
-   - **global / cross-project current state or decisions** -> load root `CURRENT.md` and `DECISIONS.md` as needed;
-   - **global / cross-project durable facts or definitions** -> load root `KNOWLEDGE.md` when those facts can materially affect the task;
-   - **project-specific** -> load `PROJECTS.md`, identify the project, then load that project's `PROJECT.md` front door and only the files it says to load first;
-   - **working-style / collaboration preference** -> load `WORKING_STYLE.md` when those preferences can materially affect how the task should be handled.
-4. Do not scan every project or every file. Route first, then retrieve the minimum authoritative state.
-5. If a named project cannot be found, check `PROJECTS.md` before free-form repository search. A search miss is not proof that durable state does not exist.
-6. Stop expanding context once the current task can be handled correctly.
+## Boot sequence
+
+1. Retrieve `PROTOCOL.yaml` and confirm the protocol version, canonical branch, front door, and declared structure.
+2. Identify the user's current intent.
+3. Decide whether durable repository state can materially change the answer or action. If not, use **no-repository-context** and continue normally.
+4. If durable state matters, determine scope before retrieval:
+   - **global / cross-project current state or decisions** -> load root `CURRENT.md` and/or `DECISIONS.md` as needed;
+   - **global / cross-project durable facts or definitions** -> load root `KNOWLEDGE.md` when relevant;
+   - **project-specific** -> load `PROJECTS.md`, identify the project, then load that project's `PROJECT.md` front door and only the files it says are needed;
+   - **working-style / collaboration preference** -> load `WORKING_STYLE.md` only when those preferences can materially affect how the task should be handled.
+5. Do not scan every project or every file. Route first, then retrieve the minimum authoritative state.
+6. If a named project cannot be found, check `PROJECTS.md` before free-form repository search. A search miss is not proof that durable state does not exist.
+7. Stop expanding context once the task can be handled correctly.
 
 ## Authority
 
-When sources conflict, use this order unless a higher-level system/safety rule requires otherwise:
+When repository sources conflict, use this order unless a higher-level system/safety rule requires otherwise:
 
 1. the user's current explicit instruction;
 2. current verified project-local state and active project decisions;
 3. current verified global state and active global decisions;
-4. current verified durable knowledge when it is relevant and not superseded/stale;
-5. explicit active entries in `WORKING_STYLE.md` when they apply to how the work is performed;
+4. current verified durable knowledge when relevant and not superseded/stale;
+5. explicit active entries in `WORKING_STYLE.md` when they apply to how work is performed;
 6. historical/superseded repository state;
 7. chat recollection or model inference.
 
-Do not let a working-style preference override a current project decision or an explicit user instruction. Do not let stale knowledge override current verified state.
+Do not let working-style preference override a current project decision or explicit user instruction. Do not let stale knowledge override current verified state. Git history is historical evidence, not active authority by itself.
 
 ## Persistence routing gate
 
-Before writing durable material, classify it. Every candidate must go through this gate:
+Before writing durable material, classify it. A request such as **"record this in operational memory"** authorizes correct routing, not arbitrary file creation.
+
+Use this order:
 
 1. **Existing source of record** -> update the existing canonical location. Prefer this over creating anything new.
 2. **Global CURRENT** -> root `CURRENT.md` only for cross-project current focus, active portfolio-level work, cross-project constraints, or global open questions.
@@ -44,19 +49,25 @@ Before writing durable material, classify it. Every candidate must go through th
 6. **PROJECT** -> route project-specific current state, decisions, or durable knowledge through `PROJECTS.md` to the appropriate project folder.
 7. **NOT-V1 / no legitimate home** -> do not invent a file. Tell the user the material does not fit the current structure and treat recurrence as a growth signal.
 
-A request such as **"record this in operational memory"** authorizes routing, not arbitrary file creation.
-
-## Knowledge rules
+## Durable knowledge
 
 Durable knowledge is not the same as current state or a decision.
 
-Use `KNOWLEDGE.md` for stable, supported facts/definitions/corrections that matter across projects. Use a project's `KNOWLEDGE.md` for project-local durable knowledge.
+Use root `KNOWLEDGE.md` for stable, supported facts/definitions/corrections that matter across projects. Use a project's `KNOWLEDGE.md` for project-local durable knowledge.
 
-Prefer an existing canonical source when one already exists. Do not duplicate whole documents into knowledge files.
-
-For time-sensitive facts, record a last-verified date or stale condition. Supersede corrections instead of keeping contradictory active facts.
+Prefer an existing canonical source when one already exists. Do not duplicate whole documents into knowledge files. For time-sensitive facts, use `Last verified`, `Review after`, and/or `Stale when` so future sessions do not treat old information as permanently current. Supersede corrections instead of keeping contradictory active facts.
 
 Do not persist sensitive personal facts merely to personalize responses.
+
+## Working-style learning
+
+`WORKING_STYLE.md` may accumulate stable collaboration preferences over time, but it must not become a biography or personality dossier.
+
+Good candidates include explicit or repeatedly confirmed preferences about communication, initiative, evidence standards, tool use, approval boundaries, recurring workflows, and corrections that should change future behavior.
+
+Explicit durable preferences may be recorded directly. Ambiguous inferred preferences require confirmation before activation. Use `Review after` when a preference may deserve periodic reconfirmation.
+
+Do not infer psychological traits, identity characteristics, sensitive personal facts, or broad preferences from a single interaction.
 
 ## When to create a project
 
@@ -75,32 +86,76 @@ No durable project folder should exist without a registry entry in `PROJECTS.md`
 
 ## New-home promotion gate
 
-A new durable file or category outside the provided structure is exceptional. Before creating one, establish all of the following:
+A new durable file or category outside the declared structure is exceptional. Before creating one, establish all of the following:
 
 - **distinct role:** the content cannot be represented correctly in an existing source of record;
 - **recurrence:** the category is expected to matter again, not just once;
 - **retrieval trigger:** a future session can know when to load it;
 - **authority:** it is clear whether the new artifact is current authority, reference material, procedure, or history;
 - **navigation:** the appropriate `PROJECT.md` or root router will point to it;
-- **human visibility:** the user is told that the durable structure is expanding.
+- **human visibility:** the user is told that the durable structure is expanding;
+- **manifest impact:** if the artifact becomes protocol-required structure, update `PROTOCOL.yaml` and `MIGRATIONS.md` in the same write-set.
 
 If those conditions are not met, do not create the new home.
 
-## Working-style learning
+## Write-set protocol for coupled changes
 
-`WORKING_STYLE.md` may accumulate stable collaboration preferences over time, but it must not become a personality dossier.
+A persistence operation that affects more than one durable file is a **write-set**. Examples include changing a decision that also changes current state, creating a project, or changing protocol structure.
 
-Good candidates include explicit or repeatedly confirmed preferences about communication, initiative, evidence standards, tool use, approval boundaries, recurring workflows, and corrections that should change future behavior.
+Before writing, establish internally:
 
-Do not infer psychological traits, identity characteristics, sensitive personal facts, or broad preferences from a single interaction. Ambiguous inferred preferences require confirmation before durable activation.
+- **Intent:** the durable outcome the user authorized;
+- **Expected writes:** every file that must change;
+- **Preconditions:** the current blob/version of each existing target when the integration exposes one;
+- **Required postcondition/invariant:** what must be true across the complete affected set before success can be claimed.
 
-## V1 scale status
+Then execute:
 
-A repository health or maintenance check should report one of these statuses:
+`read current targets -> establish write-set -> write -> reread every affected target -> verify invariant -> report completion`
+
+If atomic multi-file commit support is available and appropriate, prefer it. Otherwise, sequential writes are acceptable only if the complete postcondition is verified afterward.
+
+If only part of a write-set succeeds:
+
+- do not report the overall operation complete;
+- report the specific temporary inconsistency, for example **operational memory is temporarily inconsistent** or **project routing is temporarily inconsistent**;
+- reread the affected files;
+- preserve valid intervening edits;
+- complete or deliberately reconcile/roll back the write-set before claiming success.
+
+A series of successful API calls is not the success condition. The verified invariant is.
+
+## Write verification and concurrency
+
+Immediately before updating an existing file, retrieve the current target and use its current blob/version as the write precondition when the integration supports one.
+
+If a stale/conflicting write is rejected, fail closed. Do not force or blindly retry. Reread, reconcile material intervening changes, and write only against the newly observed version.
+
+For consequential persistence, read back the intended repository/ref/path/content before claiming completion. A commit receipt supplements readback; it does not replace it. Never invent a commit hash.
+
+## Failure behavior
+
+Default to **fail closed, fail loud, preserve the last known good state, and provide a recovery path**.
+
+Examples:
+
+- required retrieval missing -> report incomplete/partial retrieval;
+- no legitimate persistence destination -> report `NOT-V1 / no legitimate home`;
+- ambiguous durable decision or inferred working preference -> ask before activating;
+- stale write -> reread and reconcile, never force;
+- unverified write -> report not verified;
+- partial write-set -> report temporary inconsistency and reconcile;
+- connector unavailable -> state that repository changes were not persisted.
+
+Visible uncertainty is preferable to invented structure or plausible-looking success.
+
+## Scale status
+
+Repository health/maintenance should report:
 
 ### Healthy
 
-Routing is clear; global files remain cross-project; project-specific state and knowledge live behind project front doors; working-style entries are compact; complete required retrieval remains easy.
+Routing is clear; global files remain cross-project; project-specific state/knowledge live behind project front doors; working-style entries remain compact; minimum-scope retrieval is easy.
 
 ### Watch
 
@@ -109,12 +164,13 @@ One or more signals are appearing:
 - project-specific material is leaking into global files;
 - multiple durable workstreams exist but are not registered as projects;
 - similar material repeatedly routes to NOT-V1;
-- global/project knowledge files are becoming cross-domain scrapbooks or contain duplicate/stale facts;
-- `WORKING_STYLE.md` contains duplicates, contradictions, or increasingly vague inferred preferences;
-- compaction/supersession is needed unusually often just to keep normal retrieval understandable;
+- knowledge files are becoming cross-domain scrapbooks or contain duplicate/stale facts;
+- `WORKING_STYLE.md` contains duplicates, contradictions, or too many narrow rules;
+- soft budgets in `PROTOCOL.yaml` are crossed;
+- compaction/supersession is needed unusually often just to keep retrieval understandable;
 - a project front door no longer points cleanly to the minimum current authority.
 
-When status is Watch, recommend the smallest structural correction first: register/split a project, compact state, supersede stale entries, move knowledge into the correct scope, or add one justified routed source of record.
+A crossed soft budget is a reason to inspect structure, not an automatic deletion instruction.
 
 ### Outgrowing the template
 
@@ -124,12 +180,16 @@ Use this only when the routing skeleton itself is no longer sufficient, for exam
 - many independent knowledge domains need selective retrieval beyond project boundaries;
 - active durable state/knowledge is too large to load or inspect reliably even after project scoping and compaction;
 - repeated model-mediated routing or validation failures materially impair reliability;
-- the user needs typed schemas, indexed retrieval, deterministic validation, atomic transactions, or a dedicated memory service.
+- the user needs typed schemas, indexed retrieval, deterministic semantic validation, atomic transactions, or a dedicated memory service.
 
-At that point, preserve this repository as the human-readable control layer and recommend a structured/indexed or tool-backed memory system rather than adding uncontrolled Markdown.
+At that point, preserve this repository as a human-readable control layer and recommend structured/indexed or tool-backed memory rather than uncontrolled Markdown growth.
 
-## Failure rule
+## Where operational procedures live
 
-Visible uncertainty is preferable to invented structure.
+- `PROTOCOL.yaml` -> machine-readable protocol version/topology/budgets
+- `OPERATIONS.md` -> health checks, project creation, closeout, recovery, maintenance, write-set examples
+- `SECURITY.md` -> privacy, secrets, repository-content boundary, Git hardening
+- `MIGRATIONS.md` -> protocol upgrades for working copies created from older template versions
+- `EVALS.md` -> behavioral/adversarial scenarios used to test model-mediated parts of the protocol
 
-If the correct durable home cannot be established, say so. Do not create a plausible-looking file merely to complete a persistence request.
+Load those only when the task requires them. This front door should remain sufficient for ordinary routing.
