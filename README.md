@@ -33,21 +33,37 @@ Typical examples:
 
 This is not intended to archive every conversation or replace ChatGPT's native personalization features. It is for the smaller class of state that is important enough to survive the chat and explicit enough that you want to inspect and own it.
 
-## Before and after
+## What changes in practice
 
-**Without operational memory**
+This template is not trying to make ChatGPT “remember everything.” ChatGPT can already use whatever memory, chat history, Project context, and current-conversation context are available on your account and surface. This repository adds a separate, explicit operational record for the smaller set of facts and decisions important enough to govern ongoing work.
 
-New chat → “Where were we?” → ChatGPT reconstructs from whatever conversation context or native memory happens to be available → important constraints or decisions may be missing, stale, or blended with recollection.
+| Situation | ChatGPT out of the box | With this repo connected |
+| --- | --- | --- |
+| **Starting a fresh chat later** | ChatGPT may have useful prior context available, but you may not know exactly what it is relying on. | ChatGPT can retrieve `CURRENT.md` and `DECISIONS.md` and show what was actually loaded before continuing. |
+| **You ask “Where were we?”** | ChatGPT reconstructs from the context available to that conversation. The answer may be useful, but the reconstruction itself is less explicit. | The repository contains an inspectable current objective, active work, constraints, open material questions, and active durable decisions. |
+| **You make an important decision** | The decision exists in that conversation and may influence later work, but there is no separate operational decision record unless you create one. | You can say **“Make this a durable decision.”** It is recorded in `DECISIONS.md` with explicit status and supersession fields. |
+| **You change your mind later** | Old and new positions can both exist across prior conversations or memory. ChatGPT must infer which one now governs. | The newer decision can explicitly supersede the old one. The old decision remains historical but is no longer active authority. |
+| **You correct an old assumption** | You can correct ChatGPT in conversation, but later use of that correction depends on the context available to the future chat. | You can correct the recorded operational state so future repo-backed work loads the explicit correction. |
+| **Something important changes casually during a long chat** | It remains in the conversation, but there is no separate visible signal that it became durable operational state. | Assisted persistence can record clear, non-sensitive current-state changes in `CURRENT.md` and tell you what was persisted. |
+| **You wonder whether something was actually saved** | There is normally no Git-style transaction receipt for an ordinary conversational fact. | A successful write should produce readback verification and, when GitHub exposes it, a real commit receipt such as `Persisted: changed launch date · CURRENT.md · commit a1b2c3d`. |
+| **ChatGPT gives the right prior answer** | A correct answer does not necessarily tell you whether it came from memory, project/chat context, the current conversation, or inference. | The workflow treats content agreement alone as insufficient proof. The relevant repository retrieval should be observable and correctly targeted. |
+| **Only part of the relevant prior state is available** | ChatGPT may still try to answer using whatever context is available. Missing context may not always be obvious. | If only one required state file was retrieved, the workflow should report **partial retrieval** rather than claim operational memory is fully loaded. |
+| **Something goes wrong while recording state** | There usually is no separate operational-state transaction to inspect. | The workflow is designed to fail visibly: **not persisted**, **not verified**, **partial retrieval**, or **operational memory is temporarily inconsistent**, depending on the failure. |
+| **Two sessions or a manual GitHub edit collide** | Native conversational memory does not expose this as a versioned file-write problem. | Existing-file updates can use the current GitHub blob/version as a write precondition so stale writes are rejected and reconciled rather than blindly overwriting newer state. |
+| **You want to inspect what should govern future work** | Relevant context may be distributed across memories, chats, Projects, and the current conversation. | Open `CURRENT.md` and `DECISIONS.md`. The active operational state is intentionally small and human-readable. |
+| **You finish an important work session** | You normally end the chat and rely on whatever context is available next time or on notes you maintain separately. | Say **“Close out operational memory.”** ChatGPT can check for unpersisted durable changes, compact current state, reconcile decisions, verify writes, and report what changed. |
+| **You want revision history or recovery** | Chat history preserves conversations, but not a compact revision history of this explicit operational record. | Git preserves the change history of `CURRENT.md` and `DECISIONS.md`, giving you version history and recovery for the recorded state. |
+| **You want portability** | Native ChatGPT context is a ChatGPT product capability. | The durable operational state is ordinary Markdown in a GitHub repository you control. |
+| **You just want casual personalization** | Native ChatGPT memory is usually the simpler fit. | This repository is probably unnecessary overhead. It is aimed at operational continuity, not replacing ordinary personalization. |
+| **You have a one-off casual conversation** | Just chat. | Also just chat. The repository should stay out of the way because nothing needs durable operational persistence. |
 
-**With operational memory**
+The practical difference is not **“ChatGPT remembers more.”** It is closer to this:
 
-New chat → retrieve `CURRENT.md` + `DECISIONS.md` from the intended repository → receive a retrieval receipt showing what was actually loaded → continue from the explicitly recorded state.
+**Out of the box:** “ChatGPT may have useful context available.”
 
-When something important changes during the session, ChatGPT can persist it and return a visible receipt such as:
+**With this repository:** “For the parts important enough to govern ongoing work, I can inspect what was loaded, what is recorded as current, what decisions remain active, what changed, and whether that change actually persisted.”
 
-`Persisted: venue decision · DECISIONS.md · commit 4ac02d1`
-
-That receipt is useful only when the commit prefix is derived from a real GitHub commit SHA. The write still requires readback verification.
+There is a tradeoff: this workflow adds some ceremony. You set up GitHub once, may need to invoke `@GitHub` when automatic selection does not occur, and will occasionally see retrieval or persistence receipts. If you do not value that extra inspectability and control, native ChatGPT behavior may be the better fit.
 
 ## 60-second operating model
 
