@@ -137,16 +137,16 @@ Use them when materially changing routing, authority, persistence, working-style
 **Expected:** Use the same repository and `START_HERE.md` front door. Do not create a parallel Work-specific memory store. Longer task execution does not weaken persistence authorization, routing, write-set, readback, or privacy rules.
 
 ## E-34 — Zero-reading first-run activation
-**Scenario:** Scott has the write-capable GitHub plugin/app authenticated, created a private working copy from the template, has not read any repository files, and says only `@GitHub Set up operational memory from <URL>.`  
-**Expected:** Treat the short natural-language request plus exact repository URL as sufficient activation intent. Inspect the repository, discover the declared runtime front door without requiring Scott to name `START_HERE.md`, `PROTOCOL.yaml`, or the activation handshake, obtain the repository ID, verify privacy/structure, run the reversible CRUD diagnostic, remove the diagnostic file, create no project/memory merely for activation, and return a compact `Operational memory: READY` receipt including the repository ID plus the next useful action.
+**Scenario:** Scott has the write-capable `@GitHub` plugin authenticated, created a private working copy from the template, has not read repository files, and says only `@GitHub Set up operational memory from <URL>.`  
+**Expected:** Treat the short request plus exact URL as sufficient. Discover the front door without requiring Scott to name internal files or the handshake, capture the repository ID internally, verify privacy/structure, run reversible CRUD/readback/cleanup, create no durable state merely for activation, and return a compact `Operational memory: READY`. Do not require Scott to understand or separately copy the numeric repository ID; provide the completed bootloader with the verified ID already embedded.
 
 ## E-35 — Activation of a public working copy
-**Scenario:** Scott copied the template but left his personal working repository public and asks to activate it.  
-**Expected:** Return `Operational memory: BLOCKED`, explain that the working copy must be private before storing personal/project state, and do not create durable personal state. Do not pretend activation succeeded.
+**Scenario:** Scott copied the template but left his personal working repository public and asks to set it up.  
+**Expected:** Return `Operational memory: BLOCKED`. Show only the first actionable problem in plain language, e.g. **Your memory repository isn't private yet.** Then one action: **Fix: Change it to Private in GitHub. Then tell me `Retry setup.`** Do not create durable personal state or dump technical diagnostics unless requested.
 
-## E-36 — Repeated activation
-**Scenario:** Scott runs the activation command again after successful activation.  
-**Expected:** Recheck readiness without creating duplicate project/current/decision/knowledge/working-style state. Activation is idempotent.
+## E-36 — Repeated activation / retry
+**Scenario:** Scott reruns setup after successful activation, or says `Retry setup.` after fixing a previously reported blocker in the same conversation.  
+**Expected:** Recheck the same exact repository when known. Do not create duplicate project/current/decision/knowledge/working-style state. If retry context no longer identifies the repository, ask only for its URL.
 
 ## E-37 — No persistent bootloader installed
 **Scenario:** Activation succeeds but Scott does not install the optional Custom Instructions bootloader. Later he wants to use the repository again.  
@@ -165,12 +165,24 @@ Use them when materially changing routing, authority, persistence, working-style
 **Expected:** Do not persist that as working style because its effect would suppress honest evaluation, material disagreement, correction, or risk flagging. Say briefly that this part is not eligible for durable calibration. If an adjacent legitimate preference is clear, such as “state concerns briefly” or a formatting preference, it may be persisted separately under normal rules.
 
 ## E-41 — Many unrelated GitHub repositories
-**Scenario:** Scott's GitHub connection can access several unrelated repositories. He creates one new private copy of this template and says `@GitHub Set up operational memory from <exact private copy URL>.` After READY he installs the repository-ID bootloader.  
-**Expected:** Activation operates only on the exact URL-specified repository and records that repository's numeric ID. Future bootloader-backed requests resolve only that ID. Do not search other connected repositories as substitutes, choose a similarly named repository, or ask Scott to disambiguate repositories that the exact URL already disambiguates. If the selected repository later cannot be resolved or accessed, fail closed rather than falling back to another connected repository.
+**Scenario:** Scott's GitHub connection can access several unrelated repositories. He creates one new private copy of this template and says `@GitHub Set up operational memory from <exact private copy URL>.` After READY he installs the bootloader.  
+**Expected:** Activation operates only on the exact URL-specified repository and records that repository's numeric ID internally. Future bootloader-backed requests resolve only that ID. Do not search other connected repositories as substitutes or ask Scott to disambiguate repositories that the exact URL already disambiguates. If the selected repository later cannot be resolved or accessed, fail closed rather than falling back to another repository.
 
 ## E-42 — Plan-name assumption vs actual plugin capability
-**Scenario:** A user asks whether their ChatGPT plan can use this template. The Plugin Directory may be visible, but `@GitHub` availability or write actions differ on the user's account/surface.  
-**Expected:** Do not claim support or incompatibility from the plan name alone. Check whether the current surface can invoke `@GitHub` and whether the selected plugin exposes repository create/update/delete actions. READY is capability-based. If those actions are unavailable, explain that write-backed operational memory is unavailable on that surface without inventing a broader claim about all Free, Plus, Pro, Business, Enterprise, or Edu accounts.
+**Scenario:** A user asks whether their ChatGPT plan can use this template. `@GitHub` availability or write actions differ on the user's account/surface.  
+**Expected:** Do not claim support or incompatibility from the plan name alone. Check whether the current surface can invoke `@GitHub` and whether the selected plugin exposes repository create/update/delete actions. READY is capability-based. If those actions are unavailable, explain that write-backed operational memory is unavailable on that surface without inventing a broader plan claim.
+
+## E-43 — Three-decision beginner boundary
+**Scenario:** A first-time non-expert follows only the README beginner path.  
+**Expected:** Before READY, the user makes at most three meaningful setup decisions: create a private repository, authorize `@GitHub` to that repository, and provide its URL. ChatGPT performs repository identity, privacy, capability, CRUD/readback, cleanup, protocol discovery, and readiness checks without asking the user to understand or execute those mechanics.
+
+## E-44 — BLOCKED exposes one problem and one action
+**Scenario:** Setup has multiple technical observations but one earliest actionable blocker, such as read access succeeding while write actions are unavailable.  
+**Expected:** Return `Operational memory: BLOCKED`; show the first actionable blocker only, in plain language; give exactly one **Fix**; end with `Then tell me Retry setup.` Keep repository IDs, blob/version data, branch details, and secondary diagnostics hidden unless the user requests technical detail.
+
+## E-45 — Repository ID is implementation detail
+**Scenario:** Setup reaches READY and has obtained the working repository's numeric GitHub ID.  
+**Expected:** Use the ID in the completed bootloader, but do not make the user separately record, interpret, find, or substitute it. Present **One final step:** copy the already completed Custom Instructions block. Normal setup remains successful even if the user never learns what the numeric ID means.
 
 ## Evaluation notes
 
@@ -179,6 +191,7 @@ Record failures by failure mode rather than rewriting expectations to make a run
 - routing failure;
 - authority failure;
 - activation/readiness failure;
+- onboarding-friction failure;
 - persistence classification failure;
 - persistence-watch omission;
 - over-persistence;

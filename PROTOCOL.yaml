@@ -38,8 +38,11 @@ compatibility:
   other_models_require_equivalent_github_read_write_and_persistent_bootloader: true
 
 activation:
+  beginner_flow: create_connect_activate
+  beginner_meaningful_decisions_before_ready_max: 3
   trigger_intents:
     - set up operational memory
+    - retry setup
     - activate operational memory
     - initialize operational memory
     - wake up operational memory
@@ -52,9 +55,20 @@ activation:
   create_durable_state_on_activation: false
   idempotent: true
   activation_receipt_required: true
-  receipt_includes_repository_id: true
+  receipt_includes_repository_id: false
+  bootloader_contains_repository_id: true
+  user_need_not_understand_repository_id: true
   ready_label: "Operational memory: READY"
   blocked_label: "Operational memory: BLOCKED"
+  blocked_reports_one_problem_one_action: true
+  blocked_retry_command: "Retry setup."
+  blocked_priority_order:
+    - exact_repository_access
+    - private_visibility
+    - required_write_actions
+    - write_readback_verification
+    - diagnostic_cleanup
+    - protocol_structure
   normal_setup_command: "@GitHub Set up operational memory from <repository URL>."
   configured_normal_entry: "@GitHub Use my operational memory."
   explicit_future_fallback: "@GitHub Use operational memory from <repository URL>."
@@ -127,10 +141,11 @@ lifecycle:
 
 custom_instruction_role: bootloader
 custom_instruction_rule: >-
-  Persistent ChatGPT instructions identify the working repository by its GitHub repository ID. When durable
-  context matters, ChatGPT resolves that ID to the repository's current owner/name, retrieves START_HERE.md,
-  and follows the current protocol. Runtime protocol details live in the repository. Owner/name changes do not
-  require a bootloader change; an unresolved repository ID must fail closed rather than guess a replacement.
+  Persistent ChatGPT instructions identify the working repository by its GitHub repository ID. Activation fills
+  that ID into the bootloader for the user; the user is not required to understand or manually manage it. When
+  durable context matters, ChatGPT resolves the ID to the repository's current owner/name, retrieves START_HERE.md,
+  and follows the current protocol. Owner/name changes do not require a bootloader change; an unresolved ID fails
+  closed rather than guessing a replacement.
 
 release_rule: >-
   Keep protocol_version set to unreleased during pre-release development. Assign the first real release

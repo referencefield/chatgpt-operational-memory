@@ -7,26 +7,38 @@ This file is the **runtime protocol authority**. Do not begin by loading the who
 
 ## Activation handshake
 
-When the user explicitly asks to **set up**, **activate**, **initialize**, **wake up**, or **start using** a newly created operational-memory repository and identifies the repository, treat that as activation intent.
+Treat **set up**, **activate**, **initialize**, **wake up**, or **start using** operational memory plus an identified repository as activation intent. If a prior attempt in the current conversation was BLOCKED, **“Retry setup.”** means rerun against that same exact repository after the user fixes the reported problem. If the repository cannot be established from the current conversation, ask only for its URL.
 
-The user's normal setup prompt does **not** need to mention `START_HERE.md`, `PROTOCOL.yaml`, or an “activation handshake.” Those are repository implementation details that ChatGPT should discover and apply after the user identifies the repository and asks to set up operational memory.
+The user does not need to mention `START_HERE.md`, `PROTOCOL.yaml`, repository IDs, CRUD, or an activation handshake. Those are implementation details.
 
-1. confirm the exact working repository, default branch, visibility, and GitHub repository ID. The working repository may have any owner/name; its name is not part of the memory schema and does not need to match the public template source;
+1. confirm the exact working repository, default branch, visibility, and GitHub repository ID; owner/name may be arbitrary;
 2. require the personal working copy to be **private** before storing personal/project state;
-3. retrieve `PROTOCOL.yaml`, this file, the declared root memory files, and `PROJECTS.md`; verify declared structure without broad-loading unrelated content;
-4. using the selected `@GitHub` plugin's actual actions, verify read/write with reversible `SETUP-TEST.md`: create -> reread -> update against the current blob/version when available -> reread -> delete -> verify deletion. Do not infer that `@GitHub` is read-only from a separate GitHub app; if required write actions are absent, BLOCKED;
+3. retrieve `PROTOCOL.yaml`, this file, the declared root memory files, and `PROJECTS.md`; verify structure without broad-loading unrelated content;
+4. using the selected `@GitHub` plugin's actual actions, verify read/write with reversible `SETUP-TEST.md`: create -> reread -> update using the current version when available -> reread -> delete -> verify deletion. Do not infer that `@GitHub` is read-only from a separate GitHub app; if required write actions are absent, BLOCKED;
 5. create **no** project, decision, knowledge, working-style, or current-state entry merely to mark activation;
-6. return a compact receipt beginning **`Operational memory: READY`** or **`Operational memory: BLOCKED`**, covering current owner/name, GitHub repository ID, privacy, read/write verification, protocol/status, structural health, project count, durable-state empty/non-empty, persistence-watch status, and the next useful action.
+6. return **READY** or **BLOCKED** using the user-facing rules below.
 
-The setup URL selects the exact working repository even when GitHub can access many others. Never substitute another repository. After activation, future bootloader routing uses that repository's numeric ID.
+The setup URL selects the exact working repository even when GitHub can access many others. Never substitute another repository. After activation, bootloader routing uses that repository's numeric ID.
+
+### READY response
+
+Begin **`Operational memory: READY`** and show only useful human-facing status such as repository, Private, GitHub read/write verified, structure healthy, and ready to use. Do **not** make the numeric repository ID something the user must understand or copy separately.
+
+Then say **One final step:** and provide the completed Custom Instructions bootloader from `SETUP.md` with the verified repository ID already filled in. The ID may appear inside that copyable instruction because it is the routing key, but do not require the user to interpret or manually edit it.
+
+### BLOCKED response
+
+Begin **`Operational memory: BLOCKED`**. Report only the first actionable blocker in this order: exact repository access, private visibility, required write actions, write/readback verification, diagnostic cleanup, protocol structure.
+
+Use plain language and give exactly one next action under **Fix:**. End with **Then tell me `Retry setup.`** Do not dump repository IDs, blob/version details, branch diagnostics, or protocol jargon unless the user asks for technical detail.
 
 Activation is idempotent. Cloning/naming the repository alone is not activation.
 
-For future routing, prefer the GitHub repository ID over owner/name. Resolve the repository ID to its current owner/name before retrieving files. A normal repository rename therefore requires no protocol migration and no bootloader edit.
+For future routing, prefer the GitHub repository ID over owner/name. Resolve it to the current owner/name before retrieval. A normal repository rename therefore requires no protocol migration or bootloader edit.
 
-If a configured repository ID does not resolve, fail closed and ask the user to restore access or identify the intended repository. Do not guess based on a similar repository name.
+If a configured repository ID does not resolve, fail closed. Do not guess from a similar repository name.
 
-If no persistent ChatGPT bootloader is configured, offer the simple URL fallback from `SETUP.md`:
+If no persistent bootloader is configured, offer the simple fallback from `SETUP.md`:
 
 `@GitHub Use operational memory from <repository URL>.`
 
@@ -57,7 +69,7 @@ When repository sources conflict, use this order unless a higher-level rule requ
 6. historical/superseded repository state;
 7. native ChatGPT memory, chat recollection, or model inference.
 
-Working style does not override current instructions/decisions. It also cannot be used to suppress honest evaluation, material disagreement, correction of errors, material risk flagging, uncertainty disclosure, or applicable safety behavior. Stale knowledge does not override current verified state. Git history is evidence, not active authority by itself. Native ChatGPT memory may be useful context, but it does not override current verified durable repository state.
+Working style does not override current instructions/decisions. It also cannot suppress honest evaluation, material disagreement, correction of errors, material risk flagging, uncertainty disclosure, or applicable safety behavior. Stale knowledge does not override current verified state. Git history is evidence, not active authority by itself. Native ChatGPT memory may be useful context, but it does not override current verified durable repository state.
 
 ## Conservative persistence watch
 
@@ -95,7 +107,7 @@ A new durable file/category outside declared structure is exceptional. Before cr
 
 ## Write safety
 
-A **consequential write** is any write that changes declared durable memory, routing, authority, project structure, or protocol configuration. Temporary reversible diagnostics such as `SETUP-TEST.md` are excluded from this term, though their own activation procedure still requires readback and cleanup verification.
+A **consequential write** is any write that changes declared durable memory, routing, authority, project structure, or protocol configuration. Temporary reversible diagnostics such as `SETUP-TEST.md` are excluded from this term, though their activation procedure still requires readback and cleanup verification.
 
 For consequential writes:
 
@@ -130,4 +142,4 @@ For health/scale checks, use `OPERATIONS.md` and report **`Healthy | Watch | Out
 - `MIGRATIONS.md` -> release-to-release upgrade guidance
 - `EVALS.md` -> behavioral/adversarial scenarios
 
-This front door should remain sufficient for ordinary routing. Load the detailed documents only when the task actually requires them.
+This front door should remain sufficient for ordinary routing. Load detailed documents only when the task requires them.
