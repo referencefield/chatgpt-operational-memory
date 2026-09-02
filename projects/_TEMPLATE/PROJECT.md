@@ -22,8 +22,9 @@ One sentence describing what this durable workstream is trying to accomplish.
 A fresh session handling this project should normally retrieve:
 
 1. this `PROJECT.md`;
-2. `CURRENT.md`;
-3. `DECISIONS.md` when durable decisions can materially affect the task.
+2. `CURRENT.md` when current project state can matter;
+3. `DECISIONS.md` when durable project decisions can matter;
+4. `KNOWLEDGE.md` when stable project facts/definitions/corrections can matter.
 
 Load additional project artifacts only when this front door or the current task identifies them as necessary.
 
@@ -31,6 +32,7 @@ Load additional project artifacts only when this front door or the current task 
 
 - **Current state:** `CURRENT.md`
 - **Durable project decisions:** `DECISIONS.md`
+- **Durable project knowledge:** `KNOWLEDGE.md`
 - **Other canonical sources:** none yet
 
 When another project artifact becomes a source of record, register its exact path and role here. Do not create unindexed durable files.
@@ -55,9 +57,9 @@ _Not yet established._
 
 Do not create additional files merely because information exists.
 
-If recurring project material does not belong in `CURRENT.md` or `DECISIONS.md`, first check whether an existing canonical source already holds it. A new project artifact is justified only when it has a distinct role, expected recurrence, a retrieval trigger, clear authority, and is registered under **Current authority** above.
+If recurring project material does not belong in `CURRENT.md`, `DECISIONS.md`, or `KNOWLEDGE.md`, first check whether an existing canonical source already holds it. A new project artifact is justified only when it has a distinct role, expected recurrence, a retrieval trigger, clear authority, and is registered under **Current authority** above.
 
-Possible roles, when genuinely needed, include compact reference facts, a recurring procedure, or a project-specific evidence/source register. These are examples, not files that should automatically be created.
+Possible roles, when genuinely needed, include a recurring procedure or a project-specific evidence/source register. These are examples, not files that should automatically be created.
 
 ## Persistence routing
 
@@ -66,8 +68,10 @@ Before persisting project material:
 1. prefer an existing registered source of record;
 2. current objective/state/constraints/open questions -> `CURRENT.md`;
 3. durable governing decision -> `DECISIONS.md`;
-4. stable global collaboration preference -> root `WORKING_STYLE.md`, not this project;
-5. material with no legitimate project home -> do not invent a file; surface it as a routing/growth signal.
+4. stable supported project fact/definition/correction -> `KNOWLEDGE.md`;
+5. stable global collaboration preference -> root `WORKING_STYLE.md`, not this project;
+6. cross-project fact/definition/correction -> root `KNOWLEDGE.md` when no better source exists;
+7. material with no legitimate project home -> do not invent a file; surface it as a routing/growth signal.
 
 ## Maintenance
 
