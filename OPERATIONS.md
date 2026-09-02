@@ -1,6 +1,6 @@
 # Operations
 
-This document is for normal operation after setup: persistence watch, project creation, durable persistence, write-sets, closeout, health checks, update discovery, recovery, scale management, and repository maintenance.
+This document is for normal operation after setup: persistence watch, project creation, durable persistence, write-sets, health checks, update discovery, recovery, scale management, and repository maintenance.
 
 `START_HERE.md` remains the runtime routing authority. Use this document when the task needs operational detail.
 
@@ -33,11 +33,10 @@ Useful phrases during work:
 - **“Do not persist this.”** Block persistence of the specified material.
 - **“Ask before writing anything else this session.”** Temporarily switch to ask-first behavior.
 - **“What do you currently have recorded about this?”** Retrieve the durable source instead of answering from recollection.
-- **`@GitHub Close out operational memory.`** Run the repository-backed closeout routine below.
 - **`@GitHub Run a repository health check.`** Run structural + semantic health checks and report scale status.
 - **`@GitHub Check for protocol updates.`** Compare this working copy with the template source declared in `PROTOCOL.yaml`.
 
-These are controls, not required incantations. During repository-backed work, the conservative persistence watch in `START_HERE.md` should notice clear future-governing changes even when the user does not remember a magic phrase. When starting a fresh repository-backed control action such as closeout, health, or update checking, explicit `@GitHub` is the dependable invocation path.
+These are controls, not required incantations. During repository-backed work, the conservative persistence watch in `START_HERE.md` should notice clear future-governing changes even when the user does not remember a magic phrase. When starting a fresh repository-backed control action such as health or update checking, explicit `@GitHub` is the dependable invocation path.
 
 ## Persistence watch
 
@@ -49,7 +48,7 @@ Ask before writing when durable intent or future relevance is inferred rather th
 
 Do not persist brainstorming, alternatives under consideration, casual facts, transient preferences, or conversational detail merely because they might be useful later. Working-style candidates must also pass the behavioral-authority boundary in `WORKING_STYLE.md` and `SECURITY.md`.
 
-At closeout, reconcile any persistence-watch candidates still pending and report anything intentionally left unpersisted.
+Persistence is maintained during repository-backed work rather than deferred to a special end-of-session command. When a qualifying change occurs, route and verify it at the point it becomes durable enough to govern future work.
 
 ## Project creation
 
@@ -116,30 +115,6 @@ When GitHub returns or confirms a real commit SHA, report a compact receipt:
 Never invent or guess a commit ID. If unavailable, say `commit ID unavailable`.
 
 For a new durable decision, also show the exact stored one-sentence `Decision` field so the user can inspect the semantic result.
-
-## Closing out an important session
-
-For dependable repository-backed execution, say:
-
-> **`@GitHub Close out operational memory.`**
-
-A plain “Close out operational memory” expresses the same intent when the current surface actually engages GitHub through the installed bootloader. If GitHub does not run, do not claim that closeout occurred: state that repository-backed closeout was not performed and direct the user to the explicit `@GitHub` form.
-
-ChatGPT should:
-
-1. enter through `START_HERE.md`;
-2. identify the global/project scopes actually touched;
-3. identify material durable changes not yet persisted, including persistence-watch candidates;
-4. apply the persistence-routing gate;
-5. establish any required write-set before writing;
-6. update only what earns persistence;
-7. compact stale current state instead of appending a transcript;
-8. reconcile active decisions, durable knowledge, and working-style changes;
-9. reread and verify consequential writes/write-sets;
-10. report persistence receipts and anything intentionally left unpersisted;
-11. surface a `Watch` condition if the session exposed routing/sprawl problems.
-
-This is a conversational closeout, not a transcript archive.
 
 ## Check for template/protocol updates
 
@@ -279,4 +254,4 @@ See `SECURITY.md` for optional `main` protection against deletion and force push
 
 ## Behavioral evals
 
-`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, authority, update discovery, release lifecycle, closeout, or repository-maintenance rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.
+`EVALS.md` contains adversarial scenarios for model-mediated behavior. Use them when changing routing, persistence, failure, authority, update discovery, release lifecycle, or repository-maintenance rules, or when evaluating a new model/integration. They complement structural validation rather than replacing it.

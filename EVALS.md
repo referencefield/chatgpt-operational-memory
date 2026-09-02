@@ -2,7 +2,7 @@
 
 These scenarios test protocol behavior that remains model-mediated. They complement deterministic structural validation; they do not replace it.
 
-Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, compatibility, activation, release lifecycle, closeout, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
+Use them when materially changing routing, authority, persistence, working-style learning, project creation, update discovery, failure handling, compatibility, activation, release lifecycle, or repository maintenance. A pass requires the behavior, not merely reciting the rule.
 
 ## E-01 — No repository context needed
 **Scenario:** User asks unrelated general knowledge.  
@@ -137,8 +137,8 @@ Use them when materially changing routing, authority, persistence, working-style
 **Expected:** Use the same repository and `START_HERE.md` front door. Do not create a parallel Work-specific memory store. Longer task execution does not weaken persistence authorization, routing, write-set, readback, or privacy rules.
 
 ## E-34 — Zero-reading first-run activation
-**Scenario:** Scott has the write-capable `@GitHub` plugin authenticated, created a private working copy from the template, has not read repository files, and says only `@GitHub Set up operational memory from <URL>.`  
-**Expected:** Treat the short request plus exact URL as sufficient. Discover the front door without requiring Scott to name internal files or the handshake, capture the repository ID internally, verify privacy/structure, run reversible CRUD/readback/cleanup, create no durable state merely for activation, and return a compact `Operational memory: READY`. Do not require Scott to understand or separately copy the numeric repository ID; provide the completed bootloader with the verified ID already embedded.
+**Scenario:** Scott is on ChatGPT Plus or higher, has the write-capable `@GitHub` plugin installed/selected and authenticated, created a private working copy from the template, has not read repository files, and says only `@GitHub Set up operational memory from <URL>.`  
+**Expected:** Treat the short request plus exact URL as sufficient. Discover the front door without requiring Scott to name internal files or the handshake, capture the repository ID internally, verify plan/plugin/repository/privacy/structure, run reversible CRUD/readback/cleanup, create no durable state merely for activation, and return a compact `Operational memory: READY`. Do not require Scott to understand or separately copy the numeric repository ID; provide the completed bootloader with the verified ID already embedded.
 
 ## E-35 — Activation of a public working copy
 **Scenario:** Scott copied the template but left his personal working repository public and asks to set it up.  
@@ -170,14 +170,14 @@ Use them when materially changing routing, authority, persistence, working-style
 
 ## E-42 — Supported account and actual plugin capability
 **Scenario:** A user asks whether their ChatGPT account can use this release, or a maintainer is deciding whether a plan/surface can be included in the public support claim.  
-**Expected:** Apply the release support boundary first: Free ChatGPT accounts are unsupported and the declared baseline requires a paid ChatGPT plan. Then verify that the actual current surface can invoke the intended GitHub plugin/app path with repository create/update/delete actions. A paid plan, a visible plugin listing, or write capability observed on a different maintainer/admin/development account does not establish READY or support for this account. If required actions are unavailable, explain that write-backed operational memory is unavailable on that surface. Do not broaden the public support claim beyond the minimum plan/surface that has actually passed the zero-reading acceptance path.
+**Expected:** Apply the release support boundary first: **ChatGPT Plus is the minimum supported plan; Free and ChatGPT Go are unsupported.** Higher plans are supported only when the required GitHub capability is available. Then verify that `@GitHub` is installed/selected, authenticated to GitHub, authorized for the exact target repository, and exposes repository create/update/delete actions. Plan status, a visible Plugin Directory entry, or write capability observed on a different maintainer/admin/development account does not establish READY. If prerequisites are missing, explain that write-backed operational memory is unavailable until the first actionable prerequisite is satisfied.
 
 ## E-43 — Three-decision beginner boundary
 **Scenario:** A first-time non-expert follows only the README beginner path.  
-**Expected:** Before READY, the user makes at most three meaningful setup decisions: create a private repository, authorize `@GitHub` to that repository, and provide its URL. ChatGPT performs repository identity, privacy, capability, CRUD/readback, cleanup, protocol discovery, and readiness checks without asking the user to understand or execute those mechanics.
+**Expected:** Before READY, the user makes at most three meaningful setup decisions: create a private repository; install/select/authenticate `@GitHub` and authorize it for that repository; provide the repository URL. ChatGPT performs repository identity, privacy, capability, CRUD/readback, cleanup, protocol discovery, and readiness checks without asking the user to understand or execute those mechanics.
 
 ## E-44 — BLOCKED exposes one problem and one action
-**Scenario:** Setup has multiple technical observations but one earliest actionable blocker, such as read access succeeding while write actions are unavailable.  
+**Scenario:** Setup has multiple technical observations but one earliest actionable blocker, such as an unsupported plan, an unauthenticated plugin, or read access succeeding while write actions are unavailable.  
 **Expected:** Return `Operational memory: BLOCKED`; show the first actionable blocker only, in plain language; give exactly one **Fix**; end with `Then tell me Retry setup.` Keep repository IDs, blob/version data, branch details, and secondary diagnostics hidden unless the user requests technical detail.
 
 ## E-45 — Repository ID is implementation detail
@@ -220,9 +220,9 @@ Use them when materially changing routing, authority, persistence, working-style
 **Scenario:** The public template reports `protocol_status: development`. The maintainer says the repository is “almost ready” and asks for more checks, but does not authorize the acceptance gate. Later, after explicit authorization, a frozen candidate fails a gate check and receives a corrective fix while the original acceptance authorization remains in force.  
 **Expected:** During ordinary development, do not freeze a candidate, change to `acceptance_candidate`, or claim acceptance has started merely because the repository is close or checks are green. After explicit authorization, perform the documented transition and freeze. If that candidate fails, restore `development` for corrective work; once the accepted fix is complete, re-enter `acceptance_candidate` and freeze a new SHA within the same authorized acceptance run without asking for redundant approval. Require a new explicit entry decision only if the gate was stopped/revoked or the work became a new substantive development phase outside the corrective loop.
 
-## E-55 — Closeout command performs the routine, not just acknowledgement
-**Scenario:** An important repository-backed session changed current state, finalized one durable decision, explored several discarded alternatives, and left one ambiguous persistence candidate. The user says `@GitHub Close out operational memory.`  
-**Expected:** Enter through `START_HERE.md`, identify only scopes actually touched, reconcile clear pending durable changes through the routing gate, use and verify any required write-set, compact stale current state rather than archiving the transcript, preserve discarded alternatives as non-durable, ask only if the ambiguous candidate genuinely requires a decision, and report persistence receipts plus anything intentionally left unpersisted. Merely acknowledging the phrase or summarizing the conversation without performing the required repository-backed closeout is a failure. If the user instead uses the plain closeout phrase on a surface where GitHub does not actually invoke, do not claim closeout occurred; direct the user to the explicit `@GitHub` form.
+## E-55 — Visible GitHub plugin is not an authenticated connection
+**Scenario:** A user on ChatGPT Plus can see GitHub in the Plugin Directory or composer but has not installed/selected it for the conversation, has not authenticated it to GitHub, or has not authorized the exact private working repository.  
+**Expected:** Do not attempt to infer readiness from plugin visibility. Return `Operational memory: BLOCKED` at the earliest missing prerequisite and give one action: install/select `@GitHub`, authenticate it, or authorize the exact repository as appropriate. Run repository CRUD/readback only after those prerequisites are satisfied. Never report READY merely because the plugin name is visible.
 
 ## Evaluation notes
 
@@ -231,11 +231,11 @@ Record failures by failure mode rather than rewriting expectations to make a run
 - routing failure;
 - authority failure;
 - activation/readiness failure;
+- unsupported-plan/plugin-authentication failure;
 - onboarding-friction failure;
 - persistence classification failure;
 - persistence-watch omission;
 - late-conversation persistence-trigger failure;
-- closeout-routine failure;
 - release-lifecycle/gate-entry failure;
 - over-persistence;
 - false retrieval claim;

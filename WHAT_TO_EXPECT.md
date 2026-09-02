@@ -4,7 +4,11 @@ This page is for the person deciding whether Operational Memory is worth install
 
 ## Short version
 
-Use this if you have a **paid ChatGPT account where the GitHub plugin/app path exposes repository write actions**, use ChatGPT for ongoing work, and regularly run into questions like:
+Use this if you have **ChatGPT Plus (currently $20/month) or a higher ChatGPT plan**, use ChatGPT for ongoing work, and can install/select and authenticate the **`@GitHub` plugin** with repository write actions.
+
+**Free and ChatGPT Go are not supported by this release.** Seeing the Plugin Directory is not enough: the GitHub plugin must actually be available on your account/surface, authenticated to GitHub, authorized for the intended repository, and expose the required read/write actions.
+
+This is useful when you regularly run into questions like:
 
 - Where were we?
 - Which decision is actually current?
@@ -12,8 +16,6 @@ Use this if you have a **paid ChatGPT account where the GitHub plugin/app path e
 - Why am I explaining the same project again?
 - Did ChatGPT really save that change?
 - How do several projects or GitHub repositories fit together?
-
-A paid plan by itself is not enough; GitHub plugin/app availability and actions vary by account, plan, surface, workspace, and rollout. Setup verifies the actual capability before reporting READY.
 
 Skip it if most of your ChatGPT use is one-off questions and you rarely need durable project continuity.
 
@@ -41,9 +43,9 @@ It is deliberately **not a named persona** and does not pretend to know you.
 
 If you already have your own AI companion, persona, or Custom Instructions, Operational Memory does not replace or rewrite them. Your existing guidance remains in place; the generic companion fills only uncovered gaps. `WORKING_STYLE.md` can gradually preserve a small number of useful preferences that genuinely recur.
 
-## Paid ChatGPT alone vs Operational Memory
+## ChatGPT Plus alone vs Operational Memory
 
-| Situation | Paid ChatGPT out of the box | With Operational Memory |
+| Situation | ChatGPT Plus out of the box | With Operational Memory |
 | --- | --- | --- |
 | Fresh chat later | Native memory/history may help, but the basis can be unclear or incomplete. | `@GitHub` can retrieve explicit current state and active decisions from a scoped durable source. |
 | “Where were we?” | Reconstruct from available conversation/native context. | Route through the project registry and current project authority. |
@@ -83,7 +85,7 @@ Unrelated repositories do not need to be registered. Knowing about a linked repo
 
 ## Setup cost
 
-The supported release baseline is a **paid ChatGPT plan** plus a write-capable `@GitHub` plugin and one private GitHub repository.
+The supported release baseline is **ChatGPT Plus (currently $20/month) or higher**, an installed/selected and authenticated write-capable `@GitHub` plugin, and one private GitHub repository. Free and ChatGPT Go are unsupported.
 
 The intended human setup is:
 
