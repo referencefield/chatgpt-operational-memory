@@ -20,7 +20,8 @@ Do not post secrets, private repository contents, credentials, or sensitive pers
 Strong proposals usually preserve these principles:
 
 - ordinary ChatGPT users should not need a terminal for normal operation;
-- the primary ChatGPT path uses the authenticated GitHub plugin with an underlying GitHub app/connection that exposes repository read/write actions, with explicit `@GitHub` invocation when needed;
+- the supported ChatGPT baseline is **Plus or higher**; Free and ChatGPT Go are unsupported by this release;
+- the primary ChatGPT path requires `@GitHub` to be installed/selected, authenticated to GitHub, authorized for the exact repository, and exposing repository read/write actions, with explicit `@GitHub` invocation when needed;
 - durable material is routed before it is written;
 - existing sources of record are preferred over new files;
 - project boundaries prevent global files from becoming junk drawers;
@@ -64,9 +65,9 @@ The validator is structural. A green result does not replace semantic review.
 
 ## Compatibility contributions
 
-The primary release target is ChatGPT using the **write-capable GitHub plugin/app path** described in `SETUP.md`. A read-only GitHub connection may support retrieval but cannot satisfy the persistence requirements.
+The primary release target is **ChatGPT Plus or higher** using the authenticated **write-capable `@GitHub` plugin/app path** described in `SETUP.md`. Free and ChatGPT Go are outside this release's support boundary. A read-only GitHub connection may support retrieval but cannot satisfy the persistence requirements.
 
-The repository also includes a minimal root `AGENTS.md` bootloader so OpenAI Codex can enter through the same `START_HERE.md` protocol instead of inventing a second operating model. ChatGPT Work should use the same repository and front door when equivalent GitHub write actions are available.
+The repository also includes a minimal root `AGENTS.md` bootloader so OpenAI Codex can enter through the same `START_HERE.md` protocol instead of inventing a second operating model. ChatGPT Work should use the same repository and front door when equivalent GitHub write actions are available on a supported plan/workspace.
 
 Changes for other model providers are welcome when they preserve the same user-facing simplicity and can demonstrate equivalent repository read/write behavior, scoped retrieval, and persistent bootstrapping. Do not add provider-specific machinery to the default path merely for theoretical compatibility.
 
