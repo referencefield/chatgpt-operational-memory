@@ -27,13 +27,18 @@ working_repository:
 
 compatibility:
   primary_surface: chatgpt
-  supported_release_requires_paid_chatgpt_plan: true
+  minimum_supported_chatgpt_plan: plus
   free_chatgpt_plan_supported: false
+  go_chatgpt_plan_supported: false
+  higher_paid_plans_supported_when_required_github_capability_available: true
   required_chatgpt_plugin: GitHub
   plugin_invocation: "@GitHub"
+  plugin_must_be_installed_or_selected: true
+  plugin_must_be_authenticated: true
+  plugin_must_be_authorized_for_exact_repository: true
   plugin_requires_repository_read_write_actions: true
   separate_read_only_github_app_is_not_plugin_capability_authority: true
-  paid_plan_alone_does_not_guarantee_plugin_capability: true
+  plan_alone_does_not_guarantee_plugin_capability: true
   readiness_capability_test: reversible_crud_readback
   explicit_github_invocation_is_dependable_execution_path: true
   custom_instructions_alone_do_not_prove_plugin_invocation: true
@@ -67,6 +72,8 @@ activation:
   blocked_reports_one_problem_one_action: true
   blocked_retry_command: "Retry setup."
   blocked_priority_order:
+    - supported_chatgpt_plan
+    - github_plugin_installation_authentication
     - exact_repository_access
     - private_visibility
     - required_write_actions
