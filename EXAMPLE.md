@@ -66,17 +66,23 @@ Selective persistence is the point.
 
 ## A later fresh chat
 
-Two weeks later the user opens a fresh ChatGPT conversation and says:
+Two weeks later the user opens a fresh ChatGPT conversation. The one-time repository-ID bootloader was installed during setup, so the user does **not** need to restate the repository ID, repository name, routing instructions, or `START_HERE.md`.
 
-> `@GitHub Use my operational memory repository ID <repository ID>. Resolve its current owner/name, then enter through START_HERE.md. Where were we on Northstar?`
+They can simply say:
 
-ChatGPT should resolve the same repository ID even if the user renamed the private repository since activation, enter through `START_HERE.md`, use `PROJECTS.md` to locate Northstar, and retrieve only the minimum current project authority.
+> `@GitHub where are we on Northstar?`
+
+The `@GitHub` invocation selects the GitHub capability. The installed bootloader supplies the durable repository identity and tells ChatGPT to enter through the repository's current front door whenever prior durable work can materially matter.
+
+ChatGPT should resolve the configured repository ID even if the user renamed the private repository since activation, enter through `START_HERE.md`, use `PROJECTS.md` to locate Northstar, and retrieve only the minimum current project authority.
 
 A useful response would look approximately like:
 
 > Northstar is targeting **January 15**. The earlier October launch decision is superseded. **Atlas** is the selected vendor. The March market-pricing baseline remains useful, but it is scheduled for recheck after **December 1**. The next obvious action is that pricing refresh.
 
 If the user then asks for new research, the stored working preference can also shape how the research is performed without overriding the user's current instruction.
+
+If the user did **not** install the optional bootloader, ChatGPT must not pretend it knows which repository to use. In that case the explicit repository-ID fallback in `SETUP.md` remains available.
 
 ## If the plan changes again
 
@@ -98,7 +104,7 @@ The intended interaction remains conversational:
 
 1. activate the private repository once;
 2. install the tiny repository-ID bootloader if automatic future routing is desired;
-3. talk normally;
+3. talk normally, using `@GitHub` when explicit repository invocation is useful;
 4. let ChatGPT route clear durable changes conservatively;
 5. return later and ask where things stand;
 6. inspect or correct the GitHub state whenever desired.
