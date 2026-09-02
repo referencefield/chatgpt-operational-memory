@@ -1,8 +1,6 @@
 name: Operational-memory protocol validation
 
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -28,7 +26,7 @@ jobs:
       - name: Validate protocol structure
         run: python tools/validate_protocol.py
 
-# This workflow is intentionally advisory.
-# PROTOCOL.yaml declares blocking_required_check: false, and the recommended
-# main-branch ruleset does not require this status check. A failure should be
-# investigated, but it does not prevent ordinary direct ChatGPT writes to main.
+# This workflow is intentionally advisory and does not run on every direct
+# operational-memory write. It runs for pull requests or when manually
+# dispatched. PROTOCOL.yaml declares blocking_required_check: false, and the
+# recommended main-branch ruleset does not require this status check.
