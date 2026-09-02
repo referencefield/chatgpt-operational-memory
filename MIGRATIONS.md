@@ -35,7 +35,7 @@ During this phase:
 - do not auto-migrate merely because the public template changed;
 - if a pre-release working copy still carries a URL/name-based ChatGPT bootloader, replace it with the repository-ID bootloader before the final release baseline is frozen.
 
-The first real protocol identifier should be assigned only when the release candidate is frozen.
+Acceptance candidates remain `protocol_version: "unreleased"`. The first real protocol identifier is assigned only after the acceptance gate passes, during the Gate 7 release transition.
 
 ## Update discovery
 
@@ -68,13 +68,50 @@ When a future release changes protocol structure or semantics:
 
 A working-repository rename by itself is not a protocol migration.
 
+## Pre-gate development state
+
+The acceptance gate is **not automatically active** merely because the repository is close to release, has passed a validator run, has undergone adversarial review, or appears architecturally complete.
+
+While `PROTOCOL.yaml` reports:
+
+`protocol_status: development`
+
+this repository is in active pre-release development. During that state:
+
+- substantive design, documentation, protocol, validator, and implementation changes are allowed;
+- validator runs, design reviews, smoke checks, and adversarial reviews are development evidence only and do not satisfy the acceptance gate unless a later gate step explicitly says otherwise;
+- no candidate commit SHA or tree SHA is frozen;
+- ordinary accepted changes do not “invalidate a candidate,” because no acceptance candidate exists yet;
+- do not describe the repository as being in acceptance testing, in release-candidate freeze, or as release-ready;
+- statements such as “getting close,” “almost ready,” or “we should test soon” do not activate the gate.
+
+### Entering acceptance
+
+Acceptance begins only after an explicit current instruction from the repository owner/maintainer authorizes starting the acceptance gate.
+
+To enter acceptance:
+
+1. finish the intended development changes that should precede testing;
+2. change `protocol_status` from `development` to `acceptance_candidate` as the deliberate lifecycle transition;
+3. merge that transition to canonical `main`;
+4. record the resulting `main` commit SHA and tree SHA as the Gate 1 candidate;
+5. from that recorded SHA forward, apply the freeze and restart rules below.
+
+The commit that establishes `protocol_status: acceptance_candidate` is the first commit eligible to become the frozen acceptance candidate. Do not freeze an earlier development commit and then mutate the manifest afterward.
+
+If testing exposes a defect or other accepted repository change, that candidate is invalid. The corrective change must restore `protocol_status: development` as part of returning to active development. After fixes are complete, acceptance requires another explicit entry decision and a new `acceptance_candidate` transition/freeze.
+
 ## Objective pre-release acceptance gate
+
+This section is dormant while `protocol_status: development`. It begins only through the explicit entry procedure above.
 
 Do not call the repository **done**, **release-ready**, or recommend stopping substantive review merely because an architecture/design sweep found no further improvements. Release readiness is established only by the evidence below against a frozen candidate.
 
 ### Gate 1 — Freeze candidate
 
-Record the candidate `main` commit SHA and tree SHA. From that point until the gate completes, do not make opportunistic improvements. Any accepted repository change invalidates the candidate and starts the gate again from a new frozen SHA.
+Verify `PROTOCOL.yaml` reports `protocol_status: acceptance_candidate`, then record the resulting canonical `main` commit SHA and tree SHA. That exact commit is the frozen candidate.
+
+From that point until the gate completes, do not make opportunistic improvements. Any accepted repository change invalidates the candidate, returns the repository to development for corrective work, and requires a later explicit re-entry with a new frozen SHA.
 
 ### Gate 2 — Deterministic repository checks
 
@@ -102,7 +139,7 @@ Using a fresh ChatGPT conversation and the documented Fast start only:
 6. rename the private repository;
 7. start another fresh conversation and verify the same repository ID resolves to the renamed repository, the state is recovered, and a verified write succeeds without changing the bootloader.
 
-Failure or user confusion is release evidence. Fix the smallest root cause, freeze a new candidate, and restart the gate.
+Failure or user confusion is release evidence. Fix the smallest root cause, return the public template to development, and re-enter acceptance later with a new frozen candidate.
 
 ### Gate 4 — Surface smoke tests
 
@@ -125,12 +162,15 @@ Do not accept or reject a finding merely because it agrees or disagrees with pri
 
 ### Gate 6 — Post-fix regression gate
 
-If Gates 2–5 caused any repository change:
+If Gates 2–5 identify any repository change that should be made:
 
-1. freeze the new candidate SHA/tree;
-2. rerun deterministic validation against that exact candidate;
-3. rerun the portions of the zero-reading/surface tests affected by the changes;
-4. rerun the independent audit as a regression/delta audit, explicitly checking accepted fixes for newly introduced failures.
+1. invalidate the current candidate and restore `protocol_status: development` as part of corrective work;
+2. make and verify the accepted fixes in development;
+3. explicitly authorize re-entry to acceptance and change `protocol_status` back to `acceptance_candidate`;
+4. freeze the resulting new canonical `main` SHA/tree;
+5. rerun deterministic validation against that exact candidate;
+6. rerun the portions of the zero-reading/surface tests affected by the changes;
+7. rerun the independent audit as a regression/delta audit, explicitly checking accepted fixes for newly introduced failures.
 
 The candidate passes only when there are **zero unresolved blockers**, every remaining warning is consciously classified, and no new material regression is found.
 
@@ -138,7 +178,7 @@ The candidate passes only when there are **zero unresolved blockers**, every rem
 
 Only after Gates 1–6 pass:
 
-- assign the first real protocol release identifier/status;
+- assign the first real protocol release identifier and set `protocol_status: released`;
 - execute the controlled one-time history cleanup if still desired;
 - restore and verify the intended public-repository protection/settings;
 - rerun deterministic validation against the final release tree;
@@ -173,7 +213,7 @@ Do not treat this as a requirement to erase every GitHub development artifact. P
 When the first public release is actually cut:
 
 1. freeze the release-candidate structure and behavior;
-2. replace `protocol_version: "unreleased"` with the chosen first real release identifier in `PROTOCOL.yaml` and set the appropriate released status there;
+2. replace `protocol_version: "unreleased"` with the chosen first real release identifier in `PROTOCOL.yaml` and set `protocol_status: released`;
 3. update the `PROTOCOL.yaml` `release_rule` from pre-release guidance to the released lifecycle rule;
 4. remove or replace pre-release-only wording explicitly in **`README.md` (Development status), `MIGRATIONS.md` (Current pre-release rule), and `AGENTS.md` (the public-template unreleased-version instruction)**, then sweep for any other remaining `unreleased` wording that would confuse a working copy created from the release;
 5. verify that setup/activation produces and uses the repository-ID bootloader and that a working-repository rename does not require bootloader changes;

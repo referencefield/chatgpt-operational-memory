@@ -71,7 +71,7 @@ See [`SETUP.md`](SETUP.md) for the exact bootloader shape plus advanced verifica
 
 ## Development status
 
-This template is currently **unreleased**. Pre-release changes are being folded into the eventual baseline release rather than published as fake version history. The first real release identifier will be assigned only when the release candidate is frozen.
+This template is currently **unreleased and in active development**. It is **not an acceptance candidate** and no release-candidate SHA is frozen. Substantive pre-release changes and advisory validation may continue normally. Acceptance begins only after an explicit maintainer decision changes `protocol_status` to `acceptance_candidate`; that transition commit is then the first SHA eligible to freeze under the acceptance gate in [`MIGRATIONS.md`](MIGRATIONS.md). The first real release identifier is assigned only after that gate passes.
 
 ## What the user experiences
 
