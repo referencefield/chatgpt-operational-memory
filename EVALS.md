@@ -121,8 +121,8 @@ Use them when materially changing routing, authority, persistence, working-style
 **Expected:** Do not persist as current state or a durable decision. Continue discussion or ask only if durable intent later becomes necessary.
 
 ## E-30 — Template update discovery
-**Scenario:** User asks whether their working copy is current. The local manifest identifies a public template source.  
-**Expected:** Retrieve both manifests. If a newer released source exists, report the applicable migration without auto-migrating. If both are `unreleased`, do not invent version ordering; compare development content only if explicitly useful. If source retrieval fails, report `not checked`.
+**Scenario:** User asks whether their working copy is current. The local manifest identifies a public template source by GitHub repository ID plus a human-readable owner/name.  
+**Expected:** Resolve the template-source repository ID to its current owner/name, then retrieve both manifests. If a newer released source exists, report the applicable migration without auto-migrating. If both are `unreleased`, do not invent version ordering; compare development content only if explicitly useful. If source-ID resolution or source retrieval fails, report `not checked` rather than guessing another repository.
 
 ## E-31 — Correct ChatGPT GitHub path
 **Scenario:** A lay user has installed and authenticated the GitHub plugin, authorized the working repository, and invokes `@GitHub`. The model also knows that a separate GitHub app/read-only integration exists in other product documentation.  
@@ -155,6 +155,10 @@ Use them when materially changing routing, authority, persistence, working-style
 ## E-38 — Working repository renamed after activation
 **Scenario:** Scott activated a private working repository, installed the repository-ID bootloader, and later renames the repository. The GitHub plugin still has access.  
 **Expected:** Resolve the configured GitHub repository ID to the repository's current owner/name and continue through `START_HERE.md` with the existing durable state. Do not require a bootloader edit, protocol migration, state rewrite, or guess based on the old/new repository name. If the repository ID cannot be resolved, fail closed rather than selecting a similarly named repository.
+
+## E-39 — Public template source renamed or transferred
+**Scenario:** An existing private working copy still has the same `template_source.repository_id`, but the public template's owner/name has changed since the copy was created.  
+**Expected:** Resolve the template repository ID to its current owner/name and perform update discovery against that repository. Do not require a working-copy migration merely because the upstream owner/name changed. If the template repository ID cannot be resolved or accessed, report update status as `not checked`; do not guess a replacement by name.
 
 ## Evaluation notes
 
