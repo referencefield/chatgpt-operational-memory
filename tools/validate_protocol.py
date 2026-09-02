@@ -24,6 +24,16 @@ ERRORS: list[str] = []
 WARNINGS: list[str] = []
 LEGACY_REPOSITORY_SLUG = "chatgpt" + "-operational-memory"
 LEGACY_PROJECT_NAME = "ChatGPT" + " Operational Memory"
+REMOVED_END_SESSION_TERMS = (
+    "close" + "out",
+    "close " + "out operational memory",
+    "closing " + "out an important session",
+)
+AMBIGUOUS_SUPPORT_TERMS = (
+    "paid chatgpt " + "plan",
+    "paid chatgpt " + "account",
+)
+TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".py"}
 
 
 def error(message: str) -> None:
@@ -46,6 +56,14 @@ def read_text(path: Path) -> str:
         return path.read_text(encoding="utf-8")
     except FileNotFoundError:
         return ""
+
+
+def text_files() -> Iterable[Path]:
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or ".git" in path.parts:
+            continue
+        if path.suffix.lower() in TEXT_SUFFIXES:
+            yield path
 
 
 def ids_in(text: str, prefix: str) -> list[str]:
@@ -178,12 +196,7 @@ def check_legacy_project_naming() -> None:
         "template_name=" + LEGACY_REPOSITORY_SLUG,
         LEGACY_PROJECT_NAME,
     )
-    text_suffixes = {".md", ".yaml", ".yml", ".py"}
-    for path in ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
-            continue
-        if path.suffix.lower() not in text_suffixes:
-            continue
+    for path in text_files():
         text = read_text(path)
         for term in forbidden:
             if term in text:
@@ -191,6 +204,19 @@ def check_legacy_project_naming() -> None:
                     f"legacy project/repository naming remains in {path.relative_to(ROOT)}"
                 )
                 break
+
+
+def check_removed_or_ambiguous_product_wording() -> None:
+    for path in text_files():
+        text = read_text(path).lower()
+        if any(term in text for term in REMOVED_END_SESSION_TERMS):
+            error(
+                f"removed end-of-session workflow wording remains in {path.relative_to(ROOT)}"
+            )
+        if any(term in text for term in AMBIGUOUS_SUPPORT_TERMS):
+            error(
+                f"ambiguous ChatGPT support-plan wording remains in {path.relative_to(ROOT)}"
+            )
 
 
 def load_manifest() -> dict:
@@ -236,6 +262,7 @@ def main() -> int:
         return 1
 
     check_legacy_project_naming()
+    check_removed_or_ambiguous_product_wording()
 
     version = str(manifest.get("protocol_version", "")).strip()
     if not version:
@@ -313,10 +340,35 @@ def main() -> int:
         require_file(str(path), f"human_docs.{key}")
 
     compatibility = manifest.get("compatibility", {}) or {}
-    if compatibility.get("required_chatgpt_plugin") != "GitHub":
-        error("PROTOCOL.yaml compatibility.required_chatgpt_plugin must be GitHub")
-    if compatibility.get("plugin_invocation") != "@GitHub":
-        error("PROTOCOL.yaml compatibility.plugin_invocation must be @GitHub")
+    compatibility_expected = {
+        "minimum_supported_chatgpt_plan": "plus",
+        "free_chatgpt_plan_supported": False,
+        "go_chatgpt_plan_supported": False,
+        "higher_paid_plans_supported_when_required_github_capability_available": True,
+        "required_chatgpt_plugin": "GitHub",
+        "plugin_invocation": "@GitHub",
+        "plugin_must_be_installed_or_selected": True,
+        "plugin_must_be_authenticated": True,
+        "plugin_must_be_authorized_for_exact_repository": True,
+        "plugin_requires_repository_read_write_actions": True,
+        "plan_alone_does_not_guarantee_plugin_capability": True,
+    }
+    for key, expected in compatibility_expected.items():
+        if compatibility.get(key) != expected:
+            error(f"PROTOCOL.yaml compatibility.{key} must be {expected!r}")
+
+    activation = manifest.get("activation", {}) or {}
+    blocked_priority = list(activation.get("blocked_priority_order", []))
+    expected_priority_prefix = [
+        "supported_chatgpt_plan",
+        "github_plugin_installation_authentication",
+    ]
+    if blocked_priority[:2] != expected_priority_prefix:
+        error(
+            "PROTOCOL.yaml activation.blocked_priority_order must begin with "
+            "supported_chatgpt_plan then github_plugin_installation_authentication"
+        )
+
     codex_bootloader = compatibility.get("codex_bootloader")
     if not codex_bootloader:
         error("PROTOCOL.yaml compatibility.codex_bootloader is missing")
