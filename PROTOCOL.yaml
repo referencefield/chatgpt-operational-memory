@@ -1,0 +1,62 @@
+protocol_version: "1.0"
+protocol_status: active
+canonical_branch: main
+front_door: START_HERE.md
+
+human_docs:
+  readme: README.md
+  setup: SETUP.md
+  operations: OPERATIONS.md
+  security: SECURITY.md
+  migrations: MIGRATIONS.md
+  evals: EVALS.md
+
+global:
+  current: CURRENT.md
+  decisions: DECISIONS.md
+  knowledge: KNOWLEDGE.md
+  working_style: WORKING_STYLE.md
+  projects: PROJECTS.md
+
+projects:
+  root: projects
+  template: projects/_TEMPLATE
+  front_door: PROJECT.md
+  required_files:
+    - PROJECT.md
+    - CURRENT.md
+    - DECISIONS.md
+    - KNOWLEDGE.md
+
+validation:
+  mode: advisory
+  script: tools/validate_protocol.py
+  workflow: .github/workflows/protocol-validation.yml
+  blocking_required_check: false
+
+persistence:
+  route_before_write: true
+  prefer_existing_source_of_record: true
+  unindexed_durable_files_allowed: false
+  multi_file_changes_use_write_set: true
+  verify_postcondition_after_write_set: true
+
+soft_budgets:
+  # Warning indicators only. Crossing one means inspect structure, not delete content.
+  START_HERE.md_bytes: 14000
+  CURRENT.md_bytes: 7000
+  PROJECT.md_bytes: 9000
+  project_CURRENT.md_bytes: 7000
+  active_decisions_per_scope: 30
+  active_knowledge_per_scope: 40
+  active_working_style_entries: 20
+
+lifecycle:
+  knowledge_review_field: "Review after"
+  working_style_review_field: "Review after"
+  budget_status_when_crossed: Watch
+
+custom_instruction_role: bootloader
+custom_instruction_rule: >-
+  Persistent ChatGPT instructions identify the repository, require retrieval of START_HERE.md
+  when durable context matters, and require visible failure. Runtime protocol details live in the repository.
