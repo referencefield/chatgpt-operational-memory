@@ -204,13 +204,13 @@ Only after Gates 1–6 pass:
 - assign the first real protocol release identifier and set `protocol_status: released`;
 - replace the **pre-first-release bootstrap lifecycle** in `PROTOCOL.yaml`, `AGENTS.md`, and `tools/validate_protocol.py` with a post-release lifecycle that can represent the last/current released protocol and a future development/acceptance target without reverting a released protocol ambiguously to `unreleased`; define and validate that transition before tagging the first release;
 - publish the compact Gate 2B qualifying behavioral summary from the external acceptance evidence record into `EVAL_RESULTS.md`, rerunning and updating any scenarios materially affected by the prescribed release/lifecycle transition;
-- execute the controlled one-time history cleanup if still desired;
+- verify the pre-acceptance clean baseline remains intact; no additional history rewrite is part of Gate 7;
 - restore and verify the intended public-repository protection/settings;
 - rerun validator regression self-tests and deterministic validation against the final release tree;
 - tag/publish the release;
 - create one final private copy using **Use this template** and repeat the activation smoke test against what GitHub actually ships.
 
-The prescribed release/version/lifecycle/evidence/history changes in Gate 7 are the release transition after the frozen candidate has passed; they are not an acceptance-candidate defect that sends the repository back through Gate 6. Any unrelated or opportunistic change discovered during Gate 7 still invalidates the release transition and must be handled through the normal corrective path.
+The prescribed release/version/lifecycle/evidence changes in Gate 7 are the release transition after the frozen candidate has passed; they are not an acceptance-candidate defect that sends the repository back through Gate 6. Any unrelated or opportunistic change discovered during Gate 7 still invalidates the release transition and must be handled through the normal corrective path.
 
 That final private-copy activation is the release artifact check. A successful test against the source repository alone is not sufficient.
 
@@ -218,22 +218,11 @@ That final private-copy activation is the release artifact check. A successful t
 
 After the gate passes, new suggestions do not automatically reopen the release. Reopen only for a reproducible blocker, material regression, security/privacy defect, false product claim, or a change that clearly exceeds the agreed diminishing-returns threshold. Other improvements become post-release candidates.
 
-## One-time pre-release history cleanup
+## Pre-release clean baseline
 
-The public repository currently uses lightweight `main` protection that blocks deletion and non-fast-forward updates. A final pre-release history reset/squash is therefore a deliberate maintenance exception, not a normal operational-memory action.
+The one-time public-history reset was completed before acceptance began. It established a clean parentless public baseline while preserving the intended repository tree, after which normal protected development may continue with ordinary commits.
 
-When the release candidate is ready for its one-time clean baseline:
-
-1. freeze and validate the complete intended release tree, including the real release identifier/status;
-2. record the pre-rewrite `main` commit SHA and tree SHA, and keep an independent local clone/archive if recovery from the development history would be costly;
-3. verify that no non-`main` branch contains work that must survive into the release tree;
-4. temporarily suspend only the protection necessary to permit the planned non-fast-forward rewrite; if the ruleset cannot be narrowed, disable it only for the controlled rewrite window;
-5. create/repoint `main` to the clean release-baseline commit whose tree matches the frozen intended release tree;
-6. immediately restore the normal `main` protection before any unrelated repository work;
-7. verify the expected `main` commit/tree, protection rules, branch set, repository visibility/settings, and structural validator result;
-8. create the public release/tag only after those postconditions hold.
-
-Do not treat this as a requirement to erase every GitHub development artifact. Pull-request records, workflow metadata, and other ordinary public-development traces may remain. The release objective is a clean canonical release history and verified release tree, not a claim that development never happened.
+Do not repeat history rewriting merely to return the repository to a one-commit count. Pull-request records, workflow metadata, and other ordinary public-development traces may remain. Gate 7 verifies repository protection/settings and the final release tree; it does not perform another history rewrite.
 
 ## Final-release checklist
 
@@ -249,7 +238,7 @@ When the first public release is actually cut:
 8. run validator regression self-tests, deterministic structural validation, and the semantic repository health check;
 9. publish the Gate 2B behavioral summary into `EVAL_RESULTS.md` and confirm the evidence remains applicable to the release tree, rerunning any behavioral/adversarial scenarios affected by the prescribed Gate 7 lifecycle/release transition;
 10. verify README/SETUP/START_HERE/OPERATIONS/SECURITY/MIGRATIONS all describe the same release behavior;
-11. perform the controlled one-time history cleanup above if a clean release baseline is still desired;
+11. verify the pre-acceptance clean baseline history has not been rewritten again and intended protection/settings are active;
 12. only then treat the public template as the migration source for user-created copies.
 
 ## Future release entries
