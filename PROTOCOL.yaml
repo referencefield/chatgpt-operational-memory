@@ -1,0 +1,228 @@
+protocol_version: "unreleased"
+protocol_status: development
+canonical_branch: main
+front_door: START_HERE.md
+
+template_source:
+  repository_id: 1354330020
+  repository: referencefield/operational-memory
+  owner_name_runtime_resolved: true
+  repository_name_part_of_protocol: false
+  unresolved_repository_id_fails_closed: true
+  manifest: PROTOCOL.yaml
+  role: public_update_source_only
+  check_on_request: true
+  include_in_health_check_when_reachable: true
+  auto_migrate: false
+
+working_repository:
+  identity: github_repository_id
+  owner_name_runtime_resolved: true
+  repository_name_part_of_protocol: false
+  rename_supported: true
+  rename_requires_internal_migration: false
+  bootloader_uses_repository_id: true
+  rename_requires_bootloader_refresh: false
+  unresolved_repository_id_fails_closed: true
+
+compatibility:
+  primary_surface: chatgpt
+  minimum_supported_chatgpt_plan: plus
+  free_chatgpt_plan_supported: false
+  go_chatgpt_plan_supported: false
+  higher_paid_plans_supported_when_required_github_capability_available: true
+  required_chatgpt_plugin: GitHub
+  plugin_invocation: "@GitHub"
+  plugin_must_be_installed_or_selected: true
+  plugin_must_be_authenticated: true
+  plugin_must_be_authorized_for_exact_repository: true
+  plugin_requires_repository_read_write_actions: true
+  separate_read_only_github_app_is_not_plugin_capability_authority: true
+  plan_alone_does_not_guarantee_plugin_capability: true
+  readiness_capability_test: reversible_crud_readback
+  explicit_github_invocation_is_dependable_execution_path: true
+  custom_instructions_alone_do_not_prove_plugin_invocation: true
+  codex_bootloader: AGENTS.md
+  chatgpt_work_uses_same_front_door: true
+  other_models_require_equivalent_github_read_write_and_persistent_bootloader: true
+
+activation:
+  beginner_flow: create_connect_activate
+  beginner_meaningful_decisions_before_ready_max: 3
+  trigger_intents:
+    - set up operational memory
+    - retry setup
+    - activate operational memory
+    - initialize operational memory
+    - wake up operational memory
+    - start using operational memory
+  requires_exact_repository: true
+  resolve_repository_id: true
+  require_private_working_copy: true
+  reversible_crud_diagnostic: true
+  diagnostic_file: SETUP-TEST.md
+  create_durable_state_on_activation: false
+  idempotent: true
+  activation_receipt_required: true
+  receipt_includes_repository_id: false
+  bootloader_contains_repository_id: true
+  user_need_not_understand_repository_id: true
+  ready_label: "Operational memory: READY"
+  blocked_label: "Operational memory: BLOCKED"
+  blocked_reports_one_problem_one_action: true
+  blocked_retry_command: "Retry setup."
+  blocked_priority_order:
+    - supported_chatgpt_plan
+    - github_plugin_installation_authentication
+    - exact_repository_access
+    - private_visibility
+    - required_write_actions
+    - write_readback_verification
+    - diagnostic_cleanup
+    - protocol_structure
+  normal_setup_command: "@GitHub Set up operational memory from <repository URL>."
+  configured_normal_entry: "@GitHub Use my operational memory."
+  explicit_future_fallback: "@GitHub Use operational memory from <repository URL>."
+  user_need_not_name_front_door_or_resolution_steps: true
+  ready_custom_instructions_install_required: true
+  ready_custom_instructions_position: top
+  ready_custom_instructions_preserve_existing: true
+  ready_custom_instructions_web_desktop_path: "Settings > Personalization > Custom Instructions"
+  ready_custom_instructions_mobile_path: "Settings > Customize ChatGPT > Custom Instructions"
+
+human_docs:
+  readme: README.md
+  what_to_expect: WHAT_TO_EXPECT.md
+  setup: SETUP.md
+  example: EXAMPLE.md
+  operations: OPERATIONS.md
+  security: SECURITY.md
+  disclaimer: DISCLAIMER.md
+  migrations: MIGRATIONS.md
+  evals: EVALS.md
+  eval_results: EVAL_RESULTS.md
+  contributing: CONTRIBUTING.md
+
+global:
+  current: CURRENT.md
+  decisions: DECISIONS.md
+  knowledge: KNOWLEDGE.md
+  working_style: WORKING_STYLE.md
+  projects: PROJECTS.md
+
+collaboration:
+  companion: COMPANION.md
+  companion_mode: fallback
+  companion_is_not_state_authority: true
+  no_assumed_companion_name_or_identity: true
+  existing_user_companion_or_persona_wins_for_identity_style: true
+  never_overwrite_user_companion_or_custom_instructions: true
+  working_style_calibrates_companion_when_non_conflicting: true
+  load_companion_only_when_collaboration_behavior_matters: true
+
+projects:
+  root: projects
+  template: projects/_TEMPLATE
+  front_door: PROJECT.md
+  required_files:
+    - PROJECT.md
+    - CURRENT.md
+    - DECISIONS.md
+    - KNOWLEDGE.md
+
+cross_repository:
+  linked_repositories_allowed: true
+  registration_scope: project_front_door
+  identity: github_repository_id
+  role_required: true
+  authority_required: true
+  owner_name_runtime_resolved: true
+  register_only_when_ongoing_work_requires: true
+  unrelated_repositories_need_not_be_registered: true
+  registration_is_not_access_authorization: true
+  resolve_only_when_task_requires: true
+  unresolved_repository_id_fails_closed: true
+  similar_name_substitution_forbidden: true
+  operational_memory_owns_cross_repository_context: true
+  linked_repository_owns_declared_canonical_role: true
+  avoid_duplicate_canonical_content: true
+
+validation:
+  mode: advisory
+  script: tools/validate_protocol.py
+  workflow: .github/workflows/protocol-validation.yml
+  runs_on_pull_request: true
+  runs_on_main_push: true
+  manual_dispatch_available: true
+  main_push_is_post_write_integrity_check: true
+  immediate_persistence_claim_depends_on_readback_not_ci: true
+  blocking_required_check: false
+
+release_lifecycle:
+  allowed_protocol_statuses:
+    - development
+    - acceptance_candidate
+    - released
+  development_status: development
+  acceptance_candidate_status: acceptance_candidate
+  released_status: released
+  initial_acceptance_entry_requires_explicit_user_authorization: true
+  corrective_reentry_reuses_active_acceptance_authorization: true
+  development_allows_substantive_changes: true
+  development_validation_is_advisory: true
+  development_has_frozen_candidate: false
+  acceptance_transition_commit_is_first_freeze_eligible_candidate: true
+  candidate_mutation_invalidates_gate: true
+  corrective_change_requires_development_status: true
+  release_requires_acceptance_gate_pass: true
+
+persistence:
+  route_before_write: true
+  prefer_existing_source_of_record: true
+  unindexed_durable_files_allowed: false
+  multi_file_changes_use_write_set: true
+  verify_postcondition_after_write_set: true
+  conservative_persistence_watch: true
+  inferred_durable_intent_requires_confirmation: true
+  sensitive_persistence_requires_confirmation: true
+  bootloader_wakes_for_prior_durable_relevance: true
+  bootloader_wakes_for_new_future_governing_state: true
+  plugin_invocation_required_before_claiming_repository_persistence: true
+
+maintenance:
+  canonical_branch_only_steady_state: true
+  branch_cleanup_fail_closed: true
+  commit_ancestry_alone_proves_incorporation: false
+  verify_canonical_head_after_cleanup: true
+
+soft_budgets:
+  # Warning indicators only. Crossing one means inspect structure, not delete content.
+  START_HERE.md_bytes: 10000
+  CURRENT.md_bytes: 7000
+  PROJECT.md_bytes: 9000
+  project_CURRENT.md_bytes: 7000
+  active_decisions_per_scope: 30
+  active_knowledge_per_scope: 40
+  active_working_style_entries: 20
+
+lifecycle:
+  knowledge_review_field: "Review after"
+  working_style_review_field: "Review after"
+  budget_status_when_crossed: Watch
+
+custom_instruction_role: bootloader
+custom_instruction_template: >-
+  Operational Memory: I use GitHub repository ID `<ID>` for durable operational memory. When prior durable state could affect the task, or this conversation creates/changes clear future-governing state, use `@GitHub`, resolve this ID to its current repository, and follow `START_HERE.md`. Do not claim retrieval or persistence unless GitHub actions actually ran and writes were verified. If the ID cannot resolve or a write cannot be verified, say so; never guess another repository.
+custom_instruction_rule: >-
+  Activation substitutes the verified repository ID into custom_instruction_template and gives the completed block to the user. The user pastes it at the top of Custom Instructions without replacing existing instructions. The user is not required to understand or manually manage the ID. The instruction is a trigger and identity carrier, not proof that the plugin ran.
+
+release_rule: >-
+  During active pre-release work keep protocol_version set to unreleased. While protocol_status is
+  development, no acceptance candidate is frozen and development validation remains advisory. Initial
+  entry into acceptance_candidate from ordinary development requires explicit user authorization; the
+  transition commit is the first SHA eligible to freeze under MIGRATIONS.md. Any accepted repository
+  change after freeze invalidates that candidate and corrective work must restore protocol_status to
+  development. Corrective re-entry may reuse an acceptance authorization that remains in force; a new
+  authorization is required only after the gate is stopped/revoked or work returns to a new substantive
+  development phase. After the acceptance gate passes, assign the first real release identifier and set
+  protocol_status to released.

@@ -1,0 +1,27 @@
+title: "[General] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use General for open-ended conversation about Operational Memory that does not fit Q&A, Ideas, or Show and tell.
+        Do not post secrets, credentials, private repository contents, or sensitive personal information.
+  - type: textarea
+    id: topic
+    attributes:
+      label: What would you like to discuss?
+      description: Give enough context for other users to understand the topic.
+      placeholder: Tell us what you are thinking about or trying to understand.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface are you using?
+      options:
+        - ChatGPT Chat
+        - ChatGPT Work
+        - Codex
+        - More than one
+        - Other / not sure
+    validations:
+      required: false
