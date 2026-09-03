@@ -249,7 +249,7 @@ Two different test surfaces are included:
 - `tools/validate_protocol.py` checks machine-verifiable structural invariants and soft warning budgets.
 - `EVALS.md` defines adversarial scenarios for model-mediated behavior, including routing, authority, false retrieval/write claims, over-persistence, activation, GitHub surface selection, onboarding failure recovery, late-conversation persistence activation, repository identity/rename behavior, cross-repository authority/permission behavior, companion precedence, working-style safety, compatibility, and maintenance failures.
 
-The included GitHub Actions workflow is advisory and intentionally does not run on every direct operational-memory write. It runs for pull requests or when manually dispatched. Runtime write/readback verification protects individual operational writes; the structural validator protects releases, PRs, maintenance, and explicit health checks.
+The included GitHub Actions workflow is advisory. In a derived working copy it runs after every push to canonical `main` (including normal Operational Memory writes), for pull requests, or when manually dispatched. Each run checks out the repository on a GitHub-hosted runner with `contents: read`, installs pinned `PyYAML==6.0.2`, runs validator regression self-tests and structural validation, and does not replace the immediate write/readback verification required before claiming persistence.
 
 `EVAL_RESULTS.md` is the results ledger. It deliberately distinguishes a structural validator PASS from behavioral evidence. No qualifying independent behavioral run is claimed until one is actually performed.
 
